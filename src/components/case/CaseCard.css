@@ -1,0 +1,103 @@
+.case-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.case-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.case-category-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-700);
+  background-color: var(--accent-50);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--accent-100);
+}
+
+.case-card-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  line-height: 1.35;
+}
+
+.case-card-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.case-next-action-box {
+  background-color: var(--warning-50);
+  border-left: 3px solid var(--warning-500);
+  padding: 8px 12px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: var(--space-4);
+}
+
+.next-action-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+}
+
+.next-action-icon {
+  color: var(--warning-600);
+}
+
+.next-action-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--warning-700);
+}
+
+.next-action-text {
+  font-size: 0.8125rem;
+  color: var(--warning-700);
+  font-weight: 500;
+}
+
+.case-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.case-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.case-deadline-badge {
+  color: var(--danger-600);
+  font-weight: 600;
+  background-color: var(--danger-50);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.case-card-footer {
+  margin-top: var(--space-4);
+}

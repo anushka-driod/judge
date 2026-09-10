@@ -1,0 +1,465 @@
+.consultation-booking-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.booking-page-header {
+  margin-bottom: var(--space-2);
+}
+
+.booking-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.booking-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.booking-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.booking-form-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.booking-step-card {
+  padding: var(--space-6);
+}
+
+.step-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background-color: var(--accent-600);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.modes-selection-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mode-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.mode-card:hover {
+  border-color: var(--accent-500);
+  background-color: var(--accent-50);
+}
+
+.mode-card-selected {
+  border-color: var(--accent-600);
+  background-color: var(--accent-50);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.mode-radio-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  color: var(--accent-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.mode-name {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  display: block;
+}
+
+.mode-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.mode-check {
+  margin-left: auto;
+  color: var(--accent-600);
+}
+
+.date-picker-row {
+  margin-bottom: var(--space-4);
+}
+
+.slots-picker-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.slots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.slot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  background-color: var(--bg-surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.slot-chip:hover {
+  border-color: var(--accent-600);
+  color: var(--accent-600);
+}
+
+.slot-chip-selected {
+  background-color: var(--accent-600);
+  border-color: var(--accent-600);
+  color: #ffffff;
+}
+
+.slot-chip-selected:hover {
+  color: #ffffff;
+}
+
+.booking-summary-col {
+  position: sticky;
+  top: calc(var(--navbar-height) + 24px);
+}
+
+.booking-summary-card {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.lawyer-summary-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px;
+  background-color: var(--bg-surface-subtle);
+  border-radius: var(--radius-md);
+}
+
+.summary-lawyer-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.summary-lawyer-name {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  display: block;
+}
+
+.summary-lawyer-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.summary-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  padding: var(--space-3) 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.summary-total-row {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 4px;
+}
+
+.summary-total-price {
+  font-size: 1.375rem;
+  color: var(--accent-700);
+  font-family: var(--font-heading);
+}
+
+.summary-payment-terms {
+  background-color: var(--success-50);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  color: var(--success-700);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Confirmation Page */
+.consultation-confirmed-page {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-6) 0;
+}
+
+.confirmed-card-wrapper {
+  width: 100%;
+  max-width: 680px;
+}
+
+.confirmed-main-card {
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.confirmed-top-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.confirmed-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background-color: var(--success-100);
+  color: var(--success-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.confirmed-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.confirmed-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.confirmed-details-box {
+  background-color: var(--bg-surface-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.confirmed-lawyer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.lawyer-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+}
+
+.confirmed-lawyer-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.confirmed-court-text {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.confirmed-fee-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.confirmed-fee-pill span {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.confirmed-fee-pill strong {
+  font-size: 1.25rem;
+  color: var(--accent-700);
+  font-family: var(--font-heading);
+}
+
+.confirmed-schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.schedule-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--bg-surface);
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+.sched-icon {
+  color: var(--accent-600);
+  flex-shrink: 0;
+}
+
+.sched-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.sched-val {
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+}
+
+.meeting-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--accent-50);
+  border: 1px solid var(--accent-100);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  gap: var(--space-3);
+}
+
+.meeting-link-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.video-link-icon {
+  color: var(--accent-600);
+  flex-shrink: 0;
+}
+
+.meeting-link-left strong {
+  font-size: 0.875rem;
+  color: var(--accent-700);
+  display: block;
+}
+
+.meeting-link-left p {
+  font-size: 0.75rem;
+  color: var(--accent-600);
+}
+
+.join-meeting-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  background-color: var(--accent-600);
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.consult-instructions-card {
+  background-color: var(--warning-50);
+  border: 1px solid var(--warning-100);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.instructions-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--warning-700);
+  margin-bottom: 6px;
+}
+
+.instructions-list {
+  padding-left: 20px;
+  font-size: 0.8125rem;
+  color: var(--warning-700);
+  line-height: 1.5;
+}
+
+.confirmed-actions-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 800px) {
+  .booking-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .confirmed-schedule-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,77 @@
+.new-case-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.page-header {
+  margin-bottom: var(--space-2);
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.page-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  max-width: 720px;
+}
+
+.new-case-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.new-case-card {
+  padding: var(--space-6);
+}
+
+.docs-upload-section {
+  margin: var(--space-4) 0;
+}
+
+.form-submit-row {
+  margin-top: var(--space-6);
+}
+
+.guide-box-card {
+  padding: var(--space-6);
+  background-color: var(--bg-surface-subtle);
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.guide-icon {
+  color: var(--accent-600);
+}
+
+.guide-bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-left: var(--space-4);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.guide-bullet-list strong {
+  color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+  .new-case-layout {
+    grid-template-columns: 1fr;
+  }
+}

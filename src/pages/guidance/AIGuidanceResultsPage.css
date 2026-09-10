@@ -1,0 +1,429 @@
+.guidance-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.guidance-header-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.guidance-category-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.case-id-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.case-category-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--accent-50);
+  color: var(--accent-700);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--accent-100);
+}
+
+.guidance-case-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: var(--space-1);
+}
+
+.guidance-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.guidance-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.guidance-breakdown-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.guidance-section-card {
+  padding: var(--space-6);
+}
+
+.section-title-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.section-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background-color: var(--primary-100);
+  color: var(--primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-findings { background-color: var(--accent-100); color: var(--accent-700); }
+.icon-laws { background-color: var(--info-100); color: var(--info-700); }
+.icon-precedents { background-color: var(--accent-100); color: var(--accent-700); }
+.icon-docs { background-color: var(--warning-100); color: var(--warning-700); }
+
+.section-heading {
+  font-size: 1.1875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-sub {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.understood-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.jurisdiction-box {
+  margin-top: var(--space-4);
+  background-color: var(--bg-surface-subtle);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.guidance-findings-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.guidance-findings-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.finding-bullet-icon {
+  color: var(--accent-600);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* Laws list */
+.laws-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.law-item-card {
+  background-color: var(--bg-surface-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.law-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 4px;
+}
+
+.law-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: var(--info-100);
+  color: var(--info-700);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.law-title-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.law-plain-meaning {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.law-remedy-box {
+  margin-top: var(--space-3);
+  padding: 8px 12px;
+  background-color: var(--success-50);
+  border-left: 3px solid var(--success-600);
+  font-size: 0.8125rem;
+  color: var(--success-700);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.section-bottom-link {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+}
+
+.text-link-btn {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent-600);
+}
+
+/* Precedents list */
+.precedents-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.precedent-item-card {
+  background-color: var(--bg-surface-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.precedent-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.precedent-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.precedent-similarity {
+  background-color: var(--success-100);
+  color: var(--success-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.precedent-court-citation {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.precedent-verdict {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.precedent-takeaway {
+  font-size: 0.875rem;
+  color: var(--accent-700);
+  background-color: var(--accent-50);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  line-height: 1.45;
+}
+
+.view-judgment-btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent-600);
+  margin-top: 4px;
+}
+
+/* Useful docs chips */
+.useful-docs-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.useful-doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-surface-subtle);
+  border: 1px solid var(--border-light);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.useful-doc-icon {
+  color: var(--accent-600);
+}
+
+/* Right Column Decision Box */
+.guidance-decision-col {
+  position: sticky;
+  top: calc(var(--navbar-height) + 24px);
+}
+
+.decision-sticky-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.decision-box-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.decision-box-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.decision-card {
+  background-color: var(--bg-surface);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.decision-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.self-help-card {
+  border-color: var(--success-500);
+}
+
+.lawyer-card {
+  border-color: var(--accent-500);
+}
+
+.decision-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background-color: var(--success-600);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.badge-premium {
+  background-color: var(--accent-600);
+}
+
+.decision-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.decision-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-selfhelp {
+  background-color: var(--success-100);
+  color: var(--success-700);
+}
+
+.icon-lawyer {
+  background-color: var(--accent-100);
+  color: var(--accent-700);
+}
+
+.decision-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.decision-cost {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.decision-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.decision-features {
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--space-2);
+}
+
+@media (max-width: 960px) {
+  .guidance-content-grid {
+    grid-template-columns: 1fr;
+  }
+  .guidance-decision-col {
+    position: static;
+  }
+}
