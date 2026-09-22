@@ -1,6 +1,9 @@
 import { request } from './api';
 import { mockCurrentUser } from '../data/mockData';
 
+// Ephemeral OTP store for mock fallback mode (keyed by email)
+const mockOtpStorage = new Map();
+
 export const authService = {
   /**
    * Log in an existing user with email/phone & password.
@@ -17,9 +20,11 @@ export const authService = {
         // Local mock fallback
         if (!emailOrPhone) throw new Error('Please enter your email or phone number');
         if (emailOrPhone === 'unverified@example.com') {
+          const generatedOtp = '582914';
+          mockOtpStorage.set(emailOrPhone.toLowerCase(), generatedOtp);
           const err = new Error('Please verify your email before continuing.');
           err.status = 403;
-          err.data = { requiresVerification: true, email: emailOrPhone, otpPreview: '582914' };
+          err.data = { requiresVerification: true, email: emailOrPhone, otpPreview: generatedOtp };
           throw err;
         }
 
@@ -57,12 +62,16 @@ export const authService = {
         body: JSON.stringify(userData),
       },
       () => {
-        // Fallback mock
+        // Fallback mock: generate a realistic 6-digit OTP and store it
+        const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        const normEmail = (userData.email || '').toLowerCase().trim();
+        mockOtpStorage.set(normEmail, generatedOtp);
+
         return {
           success: true,
           email: userData.email,
           accountType: userData.accountType || 'candidate',
-          otpPreview: '123456',
+          otpPreview: generatedOtp,
           message: 'Account created! Verification code sent to your email.',
         };
       }
@@ -80,10 +89,17 @@ export const authService = {
         body: JSON.stringify({ email, otp }),
       },
       () => {
-        // Fallback mock
-        if (otp !== '123456' && otp !== '582914') {
+        // Fallback mock: strictly validate against the actual OTP stored for this email
+        const normEmail = (email || '').toLowerCase().trim();
+        const expectedOtp = mockOtpStorage.get(normEmail);
+
+        if (!expectedOtp || String(otp).trim() !== String(expectedOtp).trim()) {
           throw new Error('Invalid verification code. Please check and try again.');
         }
+
+        // Clean up OTP on success
+        mockOtpStorage.delete(normEmail);
+
         const user = {
           ...mockCurrentUser,
           email,
@@ -106,19 +122,75 @@ export const authService = {
   /**
    * Resend 6-digit OTP verification code with rate limit countdown.
    */
-  async resendOtp(email) {
+  async resendOtp(emailOrPhone) {
+    const payload = typeof emailOrPhone === 'string'
+      ? (emailOrPhone.includes('@') ? { email: emailOrPhone } : { phone: emailOrPhone })
+      : emailOrPhone;
     return request(
       '/auth/resend-otp',
       {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(payload),
       },
-      () => ({
-        success: true,
-        otpPreview: '123456',
-        message: 'A new 6-digit verification code has been sent.',
-      })
+      () => {
+        return {
+          success: true,
+          message: 'A new 6-digit verification code has been sent.',
+        };
+      }
     );
+  },
+
+  /**
+   * Send 6-digit OTP to mobile phone or email
+   */
+  async sendOtp(phoneOrData) {
+    const payload = typeof phoneOrData === 'string' ? { phone: phoneOrData } : phoneOrData;
+    return request(
+      '/auth/send-otp',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      () => {
+        return {
+          success: true,
+          maskedPhone: payload.phone ? `+91 ******${payload.phone.slice(-4)}` : null,
+          expiresInSeconds: 300,
+          message: 'Verification code dispatched.',
+        };
+      }
+    );
+  },
+
+  /**
+   * Verify OTP and complete authentication
+   */
+  async verifyOtp(verifyData) {
+    const res = await request(
+      '/auth/verify-otp',
+      {
+        method: 'POST',
+        body: JSON.stringify(verifyData),
+      },
+      () => {
+        const token = `vst_token_${Date.now()}`;
+        localStorage.setItem('vidhisetu_auth_token', token);
+        localStorage.setItem('earnlaw_auth_token', token);
+        return {
+          success: true,
+          token,
+          user: { ...mockCurrentUser, phone: verifyData.phone, emailVerified: true },
+          message: 'OTP verified successfully!',
+        };
+      }
+    );
+
+    if (res?.token) {
+      localStorage.setItem('vidhisetu_auth_token', res.token);
+      localStorage.setItem('earnlaw_auth_token', res.token);
+    }
+    return res;
   },
 
   /**

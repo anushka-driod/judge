@@ -164,7 +164,48 @@ export class LegalAnalyzer {
       };
     }
 
-    // 3. Consumer Dispute & E-Commerce / Defective Goods
+    // 3. Tenancy, Landlord & Security Deposit Disputes
+    if (
+      q.includes('landlord') ||
+      q.includes('tenant') ||
+      q.includes('tenancy') ||
+      q.includes('security deposit') ||
+      (q.includes('deposit') && (q.includes('flat') || q.includes('rent') || q.includes('vacat') || q.includes('house')))
+    ) {
+      return {
+        summary: 'Tenancy dispute concerning refusal or arbitrary retention of security deposit following vacation of rented premises with due notice.',
+        category: 'Tenancy & Property Law',
+        jurisdiction,
+        legal_issues: [
+          'Unlawful retention or arbitrary deduction of rental security deposit',
+          'Compliance with notice period and vacation of premises',
+          'Breach of rental agreement covenant for refund of deposit',
+        ],
+        extracted_facts: [
+          'Tenant leased and occupied residential/commercial premises',
+          'Tenant vacated premises after serving notice',
+          'Landlord refused or failed to refund the refundable security deposit',
+        ],
+        missing_information: [
+          'Whether a written Rental or Lease Agreement exists detailing deposit refund conditions',
+          'Exact notice period served and proof of delivery/acknowledgement',
+          'Proof of handover of keys and vacant possession',
+          'Whether landlord has communicated written itemized claims of damage or unpaid utilities',
+        ],
+        kanoon_search_queries: [
+          'security deposit landlord tenant refund',
+          'landlord refusing refund security deposit tenant vacate',
+          'tenant vacate security deposit deduction refund notice',
+        ],
+        relevant_acts_anticipated: [
+          'Transfer of Property Act, 1882 (Section 108)',
+          'Indian Contract Act, 1872 (Section 73 - Breach of Contract)',
+          'Model Tenancy Act / State Rent Control Act',
+        ],
+      };
+    }
+
+    // 4. Consumer Dispute & E-Commerce / Defective Goods
     if (
       q.includes('refund') ||
       q.includes('defective') ||
@@ -203,28 +244,31 @@ export class LegalAnalyzer {
       };
     }
 
-    // 4. Real Estate / Builder Delay (RERA)
+    // 5. Real Estate / Builder Delay (RERA)
     if (q.includes('builder') || q.includes('flat') || q.includes('possession') || q.includes('rera') || q.includes('apartment')) {
       return {
-        summary: 'Real estate dispute regarding delayed handover of flat possession and compensation.',
+        summary: 'Real estate dispute regarding delayed handover of flat possession and compensation under RERA.',
         category: 'Real Estate & Property Law (RERA)',
         jurisdiction,
         legal_issues: [
           'Delayed possession beyond agreed date in Agreement for Sale',
-          'Right to full refund with statutory delay interest under Section 18 RERA',
-          'Jurisdiction between RERA Authority and Consumer Forum',
+          'Right to delay compensation interest or full refund with interest under Section 18 RERA',
+          'Remedies before State RERA Authority and Consumer Commission',
         ],
         extracted_facts: [
           'Real estate developer failed to handover property by promised deadline',
+          'Developer is refusing statutory compensation or interest for delay',
         ],
         missing_information: [
           'Original possession delivery date specified in Agreement for Sale',
-          'Total amount paid to builder till date',
+          'Total consideration amount paid to builder till date',
           'Whether the real estate project is registered under State RERA',
+          'Whether Occupancy Certificate (OC) or Completion Certificate (CC) has been issued',
         ],
         kanoon_search_queries: [
-          '"Section 18" AND "RERA" AND "delayed possession" AND "interest"',
-          '"Supreme Court" AND "homebuyers" AND "concurrent remedy consumer court"',
+          'builder delayed possession flat RERA compensation',
+          'Section 18 RERA delayed possession interest compensation',
+          'homebuyers delayed possession compensation RERA',
         ],
         relevant_acts_anticipated: [
           'Real Estate (Regulation and Development) Act, 2016 (Section 18)',

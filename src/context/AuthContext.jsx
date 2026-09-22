@@ -51,8 +51,20 @@ export function AuthProvider({ children }) {
     return res;
   };
 
-  const resendOtp = async (email) => {
-    return authService.resendOtp(email);
+  const sendOtp = async (phoneOrData) => {
+    return authService.sendOtp(phoneOrData);
+  };
+
+  const verifyOtp = async (verifyData) => {
+    const res = await authService.verifyOtp(verifyData);
+    if (res?.user) {
+      setCurrentUser(res.user);
+    }
+    return res;
+  };
+
+  const resendOtp = async (emailOrPhone) => {
+    return authService.resendOtp(emailOrPhone);
   };
 
   const googleAuth = async (googleProfile) => {
@@ -118,6 +130,8 @@ export function AuthProvider({ children }) {
     loading,
     login,
     register,
+    sendOtp,
+    verifyOtp,
     verifyEmail,
     resendOtp,
     googleAuth,

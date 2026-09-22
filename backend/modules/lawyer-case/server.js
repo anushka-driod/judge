@@ -657,13 +657,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     const trimmedOtp = String(otp).trim();
-    const isValidOtp = trimmedOtp === user.otpCode || trimmedOtp === '123456';
+    const isValidOtp = user.otpCode && trimmedOtp === String(user.otpCode).trim();
 
     if (!isValidOtp) {
       return json(res, 400, { error: 'Invalid verification code. Please check and try again.' });
     }
 
-    if (user.otpExpiresAt && Date.now() > user.otpExpiresAt && trimmedOtp !== '123456') {
+    if (user.otpExpiresAt && Date.now() > user.otpExpiresAt) {
       return json(res, 400, { error: 'Verification code has expired. Please click Resend Code.' });
     }
 
@@ -857,13 +857,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     const trimmedOtp = String(otp).trim();
-    const isValid = trimmedOtp === user.resetOtp || trimmedOtp === '123456';
+    const isValid = user.resetOtp && trimmedOtp === String(user.resetOtp).trim();
 
     if (!isValid) {
       return json(res, 400, { error: 'Invalid or expired password reset code.' });
     }
 
-    if (user.resetExpiresAt && Date.now() > user.resetExpiresAt && trimmedOtp !== '123456') {
+    if (user.resetExpiresAt && Date.now() > user.resetExpiresAt) {
       return json(res, 400, { error: 'Reset code has expired. Please request a new code.' });
     }
 
@@ -970,16 +970,49 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==========================================
-  // CASES MANAGEMENT
+  // CASES MANAGEMENT (Strict User Isolation)
   // ==========================================
   if (pathname === '/api/cases' && method === 'GET') {
-    return json(res, 200, casesStore);
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    let requester = currentUser;
+
+    if (token) {
+      const found = usersStore.find((u) => token.includes(u.id) || (u.email && token.includes(u.email)));
+      if (found) requester = found;
+    }
+
+    if (!requester) {
+      return json(res, 200, []);
+    }
+
+    // Filter strictly by the authenticated user's ID or email
+    const userCases = casesStore.filter(
+      (c) =>
+        c.userId === requester.id ||
+        c.user_id === requester.id ||
+        (c.userEmail && c.userEmail.toLowerCase() === requester.email.toLowerCase()) ||
+        (!c.userId && !c.userEmail && requester.email.includes('aarav')) // Default demo user seed
+    );
+
+    return json(res, 200, userCases);
   }
 
   if (pathname === '/api/cases' && method === 'POST') {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    let requester = currentUser;
+
+    if (token) {
+      const found = usersStore.find((u) => token.includes(u.id) || (u.email && token.includes(u.email)));
+      if (found) requester = found;
+    }
+
     const body = await parseBody(req);
     const newCase = {
       id: `case-${Date.now()}`,
+      userId: requester ? requester.id : 'usr_guest',
+      userEmail: requester ? requester.email : 'guest@example.com',
       title: body.title || 'New Legal Dispute',
       category: body.category || 'General Civil Dispute',
       shortDescription: body.description || '',
@@ -989,7 +1022,7 @@ const server = http.createServer(async (req, res) => {
       currentStage: 'Preliminary Review',
       nextAction: 'Review statutory rights or choose advocate',
       nextActionDeadline: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
-      jurisdiction: 'Bengaluru',
+      jurisdiction: body.jurisdiction || requester?.city || 'Bengaluru',
       mode: 'pending_selection',
       timeline: [{ event: 'Case Created', date: new Date().toISOString().split('T')[0], status: 'completed' }],
       documents: body.documents || [],

@@ -1,6 +1,8 @@
 import { request } from './api';
 import { mockLawsDatabase, mockJudgmentsDatabase } from '../data/mockData';
 
+import { legalService } from './legalService';
+
 export const aiLegalService = {
   /**
    * Conversational legal guidance assistant.
@@ -70,5 +72,13 @@ export const aiLegalService = {
 
   async getPrecedents(caseId) {
     return request(`/ai/cases/${caseId}/precedents`, {}, () => mockJudgmentsDatabase);
+  },
+
+  async searchJudgments(query, options) {
+    return legalService.searchJudgments(query, options);
+  },
+
+  async getJudgmentDocument(docId, options) {
+    return legalService.getJudgmentDocument(docId, options);
   },
 };

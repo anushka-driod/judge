@@ -7,6 +7,7 @@ import { Button } from '../../components/common/Button';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Alert } from '../../components/common/Alert';
 import { Loading } from '../../components/common/Loading';
+import { RelevantJudgments } from '../../components/legal/RelevantJudgments';
 import {
   Sparkles,
   BookOpen,
@@ -184,7 +185,7 @@ export function AIGuidanceResultsPage() {
             </div>
           </Card>
 
-          {/* Section 4: Similar Court Precedents */}
+          {/* Section 4: Similar Court Precedents (Indian Kanoon API) */}
           <Card className="guidance-section-card">
             <div className="section-title-bar">
               <div className="section-icon-circle icon-precedents">
@@ -192,32 +193,17 @@ export function AIGuidanceResultsPage() {
               </div>
               <div className="section-title-group">
                 <h3 className="section-heading">4. Similar Previous Court Judgments</h3>
-                <span className="section-sub">How Indian benches ruled in comparable disputes</span>
+                <span className="section-sub">Authentic Indian Kanoon judicial precedents matching your legal facts</span>
               </div>
             </div>
 
-            <div className="precedents-list">
-              {(guidance.similarPrecedents || []).map((judg) => (
-                <div key={judg.id} className="precedent-item-card">
-                  <div className="precedent-top">
-                    <h4 className="precedent-title">{judg.title}</h4>
-                    <span className="precedent-similarity">{judg.similarity} Similar</span>
-                  </div>
-                  <span className="precedent-court-citation">
-                    {judg.court} • Citation: {judg.citation}
-                  </span>
-                  <p className="precedent-verdict">
-                    <strong>Court Ruling:</strong> {judg.verdict}
-                  </p>
-                  <p className="precedent-takeaway">
-                    ⭐ <strong>Key Precedent Takeaway:</strong> {judg.keyTakeaway}
-                  </p>
-                  <Link to={`/judgments/${judg.id}`} className="view-judgment-btn">
-                    View Complete Judgment Details →
-                  </Link>
-                </div>
-              ))}
-            </div>
+            <RelevantJudgments
+              initialQuery={legalCase.title || legalCase.shortDescription || guidance.understoodSummary || ''}
+              caseTitle={legalCase.title}
+              showHeader={false}
+              allowSearch={true}
+              limit={5}
+            />
           </Card>
 
           {/* Section 5: Documents / Evidence That May Be Useful */}

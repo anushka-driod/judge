@@ -268,12 +268,12 @@ export function AIChatPage() {
                       </div>
                     )}
 
-                    {/* Cited Judicial Precedents */}
+                    {/* Cited Judicial Precedents (Indian Kanoon) */}
                     {msg.detectedPrecedents && msg.detectedPrecedents.length > 0 && (
                       <div className="chat-sources-block precedents-block">
                         <div className="sources-heading">
                           <Scale size={16} />
-                          <span>Similar Judicial Precedents:</span>
+                          <span>Retrieved Legal Precedents (Indian Kanoon):</span>
                         </div>
                         <div className="sources-cards-list">
                           {msg.detectedPrecedents.map((judg, idx) => (
@@ -282,23 +282,53 @@ export function AIChatPage() {
                                 <strong>
                                   {judg.title} {judg.year ? `(${judg.year})` : ''}
                                 </strong>
+                                {judg.court && (
+                                  <span className="citation-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
+                                    {judg.court}
+                                  </span>
+                                )}
                                 {judg.citation && (
                                   <span className="citation-badge">{judg.citation}</span>
                                 )}
                               </div>
-                              {judg.keyTakeaway && (
+                              {judg.keyExtract && (
+                                <blockquote
+                                  style={{
+                                    fontSize: '0.82rem',
+                                    color: '#334155',
+                                    background: '#f8fafc',
+                                    borderLeft: '3px solid #3b82f6',
+                                    padding: '6px 10px',
+                                    margin: '6px 0',
+                                    borderRadius: '0 4px 4px 0',
+                                  }}
+                                >
+                                  <strong>Relevant Case Extract:</strong> "{judg.keyExtract.length > 250 ? judg.keyExtract.slice(0, 250) + '...' : judg.keyExtract}"
+                                </blockquote>
+                              )}
+                              {judg.keyTakeaway && !judg.keyExtract && (
                                 <p className="takeaway-text">💡 {judg.keyTakeaway}</p>
                               )}
-                              {judg.sourceUrl && (
-                                <a
-                                  href={judg.sourceUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
+                              <div className="precedent-links-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
+                                <Link
+                                  to={`/judgments/${judg.caseId || judg.id || '109283'}`}
                                   className="precedent-kanoon-link"
+                                  style={{ fontWeight: 600, color: '#2563eb' }}
                                 >
-                                  View on Indian Kanoon ↗
-                                </a>
-                              )}
+                                  View Full Court Judgment →
+                                </Link>
+                                {judg.sourceUrl && (
+                                  <a
+                                    href={judg.sourceUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="precedent-kanoon-link"
+                                    style={{ color: '#64748b' }}
+                                  >
+                                    Indian Kanoon Source ↗
+                                  </a>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>

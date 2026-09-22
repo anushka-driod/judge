@@ -24,23 +24,42 @@ import {
 } from 'lucide-react';
 import './AuthPage.css';
 
-const INDIAN_STATES = [
-  { value: 'Karnataka', label: 'Karnataka' },
-  { value: 'Maharashtra', label: 'Maharashtra' },
+const ALL_INDIAN_STATES = [
+  { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
+  { value: 'Arunachal Pradesh', label: 'Arunachal Pradesh' },
+  { value: 'Assam', label: 'Assam' },
+  { value: 'Bihar', label: 'Bihar' },
+  { value: 'Chhattisgarh', label: 'Chhattisgarh' },
   { value: 'Delhi', label: 'Delhi (NCR)' },
+  { value: 'Goa', label: 'Goa' },
+  { value: 'Gujarat', label: 'Gujarat' },
+  { value: 'Haryana', label: 'Haryana' },
+  { value: 'Himachal Pradesh', label: 'Himachal Pradesh' },
+  { value: 'Jharkhand', label: 'Jharkhand' },
+  { value: 'Karnataka', label: 'Karnataka' },
+  { value: 'Kerala', label: 'Kerala' },
+  { value: 'Madhya Pradesh', label: 'Madhya Pradesh' },
+  { value: 'Maharashtra', label: 'Maharashtra' },
+  { value: 'Manipur', label: 'Manipur' },
+  { value: 'Meghalaya', label: 'Meghalaya' },
+  { value: 'Mizoram', label: 'Mizoram' },
+  { value: 'Nagaland', label: 'Nagaland' },
+  { value: 'Odisha', label: 'Odisha' },
+  { value: 'Punjab', label: 'Punjab' },
+  { value: 'Rajasthan', label: 'Rajasthan' },
+  { value: 'Sikkim', label: 'Sikkim' },
   { value: 'Tamil Nadu', label: 'Tamil Nadu' },
   { value: 'Telangana', label: 'Telangana' },
+  { value: 'Tripura', label: 'Tripura' },
   { value: 'Uttar Pradesh', label: 'Uttar Pradesh' },
+  { value: 'Uttarakhand', label: 'Uttarakhand' },
   { value: 'West Bengal', label: 'West Bengal' },
-  { value: 'Gujarat', label: 'Gujarat' },
-  { value: 'Rajasthan', label: 'Rajasthan' },
-  { value: 'Kerala', label: 'Kerala' },
-  { value: 'Punjab', label: 'Punjab' },
-  { value: 'Madhya Pradesh', label: 'Madhya Pradesh' },
-  { value: 'Bihar', label: 'Bihar' },
-  { value: 'Odisha', label: 'Odisha' },
-  { value: 'Haryana', label: 'Haryana' },
+  { value: 'Jammu and Kashmir', label: 'Jammu and Kashmir' },
+  { value: 'Chandigarh', label: 'Chandigarh' },
+  { value: 'Puducherry', label: 'Puducherry' },
 ];
+
+const INDIAN_STATES = ALL_INDIAN_STATES;
 
 const PRACTICE_AREAS_OPTIONS = [
   'Consumer Protection & Disputes',
@@ -75,35 +94,30 @@ export function RegisterPage() {
   });
 
   // Advocate Form State
-  const [advocateStep, setAdvocateStep] = useState(1); // 1: Personal, 2: Professional, 3: Documents
   const [advocateForm, setAdvocateForm] = useState({
-    // Personal
     name: '',
     email: '',
     phone: '',
+    barCouncilState: 'Karnataka',
+    barNumber: '',
+    experienceYears: '3',
+    primaryCourt: 'High Court of Karnataka',
     country: 'India',
     state: 'Karnataka',
     city: 'Bengaluru',
+    consultationFee: '800',
+    practiceAreas: ['Consumer Protection & Disputes'],
+    languages: ['English', 'Kannada'],
+    profileBio: '',
     password: '',
     confirmPassword: '',
-    // Professional
-    barCouncil: 'Bar Council of Karnataka',
-    enrollmentNumber: '',
-    enrollmentState: 'Karnataka',
-    enrollmentYear: 2018,
-    practiceAreas: ['Consumer Protection & Disputes', 'Civil & Contract Law'],
-    experienceYears: 6,
-    officeAddress: '',
-    // Documents
-    certificateDoc: 'Bar_Enrollment_Certificate.pdf',
-    advocateIdDoc: 'Bar_Council_ID.pdf',
   });
 
-  const [loading, setLoading] = useState(false);
   const [detectingGps, setDetectingGps] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Geolocation Handler
+  // Geolocation Handler: Reverse geocodes real latitude & longitude automatically
   const handleUseCurrentLocation = (isAdvocate = false) => {
     if (!navigator.geolocation) {
       showToast('Geolocation is not supported by your browser.', 'error');
@@ -112,21 +126,80 @@ export function RegisterPage() {
 
     setDetectingGps(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        // High accuracy GPS received
-        setDetectingGps(false);
-        showToast('Location identified: Bengaluru, Karnataka', 'success');
-        if (isAdvocate) {
-          setAdvocateForm((prev) => ({ ...prev, city: 'Bengaluru', state: 'Karnataka' }));
-        } else {
-          setCandidateForm((prev) => ({ ...prev, city: 'Bengaluru', state: 'Karnataka' }));
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        let detectedCity = '';
+        let detectedState = '';
+
+        try {
+          // Primary reverse geocoding via BigDataCloud client API (free, fast, no key)
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            detectedCity = data.city || data.locality || '';
+            detectedState = data.principalSubdivision || '';
+          }
+        } catch (e) {
+          console.warn('[GPS] Primary geocoding failed, trying secondary fallback:', e);
         }
+
+        // Secondary fallback via Nominatim if needed
+        if (!detectedCity || !detectedState) {
+          try {
+            const res2 = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            if (res2.ok) {
+              const data2 = await res2.json();
+              const addr = data2.address || {};
+              detectedCity = detectedCity || addr.city || addr.town || addr.municipality || addr.state_district || '';
+              detectedState = detectedState || addr.state || '';
+            }
+          } catch (e) {
+            console.warn('[GPS] Secondary geocoding failed:', e);
+          }
+        }
+
+        setDetectingGps(false);
+
+        // Normalize state to match select dropdown
+        let matchedState = '';
+        if (detectedState) {
+          const lowerDetected = detectedState.toLowerCase();
+          const match = ALL_INDIAN_STATES.find(
+            (s) => s.value.toLowerCase() === lowerDetected || lowerDetected.includes(s.value.toLowerCase())
+          );
+          matchedState = match ? match.value : detectedState;
+        }
+
+        const finalCity = detectedCity || (matchedState ? matchedState : 'Bengaluru');
+        const finalState = matchedState || 'Karnataka';
+
+        if (isAdvocate) {
+          setAdvocateForm((prev) => ({
+            ...prev,
+            city: finalCity,
+            state: finalState,
+            barCouncilState: finalState,
+          }));
+        } else {
+          setCandidateForm((prev) => ({
+            ...prev,
+            city: finalCity,
+            state: finalState,
+          }));
+        }
+
+        showToast(`Live location detected: ${finalCity}, ${finalState}`, 'success');
       },
       (err) => {
         setDetectingGps(false);
-        showToast('Could not retrieve GPS location. Please select your city/state manually.', 'info');
+        console.warn('[GPS] Geolocation error:', err);
+        showToast('Could not access live GPS. Please enable browser location permissions.', 'info');
       },
-      { timeout: 8000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
     );
   };
 
@@ -156,6 +229,12 @@ export function RegisterPage() {
       return;
     }
 
+    const phoneDigits = candidateForm.phone.replace(/[^\d]/g, '');
+    if (phoneDigits.length < 10) {
+      setError('Please enter a valid 10-digit mobile number for SMS verification.');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await register({
@@ -168,11 +247,14 @@ export function RegisterPage() {
         },
       });
 
-      showToast('Account created! Please verify your email.', 'info');
+      showToast('Account created! Please enter verification code.', 'info');
       navigate(`/verify-email?email=${encodeURIComponent(candidateForm.email)}`, {
         state: {
           email: candidateForm.email,
-          message: 'We have dispatched a 6-digit verification code to your email.',
+          phone: candidateForm.phone,
+          maskedEmail: res?.maskedEmail,
+          maskedPhone: res?.maskedPhone,
+          message: res?.message || 'Verification code dispatched to your registered contact details.',
         },
       });
     } catch (err) {
@@ -232,11 +314,14 @@ export function RegisterPage() {
         },
       });
 
-      showToast('Advocate application submitted! Please verify your email.', 'info');
+      showToast('Advocate application submitted! Please enter verification code.', 'info');
       navigate(`/verify-email?email=${encodeURIComponent(advocateForm.email)}`, {
         state: {
           email: advocateForm.email,
-          message: 'Please verify your email to submit your advocate verification dossier.',
+          phone: advocateForm.phone,
+          maskedEmail: res?.maskedEmail,
+          maskedPhone: res?.maskedPhone,
+          message: res?.message || 'Verification code dispatched to your registered mobile and email.',
         },
       });
     } catch (err) {

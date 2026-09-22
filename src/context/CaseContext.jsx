@@ -1,10 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { caseService } from '../services/caseService';
+import { useAuth } from '../hooks/useAuth';
 
 const CaseContext = createContext(null);
-const STORAGE_KEY = 'vidhisetu_cases_v2';
 
-// Seed conversations for default cases
+// Helper to get user-specific storage key so users never share or leak chat/case data
+function getUserStorageKey(email) {
+  if (!email) return 'vidhisetu_cases_guest';
+  return `vidhisetu_cases_${email.toLowerCase().trim()}`;
+}
+
+// Seed conversations for default demo accounts
 const initialSeedCases = [
   {
     id: 'case-101',
@@ -99,13 +105,13 @@ const initialSeedCases = [
       {
         id: 'seed-103-1',
         sender: 'user',
-        text: 'I vacated my rental flat in Bengaluru after 2 years with all utility bills paid. The owner is refusing to return my security deposit of ₹70,000 citing general wear and tear.',
+        text: 'I vacated my rented apartment in Bengaluru 45 days ago after giving proper 1-month notice. Landlord is refusing to refund my ₹70,000 security deposit citing false painting charges. How do I recover it?',
         timestamp: '09:00 AM',
       },
       {
         id: 'seed-103-2',
         sender: 'ai',
-        text: `Under Indian contract jurisprudence and Model Tenancy principles:\n\n1. **Ordinary Wear & Tear**: Landlords cannot make deductions from security deposits for normal wear and tear (such as faded paint or regular aging of premises).\n2. **Itemized Accounting**: If any deduction is claimed, the landlord must provide itemized inspection proofs and valid repair invoices.\n3. **Legal Notice**: You can dispatch a formal legal demand notice claiming return of the deposit with 18% annual interest for wrongful retention.`,
+        text: `Under tenancy jurisprudence and the **Karnataka Rent Control & Tenancy principles**:\n\n1. **Ordinary Wear & Tear**: Landlords cannot deduct standard wall painting or wear-and-tear costs from your deposit unless explicitly stipulated in a signed agreement.\n2. **Right to Refund**: Deposit must be refunded within 30 days of handing over vacant possession.\n3. **Legal Redress**: Issue an advocate demand notice followed by a summary recovery suit under Order 37 of CPC or approaching the Rent Court.`,
         detectedLaws: [
           {
             act: 'Indian Contract Act, 1872',
@@ -124,31 +130,84 @@ const initialSeedCases = [
 ];
 
 export function CaseProvider({ children }) {
+  const { currentUser } = useAuth();
+  const userEmail = currentUser?.email?.toLowerCase()?.trim() || '';
+  const storageKey = getUserStorageKey(userEmail);
+
+  // Initialize cases for this specific user
   const [cases, setCases] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {
-      console.warn('Failed to parse saved cases from localStorage:', e);
+      console.warn('Failed to parse saved cases:', e);
     }
-    return initialSeedCases;
+
+    const isDemo = !userEmail || userEmail.includes('aarav') || userEmail.includes('rajesh');
+    return isDemo ? initialSeedCases : [];
   });
 
-  const [activeCaseId, setActiveCaseId] = useState(() => {
-    return initialSeedCases[0]?.id || null;
-  });
+  const [activeCaseId, setActiveCaseId] = useState(() => cases[0]?.id || null);
 
-  // Save to localStorage whenever cases change
+  // Reload user-specific cases whenever authenticated user/email changes
   useEffect(() => {
+    const key = getUserStorageKey(userEmail);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCases(parsed);
+          setActiveCaseId(parsed[0]?.id || null);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load user cases from storage:', e);
+    }
+
+    // If no saved history for this user
+    const isDemo = !userEmail || userEmail.includes('aarav') || userEmail.includes('rajesh');
+    if (isDemo) {
+      setCases(initialSeedCases);
+      setActiveCaseId(initialSeedCases[0]?.id || null);
+    } else {
+      // Create an isolated fresh welcome chat inquiry specifically for this new user
+      const freshCase = {
+        id: `case-${Date.now()}`,
+        userId: currentUser?.id,
+        userEmail: userEmail,
+        title: 'New Legal Inquiry',
+        category: 'General Civil Inquiry',
+        isPinned: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        messages: [
+          {
+            id: `welcome-${Date.now()}`,
+            sender: 'ai',
+            text: `Hello ${currentUser?.name || 'there'}! I am VidhiSetu, your AI legal assistant.\n\nDescribe any legal question, contract, consumer issue, or workplace dispute in plain words to get started.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ],
+      };
+      setCases([freshCase]);
+      setActiveCaseId(freshCase.id);
+    }
+  }, [userEmail, currentUser?.id]);
+
+  // Persist cases to user's isolated storage whenever cases update
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(cases));
     } catch (e) {
       console.warn('Failed to persist cases to localStorage:', e);
     }
-  }, [cases]);
+  }, [cases, storageKey]);
 
   // Derived sorted list: Pinned first, then newest updatedAt
   const sortedCases = [...cases].sort((a, b) => {
@@ -157,7 +216,7 @@ export function CaseProvider({ children }) {
     return new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0);
   });
 
-  const activeCase = cases.find((c) => c.id === activeCaseId) || null;
+  const activeCase = cases.find((c) => c.id === activeCaseId) || cases[0] || null;
 
   // Helper to generate a clean, concise title from user text
   const generateTitleFromText = (text) => {
@@ -275,6 +334,40 @@ export function CaseProvider({ children }) {
     setActiveCaseId(caseId);
   };
 
+  /**
+   * Delegates to caseService for dispute registration and deep guidance workflows
+   */
+  const createNewCase = async (caseData) => {
+    const created = await caseService.createCase(caseData);
+    setCases((prev) => [created, ...prev]);
+    setActiveCaseId(created.id);
+    return created;
+  };
+
+  const getCaseById = async (id) => {
+    const found = cases.find((c) => c.id === id);
+    if (found) return found;
+    return await caseService.getCaseById(id);
+  };
+
+  const setCaseResolutionMode = async (caseId, mode) => {
+    const updated = await caseService.selectCaseMode(caseId, mode);
+    setCases((prev) => prev.map((c) => (c.id === caseId ? { ...c, mode, status: updated.status } : c)));
+    return updated;
+  };
+
+  const updateCaseStatus = async (caseId, status) => {
+    const updated = await caseService.updateCaseStatus(caseId, status);
+    setCases((prev) => prev.map((c) => (c.id === caseId ? { ...c, status } : c)));
+    return updated;
+  };
+
+  const updateActionStatus = async (caseId, actionId, newStatus) => {
+    const updated = await caseService.updateActionPlanItem(caseId, actionId, newStatus);
+    setCases((prev) => prev.map((c) => (c.id === caseId ? updated : c)));
+    return updated;
+  };
+
   return (
     <CaseContext.Provider
       value={{
@@ -289,6 +382,11 @@ export function CaseProvider({ children }) {
         togglePinCase,
         renameCase,
         deleteCase,
+        createNewCase,
+        getCaseById,
+        setCaseResolutionMode,
+        updateCaseStatus,
+        updateActionStatus,
       }}
     >
       {children}
