@@ -184,7 +184,15 @@ export function Sidebar() {
           <div className="cases-list" role="list">
             {cases.length === 0 ? (
               !isSidebarCollapsed && (
-                <div className="empty-cases-note">
+                <div
+                  className="empty-cases-note"
+                  onClick={handleNewCase}
+                  style={{ cursor: 'pointer' }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleNewCase(); }}
+                  title="Click to register a new case"
+                >
                   <MessageSquare size={16} />
                   <span>No cases yet. Click + New Case to begin.</span>
                 </div>

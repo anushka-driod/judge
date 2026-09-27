@@ -216,7 +216,8 @@ export function CaseProvider({ children }) {
     return new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0);
   });
 
-  const activeCase = cases.find((c) => c.id === activeCaseId) || cases[0] || null;
+  // Active case is null when user clicks "+ New Case" / starts fresh chat
+  const activeCase = activeCaseId ? (cases.find((c) => c.id === activeCaseId) || null) : null;
 
   // Helper to generate a clean, concise title from user text
   const generateTitleFromText = (text) => {
@@ -339,9 +340,20 @@ export function CaseProvider({ children }) {
    */
   const createNewCase = async (caseData) => {
     const created = await caseService.createCase(caseData);
-    setCases((prev) => [created, ...prev]);
+    const caseWithMessages = {
+      ...created,
+      messages: created.messages && created.messages.length > 0 ? created.messages : [
+        {
+          id: `msg-${Date.now()}-usr`,
+          sender: 'user',
+          text: caseData.description || caseData.title,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ],
+    };
+    setCases((prev) => [caseWithMessages, ...prev]);
     setActiveCaseId(created.id);
-    return created;
+    return caseWithMessages;
   };
 
   const getCaseById = async (id) => {

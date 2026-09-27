@@ -86,7 +86,12 @@ export function AIGuidanceResultsPage() {
           </p>
         </div>
 
-        <div className="guidance-actions-top">
+        <div className="guidance-actions-top" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Link to="/chat">
+            <Button variant="primary" size="sm" icon={Sparkles}>
+              Discuss in AI Chat
+            </Button>
+          </Link>
           <Link to={`/cases/${legalCase.id}`}>
             <Button variant="outline" size="sm">
               View Case Hub

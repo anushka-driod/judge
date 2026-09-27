@@ -22,22 +22,23 @@ async function runMigrations() {
     }
   }
 
-  const migrationFile = path.join(__dirname, 'migrations', '001_master_anudb_schema.sql');
-  if (!fs.existsSync(migrationFile)) {
-    console.error(`Migration file not found: ${migrationFile}`);
-    process.exit(1);
-  }
+  const migrationsDir = path.join(__dirname, 'migrations');
+  const files = fs.readdirSync(migrationsDir).filter((f) => f.endsWith('.sql')).sort();
 
-  const sql = fs.readFileSync(migrationFile, 'utf-8');
-  try {
-    console.log('Applying 001_master_anudb_schema.sql to AnuDB...');
-    await db.query(sql);
-    console.log(' Master schema applied successfully to AnuDB.');
-    process.exit(0);
-  } catch (err) {
-    console.error('Migration failed:', err.message);
-    process.exit(1);
+  for (const file of files) {
+    const filePath = path.join(migrationsDir, file);
+    const sql = fs.readFileSync(filePath, 'utf-8');
+    try {
+      console.log(`Applying ${file} to AnuDB...`);
+      await db.query(sql);
+      console.log(`  ✓ ${file} applied successfully.`);
+    } catch (err) {
+      console.error(`Migration failed on ${file}:`, err.message);
+      process.exit(1);
+    }
   }
+  console.log(' All AnuDB migrations completed successfully.');
+  process.exit(0);
 }
 
 runMigrations();

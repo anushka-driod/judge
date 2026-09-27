@@ -80,6 +80,8 @@ export function RegisterPage() {
 
   // Step 0: Selection ('choose_role' | 'candidate' | 'advocate')
   const [selectedRole, setSelectedRole] = useState('choose_role');
+  const [advocateStep, setAdvocateStep] = useState(1);
+
 
   // Candidate Form State
   const [candidateForm, setCandidateForm] = useState({
@@ -386,7 +388,7 @@ export function RegisterPage() {
 
             <div
               className="role-card"
-              onClick={() => setSelectedRole('advocate')}
+              onClick={() => navigate('/lawyer/register')}
               tabIndex={0}
               role="button"
             >

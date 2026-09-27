@@ -52,6 +52,13 @@ export function AIChatPage() {
     scrollToBottom();
   }, [currentMessages, isAiThinking]);
 
+  // Autofocus input when starting a fresh case conversation
+  useEffect(() => {
+    if (!activeCaseId && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [activeCaseId]);
+
   // Adjust textarea height dynamically
   const handleTextChange = (e) => {
     setInputText(e.target.value);

@@ -8,6 +8,9 @@ import authRoutes from './routes/authRoutes.js';
 import caseRoutes from './routes/caseRoutes.js';
 import legalRoutes from './routes/legalRoutes.js';
 import lawyerCaseRoutes from '../modules/lawyer-case/src/routes/index.js';
+import lawyerRoutes from './routes/lawyerRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 // Member 3: AI + RAG + Legal Research Pipeline
 import { RagPipeline } from '../modules/ai-rag/src/rag/ragPipeline.js';
@@ -58,24 +61,50 @@ app.use('/api/legal', legalRoutes);
 app.post(['/api/legal/analyze', '/api/ai/chat'], async (req, res) => {
   const query = req.body.query || req.body.message || '';
   const jurisdiction = req.body.jurisdiction || '';
+  const options = {
+    history: req.body.history || [],
+    attachedDocs: req.body.attachedDocs || [],
+    caseId: req.body.caseId || null,
+    language: req.body.language || null,
+  };
+
+  if (!query || !query.trim()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Message or query parameter is required.',
+      code: 'INVALID_QUERY',
+    });
+  }
 
   try {
-    const analysis = await ragPipeline.processLegalQuery(query, jurisdiction);
+    const analysis = await ragPipeline.processLegalQuery(query, jurisdiction, options);
     res.json({
       success: true,
       reply: analysis.guidance,
       detectedLaws: analysis.relevant_laws,
       detectedPrecedents: analysis.similar_cases,
-      suggestedNextSteps: (analysis.missing_information || []).map((m) => `Clarify: ${m}`),
+      suggestedNextSteps: analysis.suggestedNextSteps || (analysis.missing_information || []).map((m) => `Clarify: ${m}`),
       ...analysis,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('[AI Chat] Pipeline error:', err.message);
+    res.status(err.status || 500).json({
+      success: false,
+      error: err.message,
+      code: err.code || 'AI_PIPELINE_ERROR',
+    });
   }
 });
 
-// 6. Mount Member 4: Lawyer Directory, Consultations, Actions, Documents, Timeline, Reminders, Complaints
+// 6. Mount Dedicated Lawyer Portal & Admin Oversight Routes
+app.use('/api/lawyer', lawyerRoutes);
+app.use('/api/admin', adminRoutes);
+
+// 7. Mount Consultation Payment Lifecycle & Financial Ledger Routes
+app.use('/api', paymentRoutes);
+
+// 8. Mount Member 4: Lawyer Directory, Consultations, Actions, Documents, Timeline, Reminders, Complaints
 app.use('/api', lawyerCaseRoutes);
 
 // 7. Serve Static Frontend Production Assets (Single Localhost Unified Serving)

@@ -52,6 +52,7 @@ export function CaseDetailsPage() {
     { id: 'timeline', label: 'Timeline & Milestones', icon: Clock },
     { id: 'actions', label: 'Action Plan', icon: ListTodo, badge: legalCase.actionPlan?.length || 0 },
     { id: 'documents', label: 'Case Documents', icon: FileText, badge: legalCase.documents?.length || 0 },
+    { id: 'consultations', label: 'Consultations & Invoices', icon: Scale },
   ];
 
   const handleMarkResolved = async () => {
@@ -274,6 +275,72 @@ export function CaseDetailsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Tab 5: Consultations & Invoices */}
+      {activeTab === 'consultations' && (
+        <Card className="consultations-tab-card">
+          <div className="tab-card-header">
+            <div>
+              <h3 className="card-title">Advocate Consultations & Billing</h3>
+              <p className="card-subtitle">Verified video and phone consultations, payment escrow, and tax receipts</p>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link to="/payments">
+                <Button variant="outline" size="sm">
+                  View Full Payments Ledger
+                </Button>
+              </Link>
+              <Link to={`/cases/${caseId}/lawyers`}>
+                <Button variant="primary" size="sm">
+                  Book New Consultation
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <div style={{ padding: '20px 0' }}>
+            {legalCase.assignedLawyer ? (
+              <div style={{
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '10px',
+                padding: '16px 20px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>
+                    Assigned Practice Counsel
+                  </span>
+                  <h4 style={{ margin: '4px 0', fontSize: '1.0625rem', color: '#0f172a' }}>
+                    {legalCase.assignedLawyer.name}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.8125rem', color: '#475569' }}>
+                    {legalCase.assignedLawyer.court} • Fee: ₹{legalCase.assignedLawyer.consultationFee}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Link to={`/lawyers/${legalCase.assignedLawyer.id}/book?caseId=${caseId}`}>
+                    <Button variant="primary" size="sm">
+                      Schedule Appointment
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '36px 20px', color: '#64748b' }}>
+                <p>No active advocate assigned to this case yet.</p>
+                <Link to={`/cases/${caseId}/lawyers`}>
+                  <Button variant="primary" size="sm" style={{ marginTop: '12px' }}>
+                    Browse Verified Advocates
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </Card>
       )}

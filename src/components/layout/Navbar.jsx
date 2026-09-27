@@ -11,6 +11,7 @@ import {
   Settings,
   KeyRound,
   LogOut,
+  CreditCard,
 } from 'lucide-react';
 import { ProfileModal } from '../profile/ProfileModal';
 import './Navbar.css';
@@ -172,6 +173,19 @@ export function Navbar() {
                   >
                     <Settings size={15} className="menu-icon" />
                     <span>Account Settings</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="account-menu-item"
+                    role="menuitem"
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      navigate('/payments');
+                    }}
+                  >
+                    <CreditCard size={15} className="menu-icon" />
+                    <span>Payments & Invoices</span>
                   </button>
 
                   <button

@@ -77,14 +77,18 @@ export const CaseController = {
       }
 
       // 1. Try AnuDB SQL query
-      const sql = `
-        SELECT * FROM cases
-        WHERE user_id = $1
-        ORDER BY created_at DESC;
-      `;
-      const result = await db.query(sql, [user.id]);
-      if (result.rows && result.rows.length > 0) {
-        return res.json(result.rows);
+      try {
+        const sql = `
+          SELECT * FROM cases
+          WHERE user_id = $1
+          ORDER BY created_at DESC;
+        `;
+        const result = await db.query(sql, [user.id]);
+        if (result && result.rows && result.rows.length > 0) {
+          return res.json(result.rows);
+        }
+      } catch (dbErr) {
+        // Continue to memory store fallback
       }
 
       // 2. Memory store fallback with user isolation

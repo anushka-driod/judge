@@ -55,9 +55,16 @@ export function ConsultationConfirmationPage() {
                 <span className="lawyer-label">Advocate</span>
                 <h3 className="confirmed-lawyer-title">{booking.lawyerName}</h3>
                 <p className="confirmed-court-text">{booking.court}</p>
+                {booking.transactionRef && (
+                  <div style={{ marginTop: '4px' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 600 }}>
+                      ✓ Verified Payment Txn: <code>{booking.transactionRef}</code>
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="confirmed-fee-pill">
-                <span>Fee Paid</span>
+                <span>Fee Paid (Inc. GST)</span>
                 <strong>₹{booking.fee}</strong>
               </div>
             </div>
@@ -126,6 +133,14 @@ export function ConsultationConfirmationPage() {
                 View Case Progress & Tracking
               </Button>
             </Link>
+            <Button
+              variant="outline"
+              size="lg"
+              icon={Download}
+              onClick={() => window.print()}
+            >
+              Print / Save Tax Invoice
+            </Button>
             <Link to="/dashboard">
               <Button variant="outline" size="lg">
                 Back to Dashboard

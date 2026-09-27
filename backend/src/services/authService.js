@@ -160,7 +160,7 @@ export const AuthService = {
     const maskedEmail = maskEmailAddress(createdUser.email);
     const maskedPhone = maskPhoneNumber(cleanPhone);
 
-    // Secure Return: ZERO plain-text OTP leaks!
+    // Secure Return: ZERO plain-text OTP leaks in production!
     return {
       success: true,
       email: createdUser.email,
@@ -169,6 +169,7 @@ export const AuthService = {
       maskedPhone,
       expiresInSeconds: 300,
       message: `A 6-digit verification code has been dispatched to ${maskedPhone} and ${maskedEmail}.`,
+      ...(process.env.NODE_ENV !== 'production' ? { otpPreview: otpCode } : {}),
     };
   },
 
@@ -258,6 +259,7 @@ export const AuthService = {
         maskedEmail,
         maskedPhone,
         expiresInSeconds: 300,
+        ...(process.env.NODE_ENV !== 'production' ? { otpPreview: freshOtp } : {}),
       };
       throw error;
     }

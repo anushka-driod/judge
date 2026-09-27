@@ -4,17 +4,26 @@
  *
  * Implements:
  * - Hybrid Retrieval (Vector + Keyword Search)
- * - RAG Prompt Assembly with Evidence Context
- * - Hallucination Safeguard (Validates citations strictly match retrieved cases)
+ * - Structured Context Assembly with Indian Kanoon Evidence
+ * - Real Google Gemini LLM API integration via centralized GeminiClient
+ * - Case Continuity & Context-Aware Chat Follow-ups
+ * - Multilingual Query Handling (English, Telugu, Tanglish)
+ * - Hallucination Safeguard (Ensures citations strictly match authentic retrieved cases)
  * - Insufficient Evidence Detector
- * - Structured Response Generation for Member 1 & Member 2
+ * - High-Fidelity Grounded Fallback Engine when LLM is unavailable
  */
 
 import { LegalAnalyzer } from '../llm/legalAnalyzer.js';
 import { KanoonClient } from '../kanoon/kanoonClient.js';
 import { JudgmentProcessor } from '../processing/judgmentProcessor.js';
 import { VectorEngine } from '../embeddings/vectorEngine.js';
-import { RAG_GUIDANCE_SYSTEM_PROMPT } from '../prompts/legalPrompts.js';
+import { geminiClient } from '../llm/geminiClient.js';
+import {
+  RAG_GUIDANCE_SYSTEM_PROMPT,
+  RAG_STRUCTURED_GUIDANCE_PROMPT,
+} from '../prompts/legalPrompts.js';
+
+const STANDARD_DISCLAIMER = 'This guidance is an AI-assisted analysis based on Indian statutes and relevant court judgments retrieved from Indian Kanoon. It provides legal information and does not substitute for personalized advice from a qualified advocate, nor does it constitute an official court order. The legal applicability of cited precedents depends on specific factual similarities and evidentiary proof.';
 
 export class RagPipeline {
   constructor() {
@@ -23,35 +32,36 @@ export class RagPipeline {
 
   /**
    * Complete End-to-End Legal Guidance Pipeline
-   * @param {string} userQuery - Citizen's query in plain words
-   * @param {string} [jurisdiction] - e.g. 'Karnataka', 'Telangana'
-   * @returns {Promise<Object>} Source-backed guidance with citations and safety disclaimer
+   * @param {string} userQuery - Citizen's query in plain words (English/Telugu/Tanglish)
+   * @param {string} [jurisdiction] - e.g. 'Karnataka', 'Telangana', 'Delhi'
+   * @param {Object} [options] - Chat context options { history, caseId, attachedDocs, language }
+   * @returns {Promise<Object>} Source-backed guidance with authentic citations and safety disclaimer
    */
-  async processLegalQuery(userQuery, jurisdiction = '') {
+  async processLegalQuery(userQuery, jurisdiction = '', options = {}) {
     // Stage 1: Legal Problem Understanding & Entity Extraction
-    const analysis = await LegalAnalyzer.analyzeQuery(userQuery, jurisdiction);
+    const analysis = await LegalAnalyzer.analyzeQuery(userQuery, jurisdiction, options);
 
     // Stage 2: Retrieve Relevant Judgments from Indian Kanoon API
-    const primaryQuery = analysis.kanoon_search_queries[0] || userQuery;
+    const primaryQuery = (analysis.kanoon_search_queries && analysis.kanoon_search_queries[0]) || userQuery;
     let rawJudgments = await this.kanoonClient.searchJudgments(primaryQuery);
 
     // Fallback search if primary query yielded 0 results
-    if (rawJudgments.length === 0 && analysis.kanoon_search_queries[1]) {
+    if (rawJudgments.length === 0 && analysis.kanoon_search_queries && analysis.kanoon_search_queries[1]) {
       rawJudgments = await this.kanoonClient.searchJudgments(analysis.kanoon_search_queries[1]);
     }
 
     if (rawJudgments.length === 0) {
-      return this.buildInsufficientEvidenceResponse(analysis, userQuery);
+      return this.buildInsufficientEvidenceResponse(analysis, userQuery, options);
     }
 
-    // Stage 3: Retrieve Document Context & Chunk Safely (Handling large 700k+ char judgments)
+    // Stage 3: Retrieve Document Context & Chunk Safely (Handling large judgments)
     const topDocsToHydrate = rawJudgments.slice(0, 3);
     const hydratedJudgments = await Promise.all(
       topDocsToHydrate.map(async (j) => {
         try {
           const detailedDoc = await this.kanoonClient.getJudgmentDetails(j.kanoonId);
           if (detailedDoc && detailedDoc.fullText && detailedDoc.fullText.length > 50) {
-            // Safe Large Document Handling (Cap at 25,000 characters to prevent memory/token overflows)
+            // Cap at 25,000 characters to prevent memory/token overflows
             const safeText = detailedDoc.fullText.slice(0, 25000);
             return {
               ...j,
@@ -120,36 +130,81 @@ export class RagPipeline {
 
     // Insufficient evidence check
     if (topChunks.length === 0) {
-      return this.buildInsufficientEvidenceResponse(analysis, userQuery);
+      return this.buildInsufficientEvidenceResponse(analysis, userQuery, options);
     }
 
-    // Stage 7: Evidence-Grounded Guidance Generation
-    const guidance = await this.generateGroundedGuidance(userQuery, analysis, topChunks);
+    // Stage 7: Evidence-Grounded Guidance Generation (Gemini LLM or Grounded Fallback Engine)
+    const generationResult = await this.generateGroundedGuidance(userQuery, analysis, topChunks, options);
 
-    // Stage 8: Hallucination Guard & Source Formatting
+    // Stage 8: Hallucination Guard & Source Formatting (Strict Authentic Metadata)
     const verifiedSources = this.verifyAndFormatSources(topChunks, rawJudgments);
 
-    return {
-      summary: analysis.summary,
-      category: analysis.category,
-      jurisdiction: analysis.jurisdiction,
-      legal_issues: analysis.legal_issues,
-      relevant_laws: analysis.relevant_acts_anticipated.map((act) => ({
-        act,
-        applicability: 'Identified as governing statute for the dispute',
-      })),
-      similar_cases: verifiedSources.map((s) => ({
+    // Align laws representation
+    const relevantLaws = (generationResult.relevantLaws && generationResult.relevantLaws.length > 0)
+      ? generationResult.relevantLaws.map((l) => ({
+          act: l.name || l.act || 'Governing Statute',
+          section: l.section || '',
+          plainMeaning: l.explanation || l.plainMeaning || 'Applicable statutory provision under Indian law',
+          applicability: l.explanation || 'Identified as governing statute for the dispute',
+        }))
+      : (analysis.relevant_acts_anticipated || []).map((act) => ({
+          act,
+          plainMeaning: 'Identified as governing statute for the dispute under Indian law',
+          applicability: 'Identified as governing statute for the dispute',
+        }));
+
+    // Align precedents representation
+    const similarCases = verifiedSources.map((s, idx) => {
+      const match = generationResult.relevantJudgments?.find(
+        (rj) => String(rj.documentId) === String(s.kanoonId) || rj.caseName?.toLowerCase().includes(s.title?.toLowerCase().slice(0, 15))
+      );
+      return {
         caseId: s.kanoonId,
+        id: s.kanoonId,
         title: s.title,
+        caseName: s.title,
         court: s.court,
+        date: s.publishDate,
+        publishDate: s.publishDate,
         citation: s.citation,
         similarityScore: s.similarityScore,
         sourceUrl: s.sourceUrl,
-        publishDate: s.publishDate,
         keyExtract: s.chunkText,
-        keyTakeaway: `Relevant judicial context on ${analysis.category} regarding ${s.title}`,
-      })),
-      guidance,
+        whyRelevant: match?.whyRelevant || `Relevant judicial context on ${analysis.category} regarding ${s.title}`,
+        keyTakeaway: match?.whyRelevant || `Relevant judicial context on ${analysis.category} regarding ${s.title}`,
+      };
+    });
+
+    const rawGuidance = generationResult.guidance || '';
+    const finalGuidance = rawGuidance.toLowerCase().includes('applicability depends')
+      ? rawGuidance
+      : `${rawGuidance}\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*`;
+
+    return {
+      summary: generationResult.problemSummary || analysis.summary,
+      problemSummary: generationResult.problemSummary || analysis.summary,
+      category: analysis.category,
+      jurisdiction: analysis.jurisdiction,
+      detected_language: analysis.detected_language || 'English',
+      kanoonQuery: primaryQuery,
+      primaryKanoonQuery: primaryQuery,
+      kanoon_search_queries: analysis.kanoon_search_queries || [],
+      legal_issues: generationResult.legalIssues || analysis.legal_issues,
+      legalIssues: generationResult.legalIssues || analysis.legal_issues,
+      possible_rights: generationResult.possibleRights || [
+        'Right to fair hearing and pre-litigation resolution',
+        'Statutory remedy under Indian civil/consumer jurisdiction',
+      ],
+      possibleRights: generationResult.possibleRights || [
+        'Right to fair hearing and pre-litigation resolution',
+        'Statutory remedy under Indian civil/consumer jurisdiction',
+      ],
+      relevant_laws: relevantLaws,
+      relevantLaws: relevantLaws,
+      similar_cases: similarCases,
+      relevantJudgments: similarCases,
+      guidance: finalGuidance,
+      reply: finalGuidance, // For frontend chat compatibility
       sources: verifiedSources,
       allRetrievedJudgments: rawJudgments.slice(0, 10).map((j) => ({
         id: j.kanoonId,
@@ -160,35 +215,158 @@ export class RagPipeline {
         sourceUrl: j.sourceUrl,
         snippet: j.snippet || j.fullText?.slice(0, 200),
       })),
-      missing_information: analysis.missing_information,
+      missing_information: generationResult.missingEvidence || analysis.missing_information,
+      missingInformation: generationResult.missingEvidence || analysis.missing_information,
+      suggestedNextSteps: generationResult.nextActions || (analysis.missing_information || []).map((m) => `Clarify: ${m}`),
+      nextActions: generationResult.nextActions || [],
+      evidence_suggestions: generationResult.evidenceSuggestions || [
+        'Written contracts or agreements',
+        'Bank statements and transaction receipts',
+        'Written notices and correspondence',
+      ],
       confidence: topChunks[0]?.similarityScore > 0.65 ? 'high' : 'medium',
-      disclaimer: 'This guidance is an AI-assisted analysis based on Indian statutes and relevant court judgments retrieved from Indian Kanoon. It provides legal information and does not substitute for personalized advice from a qualified advocate, nor does it constitute an official court order. The legal applicability of cited precedents depends on specific factual similarities and evidentiary proof.',
+      modelUsed: generationResult.modelUsed || 'deterministic_expert_engine',
+      executionMode: generationResult.executionMode || 'deterministic_fallback',
+      disclaimer: STANDARD_DISCLAIMER,
     };
   }
 
   /**
-   * Generates evidence-grounded simple-language guidance using retrieved case chunks.
+   * Generates evidence-grounded guidance using retrieved case chunks.
+   * Dispatches to real Gemini LLM if configured; otherwise utilizes deterministic template engine.
    */
-  async generateGroundedGuidance(query, analysis, chunks) {
+  async generateGroundedGuidance(query, analysis, chunks, options = {}) {
     const evidenceContext = chunks
-      .map((c, i) => `[Source ${i + 1} - Indian Kanoon Doc ${c.kanoonId}]:\nCase: ${c.caseTitle}\nCourt: ${c.court}\nCitation: ${c.citation}\nRelevant Extract: "${c.chunkText.slice(0, 500)}"`)
+      .map(
+        (c, i) => `[Source ${i + 1} - Indian Kanoon Doc ${c.kanoonId}]:
+Case Title: ${c.caseTitle}
+Court: ${c.court}
+Date: ${c.publishDate || 'Unknown'}
+Citation: ${c.citation}
+Source URL: ${c.sourceUrl}
+Relevant Extract:
+"${c.chunkText.slice(0, 600)}"`
+      )
       .join('\n\n');
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+    // Chat context & case continuity formatting
+    let chatContextSection = '';
+    if (options.history && Array.isArray(options.history) && options.history.length > 0) {
+      const recentHistory = options.history.slice(-4);
+      chatContextSection = `\nPREVIOUS CASE CONVERSATION HISTORY:\n${recentHistory.map((h) => `${h.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${h.text}`).join('\n')}\n`;
+    }
 
-    if (apiKey) {
+    if (geminiClient.isConfigured()) {
       try {
-        const prompt = `${RAG_GUIDANCE_SYSTEM_PROMPT}\n\nUSER'S PROBLEM: "${query}"\n\nLEGAL ISSUES DETECTED:\n- ${analysis.legal_issues.join('\n- ')}\n\nRETRIEVED LEGAL EVIDENCE (INDIAN KANOON):\n${evidenceContext}\n\nPlease generate clear, reassuring, plain-language guidance explaining their legal rights and next steps based only on this evidence.`;
-        return await this.callLLMForGuidance(prompt, apiKey);
+        const structuredPrompt = `USER LEGAL PROBLEM:
+"${query}"
+
+${chatContextSection}
+LEGAL CATEGORY ANCHOR:
+"${analysis.category}"
+
+SUMMARY OF CITIZEN'S GRIEVANCE:
+"${analysis.summary}"
+
+LEGAL ISSUES DETECTED:
+- ${(analysis.legal_issues || []).join('\n- ')}
+
+ANTICIPATED INDIAN STATUTES:
+- ${(analysis.relevant_acts_anticipated || []).join('\n- ')}
+
+RETRIEVED LEGAL EVIDENCE (AUTHENTIC INDIAN KANOON RECORDS):
+${evidenceContext}
+
+USER DETECTED LANGUAGE:
+${analysis.detected_language || 'English'}
+
+CRITICAL TASK REQUIREMENTS:
+1. Synthesize a comprehensive, evidence-grounded legal analysis for the citizen adhering strictly to the schema.
+2. ANCHOR INTEGRITY: You MUST keep your entire response strictly anchored to the citizen's actual grievance and category: "${analysis.category}".
+   - If the dispute is a Tenancy dispute (e.g., landlord withholding security deposit), your advice MUST focus exclusively on tenancy law, deposit refund, statutory demand notice to landlord, and civil recovery / rent tribunal. Do NOT mention builder delay, RERA, or homebuyer rights!
+   - If the dispute is a Real Estate / RERA dispute (e.g., builder delayed flat possession), your advice MUST focus on RERA Section 18, delay compensation interest, and homebuyer remedies.
+3. Multilingual: If user input was in Telugu or Tanglish, provide accessible explanations in Telugu or Tanglish in "guidance" so they clearly understand their rights, preserving Indian statutory names in English.
+4. Grounded in Evidence: Cite ONLY authentic Indian Kanoon records from the retrieved evidence. Do NOT fabricate citations or case names.
+5. Follow all safety rules: no guaranteed wins, cautious language.`;
+
+        const response = await geminiClient.generateStructured({
+          prompt: structuredPrompt,
+          systemInstruction: `${RAG_GUIDANCE_SYSTEM_PROMPT}\n\n${RAG_STRUCTURED_GUIDANCE_PROMPT}`,
+          temperature: 0.2,
+          timeoutMs: 30000,
+        });
+
+        if (response && response.data) {
+          const guardedData = this.validateAndGuardGeneratedGuidance(response.data, analysis, query, chunks, options);
+          return {
+            problemSummary: guardedData.problemSummary || analysis.summary,
+            legalIssues: Array.isArray(guardedData.legalIssues) ? guardedData.legalIssues : analysis.legal_issues,
+            possibleRights: Array.isArray(guardedData.possibleRights) ? guardedData.possibleRights : [],
+            relevantLaws: Array.isArray(guardedData.relevantLaws) ? guardedData.relevantLaws : [],
+            relevantJudgments: Array.isArray(guardedData.relevantJudgments) ? guardedData.relevantJudgments : [],
+            evidenceSuggestions: Array.isArray(guardedData.evidenceSuggestions) ? guardedData.evidenceSuggestions : [],
+            missingEvidence: Array.isArray(guardedData.missingEvidence) ? guardedData.missingEvidence : analysis.missing_information,
+            nextActions: Array.isArray(guardedData.nextActions) ? guardedData.nextActions : [],
+            guidance: guardedData.guidance || response.text,
+            disclaimer: guardedData.disclaimer || 'AI legal information based on Indian Kanoon records; does not constitute legal representation.',
+            modelUsed: response.modelUsed,
+            executionMode: guardedData.executionMode || 'gemini_llm',
+          };
+        }
       } catch (err) {
-        console.warn('[RagPipeline] Remote RAG call failed, using grounded template engine:', err.message);
+        console.warn(`[RagPipeline] Gemini LLM generation failed (${err.code || err.message}), engaging high-fidelity deterministic grounded engine.`);
       }
     }
 
-    // High-fidelity grounded synthesis tailored to the legal issue and retrieved precedents
+    // High-fidelity domain expert grounded fallback synthesis
+    return this.generateDeterministicGuidance(query, analysis, chunks, options);
+  }
+
+  /**
+   * Response Guard: Ensures the generated response did not drift from the anchor legal problem
+   */
+  validateAndGuardGeneratedGuidance(data, analysis, query, chunks, options = {}) {
+    if (!data || !data.guidance) {
+      return this.generateDeterministicGuidance(query, analysis, chunks, options);
+    }
+
+    const catLower = (analysis.category || '').toLowerCase();
+    const isTenancy = catLower.includes('tenan') || catLower.includes('deposit') || catLower.includes('rent');
+    const isRera = catLower.includes('rera') || catLower.includes('real estate') || catLower.includes('builder');
+
+    const guidanceLower = (data.guidance || '').toLowerCase();
+    const summaryLower = (data.problemSummary || '').toLowerCase();
+
+    // Guard 1: Tenancy dispute must not drift to RERA / builder
+    if (isTenancy) {
+      const mentionsRera = guidanceLower.includes('rera') || guidanceLower.includes('delayed flat possession') || summaryLower.includes('builder delay');
+      const mentionsTenancy = guidanceLower.includes('deposit') || guidanceLower.includes('landlord') || guidanceLower.includes('tenant') || guidanceLower.includes('rent');
+
+      if (mentionsRera && !mentionsTenancy) {
+        console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Engaging grounded domain synthesis.');
+        return this.generateDeterministicGuidance(query, analysis, chunks, options);
+      }
+    }
+
+    // Guard 2: Builder / RERA dispute must not drift to Tenancy
+    if (isRera) {
+      const mentionsLandlord = guidanceLower.includes('landlord') && !guidanceLower.includes('builder');
+      if (mentionsLandlord) {
+        console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (Tenancy instead of RERA). Engaging grounded domain synthesis.');
+        return this.generateDeterministicGuidance(query, analysis, chunks, options);
+      }
+    }
+
+    return data;
+  }
+
+  /**
+   * Deterministic grounded template engine for offline / test / fallback scenarios
+   */
+  generateDeterministicGuidance(query, analysis, chunks, options = {}) {
     const leadSource = chunks[0];
     const secondSource = chunks[1] || chunks[0];
-    const statutes = analysis.relevant_acts_anticipated.join(', ');
+    const statutes = (analysis.relevant_acts_anticipated || []).join(', ');
 
     let guidanceBody = '';
 
@@ -200,24 +378,45 @@ export class RagPipeline {
       guidanceBody = `Based on Indian judicial precedents, particularly **${leadSource.caseTitle}** (${leadSource.court}), Indian courts enforce strict adherence to statutory procedures and contractual good faith.\n\n### Key Legal Principles:\n1. **Statutory Protection**: Your issue is governed by **${statutes}**.\n2. **Judicial Precedent**: In **${leadSource.caseTitle}**, the court observed that legal rights and procedures must be scrupulously maintained.\n\n### Recommended Next Steps:\n1. **Evidence Gathering**: Organize all written communications, receipts, and contract copies.\n2. **Statutory Notice**: Issue a formal pre-litigation notice setting out the grievance.\n3. **Advocate Consultation**: Consult an advocate in ${analysis.jurisdiction} for representation if required.`;
     }
 
-    return `${guidanceBody}\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*`;
-  }
+    const fullGuidance = `${guidanceBody}\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*`;
 
-  async callLLMForGuidance(prompt, apiKey) {
-    const endpoint = process.env.GEMINI_API_KEY
-      ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`
-      : 'https://api.openai.com/v1/chat/completions';
-
-    const payload = process.env.GEMINI_API_KEY
-      ? { contents: [{ role: 'user', parts: [{ text: prompt }] }] }
-      : { model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }] };
-
-    const headers = { 'Content-Type': 'application/json' };
-    if (!process.env.GEMINI_API_KEY) headers['Authorization'] = `Bearer ${apiKey}`;
-
-    const res = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(payload) });
-    const data = await res.json();
-    return process.env.GEMINI_API_KEY ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+    return {
+      problemSummary: analysis.summary,
+      legalIssues: analysis.legal_issues,
+      possibleRights: [
+        'Right to statutory notice and procedural fairness',
+        'Right to recovery of withheld amounts or delay compensation',
+      ],
+      relevantLaws: (analysis.relevant_acts_anticipated || []).map((name) => ({
+        name,
+        section: '',
+        explanation: 'Statute governing the primary dispute domain',
+      })),
+      relevantJudgments: chunks.map((c) => ({
+        caseName: c.caseTitle,
+        court: c.court,
+        date: c.publishDate,
+        whyRelevant: `Judicial precedent from ${c.court} addressing ${analysis.category}`,
+        extract: c.chunkText.slice(0, 200),
+        sourceUrl: c.sourceUrl,
+        documentId: c.kanoonId,
+      })),
+      evidenceSuggestions: [
+        'Agreement or contract document copy',
+        'Proof of payments, bank statements, and invoices',
+        'Written notices or email communications',
+      ],
+      missingEvidence: analysis.missing_information,
+      nextActions: [
+        'Consolidate documentary evidence into a timeline',
+        'Dispatch a formal written legal notice',
+        'Seek professional advocate representation if informal resolution fails',
+      ],
+      guidance: fullGuidance,
+      disclaimer: 'This guidance is based on Indian Kanoon precedents and statutory provisions. It does not constitute formal legal representation.',
+      modelUsed: 'deterministic_expert_engine',
+      executionMode: 'deterministic_fallback',
+    };
   }
 
   verifyAndFormatSources(chunks, rawJudgments = []) {
@@ -243,20 +442,37 @@ export class RagPipeline {
     return sources;
   }
 
-  buildInsufficientEvidenceResponse(analysis, query) {
+  buildInsufficientEvidenceResponse(analysis, query, options = {}) {
+    const text = 'Available legal records and previous court judgments on Indian Kanoon are currently insufficient to provide high-confidence statutory guidance on this specific query. A professional consultation with a licensed advocate is strongly advised.\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*';
     return {
       summary: analysis.summary,
+      problemSummary: analysis.summary,
       category: analysis.category,
       jurisdiction: analysis.jurisdiction,
+      detected_language: analysis.detected_language || 'English',
       legal_issues: analysis.legal_issues,
+      legalIssues: analysis.legal_issues,
+      possible_rights: [],
+      possibleRights: [],
       relevant_laws: [],
+      relevantLaws: [],
       similar_cases: [],
-      guidance: 'Available legal records and previous court judgments on Indian Kanoon are currently insufficient to provide high-confidence statutory guidance on this specific query. A professional consultation with a licensed advocate is strongly advised.',
+      relevantJudgments: [],
+      guidance: text,
+      reply: text,
       sources: [],
       allRetrievedJudgments: [],
+      evidence_suggestions: [],
       missing_information: analysis.missing_information,
+      missingInformation: analysis.missing_information,
+      suggestedNextSteps: ['Consult a licensed advocate for personalized advice'],
+      nextActions: ['Consult a licensed advocate for personalized advice'],
       confidence: 'low',
-      disclaimer: 'The Vidhi Setu research system detected insufficient matching judicial evidence for this specific factual situation.',
+      modelUsed: 'none',
+      executionMode: 'insufficient_evidence',
+      disclaimer: STANDARD_DISCLAIMER,
     };
   }
 }
+
+export default RagPipeline;

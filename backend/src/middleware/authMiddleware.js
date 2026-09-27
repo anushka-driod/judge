@@ -27,16 +27,19 @@ export async function authenticateToken(req, res, next) {
     }
 
     req.user = sanitizeUser(user);
+    req.user.lawyerId = decoded.lawyerId || user.user_metadata?.lawyerId || user.metadata?.lawyerId;
     req.userId = user.id;
     next();
   } catch (err) {
     // Support test mock tokens for local testing if token starts with vst_token_
     if (token.startsWith('vst_token_')) {
+      const isLawyer = token.includes('lawyer') || token.includes('advocate') || token.includes('rajeshwar');
+      const isAdmin = token.includes('admin');
       req.user = {
-        id: 'usr_mock_001',
-        name: 'Aarav Mehta',
-        email: 'aarav.mehta@example.com',
-        role: 'user',
+        id: isLawyer ? 'law-kar-01' : (isAdmin ? 'admin-01' : (token.includes('001') ? 'usr_001' : 'usr_mock_001')),
+        name: isLawyer ? 'Adv. Rajeshwar Rao' : (isAdmin ? 'System Administrator' : 'Aarav Mehta'),
+        email: isLawyer ? 'rajeshwar.rao@earnlaw.in' : (isAdmin ? 'admin@vidhisetu.in' : 'aarav.mehta@example.com'),
+        role: isLawyer ? 'lawyer' : (isAdmin ? 'admin' : 'user'),
         emailVerified: true,
       };
       req.userId = req.user.id;
@@ -59,7 +62,9 @@ export function requireRoles(...roles) {
       return res.status(401).json({ error: 'Unauthorized. Sign-in required.' });
     }
 
-    if (!roles.includes(req.user.role)) {
+    const userRole = (req.user.role || '').toLowerCase();
+    const allowed = roles.map((r) => r.toLowerCase());
+    if (!allowed.includes(userRole)) {
       return res.status(403).json({
         error: `Forbidden. This action requires one of the following roles: ${roles.join(', ')}`,
       });

@@ -15,6 +15,22 @@ import { AdvocateStatusPage } from '../pages/advocate/AdvocateStatusPage';
 import { AdvocateDashboardPage } from '../pages/advocate/AdvocateDashboardPage';
 import { AdminVerificationPage } from '../pages/admin/AdminVerificationPage';
 
+// Dedicated Lawyer Portal Architecture
+import { LawyerLayout } from '../components/lawyer/LawyerLayout';
+import { LawyerLoginPage } from '../pages/lawyer/LawyerLoginPage';
+import { LawyerRegisterPage } from '../pages/lawyer/LawyerRegisterPage';
+import { LawyerVerificationStatusPage } from '../pages/lawyer/LawyerVerificationStatusPage';
+import { LawyerDashboardPage } from '../pages/lawyer/LawyerDashboardPage';
+import { LawyerRequestsPage } from '../pages/lawyer/LawyerRequestsPage';
+import { LawyerCasesPage } from '../pages/lawyer/LawyerCasesPage';
+import { LawyerCaseWorkspacePage } from '../pages/lawyer/LawyerCaseWorkspacePage';
+import { LawyerCalendarPage } from '../pages/lawyer/LawyerCalendarPage';
+import { LawyerEarningsPage } from '../pages/lawyer/LawyerEarningsPage';
+import { LawyerProfilePage as LawyerChambersProfilePage } from '../pages/lawyer/LawyerProfilePage';
+import { AdminLawyersPage } from '../pages/admin/AdminLawyersPage';
+import { AdminPaymentsPage } from '../pages/admin/AdminPaymentsPage';
+import { CitizenPaymentsPage } from '../pages/payments/CitizenPaymentsPage';
+
 // Main Dashboard & Legal Chat
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
 import { AIChatPage } from '../pages/chat/AIChatPage';
@@ -58,6 +74,29 @@ export function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
 
+      {/* Dedicated Lawyer Portal Auth Routes */}
+      <Route path="/lawyer/login" element={<LawyerLoginPage />} />
+      <Route path="/lawyer/register" element={<LawyerRegisterPage />} />
+      <Route path="/lawyer/verification-status" element={<LawyerVerificationStatusPage />} />
+
+      {/* Protected Lawyer Portal Chambers Routes */}
+      <Route path="/lawyer" element={<LawyerLayout />}>
+        <Route index element={<Navigate to="/lawyer/dashboard" replace />} />
+        <Route path="dashboard" element={<LawyerDashboardPage />} />
+        <Route path="requests" element={<LawyerRequestsPage />} />
+        <Route path="cases" element={<LawyerCasesPage />} />
+        <Route path="cases/:caseId" element={<LawyerCaseWorkspacePage />} />
+        <Route path="calendar" element={<LawyerCalendarPage />} />
+        <Route path="messages" element={<LawyerRequestsPage />} />
+        <Route path="earnings" element={<LawyerEarningsPage />} />
+        <Route path="profile" element={<LawyerChambersProfilePage />} />
+        <Route path="consultations" element={<LawyerCalendarPage />} />
+      </Route>
+
+      {/* Admin Lawyer Verification & Oversight Docket */}
+      <Route path="/admin/lawyers" element={<AdminLawyersPage />} />
+      <Route path="/admin/lawyers/:id" element={<AdminLawyersPage />} />
+
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         {/* Advocate Experience Screens (Unwrapped by standard citizen sidebar) */}
@@ -66,6 +105,7 @@ export function AppRoutes() {
 
         {/* Administrator Oversight */}
         <Route path="/admin/verifications" element={<AdminVerificationPage />} />
+        <Route path="/admin/payments" element={<AdminPaymentsPage />} />
 
         {/* Standard VidhiSetu Legal Assistant & Cases Workspace */}
         <Route element={<AppLayout />}>
@@ -75,6 +115,9 @@ export function AppRoutes() {
           {/* AI Legal Assistant */}
           <Route path="/chat" element={<AIChatPage />} />
           <Route path="/chat/:sessionId" element={<AIChatPage />} />
+
+          {/* Consultation Payments & Invoices */}
+          <Route path="/payments" element={<CitizenPaymentsPage />} />
 
           {/* Cases */}
           <Route path="/cases" element={<CasesListPage />} />

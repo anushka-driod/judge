@@ -48,6 +48,7 @@ async function runAuthTests() {
     await AuthService.register({
       name: 'Duplicate',
       email: testEmail,
+      phone: '+91 9876543210',
       password: testPassword,
     });
     assert.fail('Duplicate registration should have thrown error');

@@ -166,6 +166,7 @@ export const LawyerCaseController = {
     const lawyer = lawyersStore.find((l) => l.id === lawyerId);
     if (!lawyer) return res.status(404).json({ success: false, message: 'Lawyer not found' });
 
+    const isPaid = Boolean(req.body.transactionRef || req.body.paymentId);
     const booking = {
       id: `cons-${Date.now()}`,
       case_id: caseId || `case-${Date.now()}`,
@@ -176,8 +177,10 @@ export const LawyerCaseController = {
       time_slot: timeSlot,
       consultation_mode: consultationMode || 'video',
       fee_amount: lawyer.consultation_fee,
-      status: 'requested',
-      meeting_link: consultationMode === 'video' ? `https://meet.earnlaw.in/room-${Date.now()}` : null,
+      payment_status: isPaid ? 'PAYMENT_SUCCESSFUL' : 'PENDING_PAYMENT',
+      transaction_ref: req.body.transactionRef || req.body.paymentId || null,
+      status: isPaid ? 'accepted' : 'pending_payment',
+      meeting_link: isPaid && consultationMode === 'video' ? `https://meet.earnlaw.in/room-${Date.now()}` : null,
       user_notes: userNotes || '',
       created_at: new Date().toISOString(),
     };
@@ -189,7 +192,7 @@ export const LawyerCaseController = {
       casesStore[caseId] = CaseTrackingService.updateStatus(
         casesStore[caseId],
         CASE_STATUSES.CONSULTATION_PENDING,
-        { actorType: 'user', remarks: `Booked consultation with ${lawyer.name}` }
+        { actorType: 'user', remarks: `Initiated consultation with ${lawyer.name}` }
       );
     }
 
