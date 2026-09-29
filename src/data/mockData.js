@@ -130,6 +130,7 @@ export const mockLawyers = [
     availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Friday'],
     timeSlots: ['09:30 AM', '01:00 PM', '04:30 PM'],
   },
+<<<<<<< HEAD
   {
     id: 'lawyer-04',
     name: 'Adv. Vikramaditya Sen',
@@ -215,6 +216,8 @@ export const mockLawyers = [
     availableDays: ['Wednesday', 'Thursday', 'Friday'],
     timeSlots: ['10:30 AM', '02:30 PM', '05:30 PM'],
   },
+=======
+>>>>>>> origin/main
 ];
 
 export const mockCases = [

@@ -11,7 +11,10 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+<<<<<<< HEAD
   overflow-x: hidden;
+=======
+>>>>>>> origin/main
 }
 
 body {
@@ -22,6 +25,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+<<<<<<< HEAD
   overflow-x: hidden;
 }
 
@@ -29,6 +33,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+=======
+>>>>>>> origin/main
 }
 
 /* Headings */
@@ -149,6 +155,7 @@ input, textarea, select {
 .w-full { width: 100%; }
 .text-center { text-align: center; }
 .cursor-pointer { cursor: pointer; }
+<<<<<<< HEAD
 
 /* Apply the shared black-and-gold palette to legacy page surfaces. */
 :root {
@@ -194,3 +201,5 @@ body,
   background-color: var(--accent-600);
   border-color: var(--accent-600);
 }
+=======
+>>>>>>> origin/main

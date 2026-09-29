@@ -19,11 +19,18 @@ import {
   RotateCw,
   Clock,
 } from 'lucide-react';
+<<<<<<< HEAD
 import { GoogleAuthService } from '../../services/googleAuthService';
 import './AuthPage.css';
 
 export function LoginPage() {
   const { login, sendOtp, verifyOtp, googleAuth, completeGoogleProfile, logout, isAuthenticated, currentUser } = useAuth();
+=======
+import './AuthPage.css';
+
+export function LoginPage() {
+  const { login, sendOtp, verifyOtp, googleAuth, completeGoogleProfile } = useAuth();
+>>>>>>> origin/main
   const { showToast } = useUI();
   const navigate = useNavigate();
 
@@ -116,7 +123,10 @@ export function LoginPage() {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [remainingAttempts, setRemainingAttempts] = useState(null);
   const [maskedMobile, setMaskedMobile] = useState('');
+<<<<<<< HEAD
   const [simulatedOtp, setSimulatedOtp] = useState('');
+=======
+>>>>>>> origin/main
   const otpInputRefs = useRef([]);
 
   // Resend cooldown timer
@@ -175,9 +185,12 @@ export function LoginPage() {
       setOtpCountdown(60);
       setOtpExpirySeconds(300);
       setMaskedMobile(res?.maskedPhone || `+91 ******${cleanPhone.slice(-4)}`);
+<<<<<<< HEAD
       if (res?.otpPreview) {
         setSimulatedOtp(res.otpPreview);
       }
+=======
+>>>>>>> origin/main
       showToast(res?.message || 'OTP dispatched to your mobile number.', 'success');
       setTimeout(() => {
         if (otpInputRefs.current[0]) otpInputRefs.current[0].focus();
@@ -246,20 +259,40 @@ export function LoginPage() {
     setError('');
 
     try {
+<<<<<<< HEAD
       const googleProfile = await GoogleAuthService.promptGoogleSignIn();
       const res = await googleAuth(googleProfile);
 
       if (res.isNewUser) {
         // First-time sign-in: allow role and location customization
+=======
+      // Simulate Google Identity Provider response
+      const mockGoogleProfile = {
+        email: formData.emailOrPhone.includes('@')
+          ? formData.emailOrPhone
+          : 'google.citizen@example.com',
+        name: 'Siddharth Rao',
+        picture: null,
+      };
+
+      const res = await googleAuth(mockGoogleProfile);
+
+      if (res.isNewUser) {
+        // First-time sign-in: require role and location selection per spec
+>>>>>>> origin/main
         setGoogleOnboarding(res);
       } else {
         showToast('Signed in with Google!', 'success');
         routeByAccountType(res.user);
       }
     } catch (err) {
+<<<<<<< HEAD
       if (err.message && !err.message.includes('cancelled')) {
         setError(err.message || 'Google authentication failed. Please try again.');
       }
+=======
+      setError(err.message || 'Google authentication failed. Please try again.');
+>>>>>>> origin/main
     } finally {
       setLoading(false);
     }
@@ -329,6 +362,7 @@ export function LoginPage() {
         <p className="auth-desc">Sign in to your verified VidhiSetu account.</p>
       </div>
 
+<<<<<<< HEAD
       {isAuthenticated && currentUser && (
         <div
           className="auth-session-banner"
@@ -389,6 +423,8 @@ export function LoginPage() {
         </div>
       )}
 
+=======
+>>>>>>> origin/main
       {error && <Alert type="danger" onClose={() => setError('')}>{error}</Alert>}
 
       {/* Mode Switcher Tabs */}
@@ -576,6 +612,7 @@ export function LoginPage() {
                 <span>5-min window</span>
               </div>
 
+<<<<<<< HEAD
               {simulatedOtp && (
                 <div
                   style={{
@@ -617,6 +654,8 @@ export function LoginPage() {
                 </div>
               )}
 
+=======
+>>>>>>> origin/main
               <div className="otp-input-group" onPaste={handlePaste} style={{ marginBottom: '16px' }}>
                 {otpDigits.map((digit, idx) => (
                   <input

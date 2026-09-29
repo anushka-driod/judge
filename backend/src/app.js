@@ -14,7 +14,10 @@ import paymentRoutes from './routes/paymentRoutes.js';
 
 // Member 3: AI + RAG + Legal Research Pipeline
 import { RagPipeline } from '../modules/ai-rag/src/rag/ragPipeline.js';
+<<<<<<< HEAD
 import { networkManager } from './services/networkManager.js';
+=======
+>>>>>>> origin/main
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +26,7 @@ const distPath = path.join(__dirname, '../../dist');
 const app = express();
 const ragPipeline = new RagPipeline();
 
+<<<<<<< HEAD
 // 1. Security & Parsing Middlewares - Configured CORS with FRONTEND_URL & credentials
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -54,6 +58,16 @@ app.options('*', cors());
 // Allow large documents, evidence scans, agreements up to 200MB
 app.use(express.json({ limit: '200mb' }));
 app.use(express.urlencoded({ limit: '200mb', extended: true }));
+=======
+// 1. Security & Parsing Middlewares
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+>>>>>>> origin/main
 
 // 2. Healthcheck Route
 app.get(['/health', '/api/health'], (req, res) => {
@@ -62,17 +76,25 @@ app.get(['/health', '/api/health'], (req, res) => {
     status: 'online',
     version: '2.0.0',
     unified_engine: 'Single Localhost Architecture',
+<<<<<<< HEAD
     offline_ready: true,
     active_subsystems: [
       'Member 1: React 19 Frontend Client',
       'Member 2: Core Auth, Persistence & AnuDB',
       'Member 3: AI Legal Research & Kanoon RAG Pipeline (Offline Capable)',
+=======
+    active_subsystems: [
+      'Member 1: React 19 Frontend Client',
+      'Member 2: Core Auth, Persistence & AnuDB',
+      'Member 3: AI Legal Research & Kanoon RAG Pipeline',
+>>>>>>> origin/main
       'Member 4: Lawyer Matching Engine & Case Management',
     ],
     timestamp: new Date().toISOString(),
   });
 });
 
+<<<<<<< HEAD
 // 2b. System Network & Offline Status
 app.get(['/api/system/status', '/api/network/status'], async (req, res) => {
   const isOnline = await networkManager.checkConnectivity();
@@ -97,6 +119,8 @@ app.post('/api/system/toggle-offline', (req, res) => {
   });
 });
 
+=======
+>>>>>>> origin/main
 // 3. Mount Member 2: Auth Routes
 app.use('/api/auth', authRoutes);
 
@@ -130,8 +154,13 @@ app.post(['/api/legal/analyze', '/api/ai/chat'], async (req, res) => {
     res.json({
       success: true,
       reply: analysis.guidance,
+<<<<<<< HEAD
       detectedLaws: analysis.relevant_laws || analysis.relevantLaws || [],
       detectedPrecedents: analysis.similar_cases || analysis.relevantJudgments || [],
+=======
+      detectedLaws: analysis.relevant_laws,
+      detectedPrecedents: analysis.similar_cases,
+>>>>>>> origin/main
       suggestedNextSteps: analysis.suggestedNextSteps || (analysis.missing_information || []).map((m) => `Clarify: ${m}`),
       ...analysis,
       timestamp: new Date().toISOString(),
@@ -146,6 +175,7 @@ app.post(['/api/legal/analyze', '/api/ai/chat'], async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // 6b. SSE Streaming Legal Guidance & Chat Endpoint
 app.post('/api/ai/chat/stream', async (req, res) => {
   const query = req.body.query || req.body.message || '';
@@ -225,6 +255,8 @@ app.post('/api/ai/chat/stream', async (req, res) => {
   }
 });
 
+=======
+>>>>>>> origin/main
 // 6. Mount Dedicated Lawyer Portal & Admin Oversight Routes
 app.use('/api/lawyer', lawyerRoutes);
 app.use('/api/admin', adminRoutes);
@@ -235,6 +267,7 @@ app.use('/api', paymentRoutes);
 // 8. Mount Member 4: Lawyer Directory, Consultations, Actions, Documents, Timeline, Reminders, Complaints
 app.use('/api', lawyerCaseRoutes);
 
+<<<<<<< HEAD
 // 9. Catch Unmatched /api/* routes cleanly with JSON instead of hanging
 app.all('/api/*', (req, res) => {
   res.status(404).json({
@@ -267,6 +300,17 @@ app.use((err, req, res, next) => {
     error: err.message || 'An unexpected server error occurred.',
     code: err.code || 'INTERNAL_SERVER_ERROR',
   });
+=======
+// 7. Serve Static Frontend Production Assets (Single Localhost Unified Serving)
+app.use(express.static(distPath));
+
+// 8. Client-side Single-Page-App (SPA) Fallback for React Router navigation
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') {
+    return next();
+  }
+  res.sendFile(path.join(distPath, 'index.html'));
+>>>>>>> origin/main
 });
 
 export default app;

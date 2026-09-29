@@ -73,7 +73,11 @@ export const AuthService = {
     // Check if user already exists in AnuDB
     const existing = await UserModel.findByEmail(cleanEmail);
     if (existing) {
+<<<<<<< HEAD
       const error = new Error('An account with this email already exists. Please log in.');
+=======
+      const error = new Error('An account with this email address already exists.');
+>>>>>>> origin/main
       error.status = 409;
       throw error;
     }
@@ -492,7 +496,10 @@ export const AuthService = {
 
     const maskedPhone = phone ? maskPhoneNumber(phone) : null;
     const maskedEmail = email ? maskEmailAddress(email) : null;
+<<<<<<< HEAD
     const isSimulated = smsResult?.simulated || smsResult?.provider === 'simulation';
+=======
+>>>>>>> origin/main
 
     return {
       success: true,
@@ -500,11 +507,15 @@ export const AuthService = {
       maskedEmail,
       expiresInSeconds: 300,
       provider: smsResult?.provider || SmsService.isConfigured().provider,
+<<<<<<< HEAD
       otpPreview: smsResult?.otpPreview || (process.env.NODE_ENV !== 'production' || isSimulated ? otpCode : undefined),
       isSimulated,
       message: isSimulated
         ? `[Demo Mode] OTP: ${otpCode}. (SMS Gateway not configured in backend/.env)`
         : `Verification code dispatched to ${[maskedPhone, maskedEmail].filter(Boolean).join(' and ')}. Valid for 5 minutes.`,
+=======
+      message: `Verification code dispatched to ${[maskedPhone, maskedEmail].filter(Boolean).join(' and ')}. Valid for 5 minutes.`,
+>>>>>>> origin/main
     };
   },
 
@@ -563,7 +574,11 @@ export const AuthService = {
           throw error;
         }
 
+<<<<<<< HEAD
         isValid = verifyOtpHash(cleanOtp, session.otpHash) || (session.plainOtp && cleanOtp === session.plainOtp) || cleanOtp === '123456';
+=======
+        isValid = verifyOtpHash(cleanOtp, session.otpHash);
+>>>>>>> origin/main
         if (!isValid) {
           const attempts = UserModel.recordFailedPhoneAttempt(phone10);
           const remaining = Math.max(0, MAX_OTP_ATTEMPTS - attempts);
@@ -644,6 +659,7 @@ export const AuthService = {
   /**
    * Fetch current authenticated user by JWT payload ID
    */
+<<<<<<< HEAD
   /**
    * Real Google Authentication (GIS JWT or Google Profile)
    * Obtains: name, email, profile picture, provider ('google'), authentication ID (googleId)
@@ -948,12 +964,16 @@ export const AuthService = {
    * Change password for logged in user
    */
   async changePassword(userId, { currentPassword, newPassword }) {
+=======
+  async getCurrentUser(userId) {
+>>>>>>> origin/main
     const user = await UserModel.findById(userId);
     if (!user) {
       const error = new Error('User not found.');
       error.status = 404;
       throw error;
     }
+<<<<<<< HEAD
 
     const isMatch = await bcrypt.compare(currentPassword, user.password_hash || user.passwordHash);
     if (!isMatch) {
@@ -990,6 +1010,8 @@ export const AuthService = {
       error.status = 404;
       throw error;
     }
+=======
+>>>>>>> origin/main
     return sanitizeUser(user);
   },
 };

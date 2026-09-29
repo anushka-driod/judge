@@ -46,11 +46,14 @@ export const authService = {
     if (res?.token) {
       localStorage.setItem('vidhisetu_auth_token', res.token);
       localStorage.setItem('earnlaw_auth_token', res.token);
+<<<<<<< HEAD
       if (res.user) {
         try {
           localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
         } catch (_) {}
       }
+=======
+>>>>>>> origin/main
     }
     return res;
   },
@@ -200,24 +203,52 @@ export const authService = {
 
   /**
    * Social Authentication (Continue with Google).
+<<<<<<< HEAD
    * Sends Google credential or verified profile payload to backend.
    * Backend returns { isNewUser: boolean, token, user }.
    */
   async googleAuth(googlePayload) {
+=======
+   * Returns { isNewUser: boolean, token, user } or { isNewUser: true, email, name, picture }.
+   */
+  async googleAuth(googleProfile) {
+>>>>>>> origin/main
     const res = await request(
       '/auth/google',
       {
         method: 'POST',
+<<<<<<< HEAD
         body: JSON.stringify(googlePayload),
+=======
+        body: JSON.stringify(googleProfile),
+      },
+      () => {
+        // Fallback mock check
+        const isExisting = googleProfile.email === 'aarav.mehta@example.com';
+        if (isExisting) {
+          const token = `vst_token_usr_001`;
+          localStorage.setItem('vidhisetu_auth_token', token);
+          return { isNewUser: false, token, user: mockCurrentUser };
+        }
+        return {
+          isNewUser: true,
+          email: googleProfile.email,
+          name: googleProfile.name,
+          picture: googleProfile.picture,
+        };
+>>>>>>> origin/main
       }
     );
 
     if (res?.token) {
       localStorage.setItem('vidhisetu_auth_token', res.token);
       localStorage.setItem('earnlaw_auth_token', res.token);
+<<<<<<< HEAD
       if (res.user) {
         localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
       }
+=======
+>>>>>>> origin/main
     }
     return res;
   },
@@ -231,15 +262,32 @@ export const authService = {
       {
         method: 'POST',
         body: JSON.stringify(profileData),
+<<<<<<< HEAD
+=======
+      },
+      () => {
+        const user = {
+          ...mockCurrentUser,
+          ...profileData,
+          emailVerified: true,
+          verificationStatus: profileData.accountType === 'advocate' ? 'pending' : undefined,
+        };
+        const token = `vst_token_${Date.now()}`;
+        localStorage.setItem('vidhisetu_auth_token', token);
+        return { success: true, token, user };
+>>>>>>> origin/main
       }
     );
 
     if (res?.token) {
       localStorage.setItem('vidhisetu_auth_token', res.token);
       localStorage.setItem('earnlaw_auth_token', res.token);
+<<<<<<< HEAD
       if (res.user) {
         localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
       }
+=======
+>>>>>>> origin/main
     }
     return res;
   },
@@ -395,6 +443,7 @@ export const authService = {
    * Get active authenticated user session.
    */
   async getCurrentUser() {
+<<<<<<< HEAD
     const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
     if (!token) return null;
 
@@ -437,12 +486,26 @@ export const authService = {
       }
       return null;
     }
+=======
+    return request('/auth/me', {}, () => {
+      const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
+      if (!token) return null;
+      try {
+        const saved = localStorage.getItem('vidhisetu_user_profile');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+      return mockCurrentUser;
+    });
+>>>>>>> origin/main
   },
 
   /**
    * Terminate user session.
    */
   async logout() {
+<<<<<<< HEAD
     try {
       await request('/auth/logout', { method: 'POST' }).catch(() => null);
     } finally {
@@ -450,6 +513,10 @@ export const authService = {
       localStorage.removeItem('earnlaw_auth_token');
       localStorage.removeItem('vidhisetu_user_profile');
     }
+=======
+    localStorage.removeItem('vidhisetu_auth_token');
+    localStorage.removeItem('earnlaw_auth_token');
+>>>>>>> origin/main
     return true;
   },
 };

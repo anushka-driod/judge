@@ -423,6 +423,7 @@
   flex-shrink: 0;
 }
 
+<<<<<<< HEAD
 /* Sidebar Auth Strip */
 .sidebar-auth-strip {
   margin-top: 10px;
@@ -531,6 +532,8 @@
   border-color: #1d4ed8;
 }
 
+=======
+>>>>>>> origin/main
 /* =========================================================================
    Collapsed State (Icon-Only Mode)
    ========================================================================= */

@@ -10,11 +10,14 @@
  */
 
 import IndianKanoonService from '../../../../src/services/indianKanoonService.js';
+<<<<<<< HEAD
 import { networkManager } from '../../../../src/services/networkManager.js';
 
 // Memory caches to prevent duplicate remote searches and accelerate responses
 const searchCache = new Map();
 const docCache = new Map();
+=======
+>>>>>>> origin/main
 
 export class KanoonClient {
   constructor(apiToken = process.env.INDIANKANOON_API_TOKEN || process.env.INDIAN_KANOON_API_TOKEN) {
@@ -23,12 +26,16 @@ export class KanoonClient {
 
   /**
    * Searches Indian Kanoon for authentic judgments matching formulated query strings.
+<<<<<<< HEAD
    * If cached or offline, returns immediately to avoid duplicate API requests.
+=======
+>>>>>>> origin/main
    * @param {string} query - Boolean or keyword query (e.g. '"termination without notice" "Section 25F"')
    * @param {number} [pageNum=0]
    * @returns {Promise<Array>} List of matching case documents (normalized for RAG)
    */
   async searchJudgments(query, pageNum = 0) {
+<<<<<<< HEAD
     const cacheKey = `${query.toLowerCase().trim()}_p${pageNum}`;
     if (searchCache.has(cacheKey)) {
       return searchCache.get(cacheKey);
@@ -38,6 +45,8 @@ export class KanoonClient {
       return [];
     }
 
+=======
+>>>>>>> origin/main
     try {
       const response = await IndianKanoonService.search({
         query,
@@ -45,6 +54,7 @@ export class KanoonClient {
       });
 
       if (response && Array.isArray(response.results) && response.results.length > 0) {
+<<<<<<< HEAD
         const normalized = response.results.map(this.normalizeForRag);
         searchCache.set(cacheKey, normalized);
         return normalized;
@@ -55,6 +65,12 @@ export class KanoonClient {
       if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.message?.includes('fetch failed')) {
         networkManager.recordNetworkFailure(err);
       }
+=======
+        return response.results.map(this.normalizeForRag);
+      }
+      return [];
+    } catch (err) {
+>>>>>>> origin/main
       console.warn('[KanoonClient] Indian Kanoon search returned:', err.message);
       return [];
     }
@@ -62,11 +78,15 @@ export class KanoonClient {
 
   /**
    * Fetches full authentic judgment text by document ID.
+<<<<<<< HEAD
    * Uses docCache to eliminate duplicate lookups.
+=======
+>>>>>>> origin/main
    * @param {string|number} docId
    * @returns {Promise<Object|null>}
    */
   async getJudgmentDetails(docId) {
+<<<<<<< HEAD
     const cleanId = String(docId);
     if (docCache.has(cleanId)) {
       return docCache.get(cleanId);
@@ -85,6 +105,12 @@ export class KanoonClient {
       if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.message?.includes('fetch failed')) {
         networkManager.recordNetworkFailure(err);
       }
+=======
+    try {
+      const doc = await IndianKanoonService.getDocument(docId);
+      return this.normalizeForRag(doc);
+    } catch (err) {
+>>>>>>> origin/main
       console.warn(`[KanoonClient] Remote doc fetch failed for ${docId}:`, err.message);
       return null;
     }

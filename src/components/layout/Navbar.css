@@ -340,6 +340,7 @@
   color: #dc2626;
 }
 
+<<<<<<< HEAD
 /* =========================================================================
    Unauthenticated Auth Action Buttons (Sign In / Register / Lawyer Portal)
    ========================================================================= */
@@ -413,6 +414,8 @@
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
 }
 
+=======
+>>>>>>> origin/main
 @media (max-width: 768px) {
   .brand-tagline {
     display: none;
@@ -425,9 +428,12 @@
   .navbar-compact-account-btn {
     padding: 3px 6px 3px 3px;
   }
+<<<<<<< HEAD
 
   .navbar-lawyer-pill {
     display: none;
   }
+=======
+>>>>>>> origin/main
 }
 

@@ -21,6 +21,7 @@
   overflow-y: auto;
 }
 
+<<<<<<< HEAD
 .app-main.app-main-chat {
   padding: 0;
   overflow: hidden;
@@ -28,12 +29,15 @@
   flex-direction: column;
 }
 
+=======
+>>>>>>> origin/main
 .app-content-container {
   max-width: var(--container-max);
   margin: 0 auto;
   width: 100%;
 }
 
+<<<<<<< HEAD
 .app-content-container.app-content-chat {
   max-width: 100%;
   height: 100%;
@@ -43,6 +47,8 @@
   overflow: hidden;
 }
 
+=======
+>>>>>>> origin/main
 @media (max-width: 768px) {
   .app-main {
     padding: var(--space-4);

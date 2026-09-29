@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useCases } from '../../context/CaseContext';
 import { aiLegalService } from '../../services/aiLegalService';
 import { MarkdownMessage } from '../../components/chat/MarkdownMessage';
+=======
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useCases } from '../../context/CaseContext';
+import { aiLegalService } from '../../services/aiLegalService';
+>>>>>>> origin/main
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { FileUpload } from '../../components/common/FileUpload';
@@ -21,6 +28,7 @@ import {
   Clock,
   Sparkles,
   ArrowUp,
+<<<<<<< HEAD
   ArrowDown,
   Copy,
   Check,
@@ -41,6 +49,9 @@ import {
   Video,
 } from 'lucide-react';
 import { mockLawyers } from '../../data/mockData';
+=======
+} from 'lucide-react';
+>>>>>>> origin/main
 import './AIChatPage.css';
 
 export function AIChatPage() {
@@ -49,12 +60,16 @@ export function AIChatPage() {
     activeCase,
     createChatCase,
     addMessageToCase,
+<<<<<<< HEAD
     updateMessageInCase,
     removeLastMessage,
+=======
+>>>>>>> origin/main
     startFreshChat,
   } = useCases();
 
   const navigate = useNavigate();
+<<<<<<< HEAD
   const location = useLocation();
 
   // Input & composer state
@@ -185,6 +200,26 @@ export function AIChatPage() {
       }
     }
   }, [streamingText, isStreaming]);
+=======
+
+  const [inputText, setInputText] = useState('');
+  const [attachedFiles, setAttachedFiles] = useState([]);
+  const [showAttachModal, setShowAttachModal] = useState(false);
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  // Active messages from current selected case (or empty for new case)
+  const currentMessages = activeCase?.messages || [];
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [currentMessages, isAiThinking]);
+>>>>>>> origin/main
 
   // Autofocus input when starting a fresh case conversation
   useEffect(() => {
@@ -193,6 +228,7 @@ export function AIChatPage() {
     }
   }, [activeCaseId]);
 
+<<<<<<< HEAD
   // Refocus input whenever AI generation completes, errors, or is stopped
   const wasGeneratingRef = useRef(false);
   useEffect(() => {
@@ -206,6 +242,9 @@ export function AIChatPage() {
   }, [isAiThinking, isStreaming]);
 
   // Adjust textarea height dynamically up to 180px
+=======
+  // Adjust textarea height dynamically
+>>>>>>> origin/main
   const handleTextChange = (e) => {
     setInputText(e.target.value);
     if (textareaRef.current) {
@@ -214,6 +253,7 @@ export function AIChatPage() {
     }
   };
 
+<<<<<<< HEAD
   const handleClarificationAnswer = (question) => {
     setInputText('My answer: ');
     requestAnimationFrame(() => {
@@ -362,6 +402,11 @@ export function AIChatPage() {
     if (isSubmittingRef.current || isAiThinking || isStreaming) return;
 
     isSubmittingRef.current = true;
+=======
+  const handleSendMessage = async (textToSend = inputText) => {
+    const trimmed = textToSend.trim();
+    if (!trimmed && attachedFiles.length === 0) return;
+>>>>>>> origin/main
 
     const userMessage = {
       id: `usr-msg-${Date.now()}`,
@@ -371,6 +416,7 @@ export function AIChatPage() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
+<<<<<<< HEAD
     let targetCaseId = currentCaseIdRef.current || activeCaseId;
 
     // New Case Flow: If no active case, create one automatically
@@ -378,16 +424,28 @@ export function AIChatPage() {
       const createdCase = createChatCase(trimmed);
       targetCaseId = createdCase.id;
       currentCaseIdRef.current = targetCaseId;
+=======
+    let targetCaseId = activeCaseId;
+
+    // 7. New Case Flow: If no active case, create one automatically from first message
+    if (!targetCaseId) {
+      const createdCase = createChatCase(trimmed);
+      targetCaseId = createdCase.id;
+>>>>>>> origin/main
     } else {
       addMessageToCase(targetCaseId, userMessage);
     }
 
+<<<<<<< HEAD
     // Reset composer immediately so input is cleared and ready for next turn
+=======
+>>>>>>> origin/main
     setInputText('');
     setAttachedFiles([]);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
+<<<<<<< HEAD
 
     // Always scroll to bottom when user explicitly sends a message
     isNearBottomRef.current = true;
@@ -627,6 +685,42 @@ export function AIChatPage() {
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 60);
+=======
+    setIsAiThinking(true);
+
+    try {
+      // Call Member 3 RAG Pipeline / Legal Analyzer
+      const aiResponse = await aiLegalService.sendMessage(
+        trimmed,
+        currentMessages,
+        attachedFiles
+      );
+
+      const aiMessage = {
+        id: `ai-msg-${Date.now()}`,
+        sender: 'ai',
+        text: aiResponse.reply || aiResponse.guidance || 'I have analyzed your situation under Indian legal principles.',
+        detectedLaws: aiResponse.detectedLaws || aiResponse.relevant_laws || [],
+        detectedPrecedents: aiResponse.detectedPrecedents || aiResponse.similar_cases || [],
+        suggestedNextSteps: aiResponse.suggestedNextSteps || [],
+        missingInformation: aiResponse.missing_information || [],
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      addMessageToCase(targetCaseId, aiMessage);
+    } catch (err) {
+      console.error('Chat error:', err);
+      const fallbackAi = {
+        id: `err-${Date.now()}`,
+        sender: 'ai',
+        text: 'I apologize, but I encountered an issue analyzing this specific issue. Please ensure your problem includes context like dates, state, or contract terms.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      addMessageToCase(targetCaseId, fallbackAi);
+    } finally {
+      setIsAiThinking(false);
+    }
+>>>>>>> origin/main
   };
 
   const handleStarterClick = (starterText) => {
@@ -635,12 +729,15 @@ export function AIChatPage() {
 
   const starterCards = [
     {
+<<<<<<< HEAD
       icon: '🏠',
       title: 'Security Deposit Withheld',
       desc: 'Landlord refuses deposit refund or made arbitrary deductions',
       prompt: 'My landlord is withholding my ₹70,000 security deposit after I vacated the house with proper 30-day notice and claims ₹25,000 for painting.',
     },
     {
+=======
+>>>>>>> origin/main
       icon: '🏢',
       title: 'Wrongful Job Dismissal',
       desc: 'Terminated without 30 days statutory notice or severance pay',
@@ -653,18 +750,22 @@ export function AIChatPage() {
       prompt: 'A business client gave me a cheque of ₹2,50,000 which bounced due to insufficient funds. What is the legal procedure and time limit to take action?',
     },
     {
+<<<<<<< HEAD
       icon: '🛡️',
       title: 'Cyber Fraud & Unauthorized Debit',
       desc: 'Unrecognized UPI/bank debit and 1930 reporting helpline',
       prompt: '₹45,000 was debited from my bank account via unauthorized UPI transactions without any OTP or alert. What immediate steps and legal notice should I issue?',
     },
     {
+=======
+>>>>>>> origin/main
       icon: '📦',
       title: 'Defective Product & Refund',
       desc: 'E-commerce platform refused return for damaged goods',
       prompt: 'I purchased an electronic appliance online that arrived damaged and defective, but the seller refused refund citing their 7-day return policy.',
     },
     {
+<<<<<<< HEAD
       icon: '🏗️',
       title: 'Builder Possession Delay',
       desc: 'RERA delayed handover compensation or 100% full refund',
@@ -682,10 +783,18 @@ export function AIChatPage() {
       desc: 'Ancestral property share dispute among legal heirs',
       prompt: 'My siblings are refusing to give me my lawful share of our ancestral residential property after our father passed away without leaving a will. What legal steps should I take?',
     },
+=======
+      icon: '🏠',
+      title: 'Builder Possession Delay',
+      desc: 'RERA delayed handover compensation or full refund',
+      prompt: 'My builder delayed flat possession by over 14 months beyond the date promised in the Agreement for Sale. Can I claim full refund under RERA?',
+    },
+>>>>>>> origin/main
   ];
 
   return (
     <div className="vidhisetu-chat-layout animate-fade-in">
+<<<<<<< HEAD
       {/* 1. Header Toolbar */}
       <header className="chat-top-toolbar">
         <div className="chat-top-left">
@@ -731,6 +840,12 @@ export function AIChatPage() {
       >
         <div className="chat-inner-column">
           {/* Empty State / Welcome Screen */}
+=======
+      {/* Scrollable Conversation Stream */}
+      <div className="chat-scroll-area">
+        <div className="chat-inner-column">
+          {/* Empty State / New Case Screen */}
+>>>>>>> origin/main
           {currentMessages.length === 0 ? (
             <div className="chat-empty-hero animate-fade-in">
               <div className="hero-badge-container">
@@ -738,6 +853,7 @@ export function AIChatPage() {
                   <Scale size={32} />
                 </div>
               </div>
+<<<<<<< HEAD
               <h1 className="hero-title">Public AI Legal Agent</h1>
               <p className="hero-subtitle">
                 Individualized Legal Procedures • Authentic Kanoon Precedents • Multi-Turn Memory
@@ -760,6 +876,15 @@ export function AIChatPage() {
 
               <p className="hero-explanation">
                 Explain any legal grievance in your own words (English, Telugu, or Tanglish). VidhiSetu tailors a suitable legal roadmap for your specific issue, cites authentic Indian judicial precedents, and remembers your facts as you ask follow-up questions.
+=======
+              <h1 className="hero-title">VidhiSetu AI</h1>
+              <p className="hero-subtitle">
+                How can I help with your legal situation today?
+              </p>
+              <p className="hero-explanation">
+                Describe your dispute in everyday words. VidhiSetu researches relevant Indian statutes,
+                court precedents, and guides you on self-help or advocate consultation.
+>>>>>>> origin/main
               </p>
 
               <div className="hero-starters-grid">
@@ -782,6 +907,7 @@ export function AIChatPage() {
           ) : (
             /* Active Conversation Messages */
             <div className="chat-messages-list">
+<<<<<<< HEAD
               {currentMessages.map((msg, index) => {
                 const isLastAiMessage =
                   msg.sender === 'ai' && index === currentMessages.length - 1;
@@ -1279,16 +1405,203 @@ export function AIChatPage() {
                           {streamingMeta.detectedLaws.slice(0, 2).map((law, idx) => (
                             <div key={idx} className="source-card">
                               <strong>{law.act || law.act_name || law.name}</strong>
+=======
+              {currentMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`chat-message-row message-from-${msg.sender}`}
+                >
+                  <div className="message-avatar">
+                    {msg.sender === 'ai' ? (
+                      <div className="ai-avatar-badge">
+                        <Scale size={16} />
+                      </div>
+                    ) : (
+                      <div className="user-avatar-badge">
+                        <User size={16} />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="message-bubble">
+                    <div className="message-header-meta">
+                      <span className="message-sender-name">
+                        {msg.sender === 'ai' ? 'VidhiSetu AI' : 'You'}
+                      </span>
+                      <span className="message-time">{msg.timestamp}</span>
+                    </div>
+
+                    {/* Body text with formatted paragraphs */}
+                    <div className="message-text">
+                      {msg.text.split('\n\n').map((para, i) => (
+                        <p
+                          key={i}
+                          dangerouslySetInnerHTML={{
+                            __html: para
+                              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                              .replace(/\*(.*?)\*/g, '<em>$1</em>'),
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Attached file chips */}
+                    {msg.attachedFiles && msg.attachedFiles.length > 0 && (
+                      <div className="message-attachments">
+                        <span className="attachments-title">Attached Proofs:</span>
+                        {msg.attachedFiles.map((file, idx) => (
+                          <span key={idx} className="attachment-chip">
+                            <FileText size={14} /> {file.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Relevant Statutory Laws */}
+                    {msg.detectedLaws && msg.detectedLaws.length > 0 && (
+                      <div className="chat-sources-block">
+                        <div className="sources-heading">
+                          <BookOpen size={16} />
+                          <span>Relevant Indian Statutes:</span>
+                        </div>
+                        <div className="sources-cards-list">
+                          {msg.detectedLaws.map((law, idx) => (
+                            <div key={idx} className="source-card">
+                              <strong>
+                                {law.act || law.act_name} {law.section ? `– ${law.section}` : ''}
+                              </strong>
+                              {law.plainMeaning && <p>{law.plainMeaning}</p>}
+>>>>>>> origin/main
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
+<<<<<<< HEAD
                   </div>
                 </div>
               )}
 
               {/* AI Thinking Animation (Initial phase before tokens arrive) */}
+=======
+
+                    {/* Cited Judicial Precedents (Indian Kanoon) */}
+                    {msg.detectedPrecedents && msg.detectedPrecedents.length > 0 && (
+                      <div className="chat-sources-block precedents-block">
+                        <div className="sources-heading">
+                          <Scale size={16} />
+                          <span>Retrieved Legal Precedents (Indian Kanoon):</span>
+                        </div>
+                        <div className="sources-cards-list">
+                          {msg.detectedPrecedents.map((judg, idx) => (
+                            <div key={idx} className="source-card precedent-source-card">
+                              <div className="precedent-card-top">
+                                <strong>
+                                  {judg.title} {judg.year ? `(${judg.year})` : ''}
+                                </strong>
+                                {judg.court && (
+                                  <span className="citation-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
+                                    {judg.court}
+                                  </span>
+                                )}
+                                {judg.citation && (
+                                  <span className="citation-badge">{judg.citation}</span>
+                                )}
+                              </div>
+                              {judg.keyExtract && (
+                                <blockquote
+                                  style={{
+                                    fontSize: '0.82rem',
+                                    color: '#334155',
+                                    background: '#f8fafc',
+                                    borderLeft: '3px solid #3b82f6',
+                                    padding: '6px 10px',
+                                    margin: '6px 0',
+                                    borderRadius: '0 4px 4px 0',
+                                  }}
+                                >
+                                  <strong>Relevant Case Extract:</strong> "{judg.keyExtract.length > 250 ? judg.keyExtract.slice(0, 250) + '...' : judg.keyExtract}"
+                                </blockquote>
+                              )}
+                              {judg.keyTakeaway && !judg.keyExtract && (
+                                <p className="takeaway-text">💡 {judg.keyTakeaway}</p>
+                              )}
+                              <div className="precedent-links-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
+                                <Link
+                                  to={`/judgments/${judg.caseId || judg.id || '109283'}`}
+                                  className="precedent-kanoon-link"
+                                  style={{ fontWeight: 600, color: '#2563eb' }}
+                                >
+                                  View Full Court Judgment →
+                                </Link>
+                                {judg.sourceUrl && (
+                                  <a
+                                    href={judg.sourceUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="precedent-kanoon-link"
+                                    style={{ color: '#64748b' }}
+                                  >
+                                    Indian Kanoon Source ↗
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Missing Information / Follow-up Questions */}
+                    {msg.missingInformation && msg.missingInformation.length > 0 && (
+                      <div className="missing-info-card">
+                        <div className="missing-info-header">
+                          <HelpCircle size={15} />
+                          <span>Important Questions to Clarify:</span>
+                        </div>
+                        <ul className="missing-info-list">
+                          {msg.missingInformation.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Suggested Next Steps */}
+                    {msg.suggestedNextSteps && msg.suggestedNextSteps.length > 0 && (
+                      <div className="suggested-actions-box">
+                        <span className="suggested-actions-title">
+                          <CheckCircle2 size={15} /> Recommended Next Steps:
+                        </span>
+                        <ul className="suggested-actions-list">
+                          {msg.suggestedNextSteps.map((step, idx) => (
+                            <li key={idx}>{step}</li>
+                          ))}
+                        </ul>
+                        <div className="action-box-footer">
+                          <Link
+                            to={`/cases/${activeCaseId || 'case-101'}/action-plan`}
+                            className="action-link-btn"
+                          >
+                            <span>Open Step-by-Step Action Plan</span>
+                            <ArrowRight size={14} />
+                          </Link>
+                          <Link
+                            to={`/cases/${activeCaseId || 'case-101'}/lawyers`}
+                            className="action-link-btn btn-secondary"
+                          >
+                            <Users size={14} />
+                            <span>Find Recommended Advocates</span>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* AI Thinking Animation */}
+>>>>>>> origin/main
               {isAiThinking && (
                 <div className="chat-message-row message-from-ai">
                   <div className="message-avatar">
@@ -1309,13 +1622,18 @@ export function AIChatPage() {
                 </div>
               )}
 
+<<<<<<< HEAD
               {/* Bottom anchor for scrolling */}
               <div ref={messagesEndRef} className="scroll-sentinel" />
+=======
+              <div ref={messagesEndRef} />
+>>>>>>> origin/main
             </div>
           )}
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* 3. Floating Jump to Bottom Button */}
       {showScrollBottomBtn && (
         <button
@@ -1334,11 +1652,17 @@ export function AIChatPage() {
       <footer className="chat-bottom-dock">
         <div className="chat-dock-inner">
           {/* File Attachment Tray */}
+=======
+      {/* 6. Message Input Box Fixed at Bottom (ChatGPT style) */}
+      <div className="chat-bottom-dock">
+        <div className="chat-dock-inner">
+>>>>>>> origin/main
           {attachedFiles.length > 0 && (
             <div className="chat-attached-tray">
               {attachedFiles.map((f, i) => (
                 <span key={i} className="tray-chip">
                   <FileText size={14} /> {f.name}
+<<<<<<< HEAD
                   <button
                     type="button"
                     className="tray-chip-remove"
@@ -1347,11 +1671,14 @@ export function AIChatPage() {
                   >
                     ×
                   </button>
+=======
+>>>>>>> origin/main
                 </span>
               ))}
             </div>
           )}
 
+<<<<<<< HEAD
           {/* Voice Input Listening State Indicator */}
           {isListening && (
             <div className="voice-listening-banner animate-fade-in">
@@ -1361,17 +1688,24 @@ export function AIChatPage() {
           )}
 
           {/* Composer Input Box */}
+=======
+>>>>>>> origin/main
           <div className="chat-composer-box">
             <button
               type="button"
               className="composer-attach-btn"
               onClick={() => setShowAttachModal(true)}
+<<<<<<< HEAD
               title="Attach Agreements, Invoices, Dishonour Memos, or Notice Copies"
+=======
+              title="Attach Agreements, Receipts, or Bounced Cheques"
+>>>>>>> origin/main
               aria-label="Attach Documents"
             >
               <Paperclip size={18} />
             </button>
 
+<<<<<<< HEAD
             {/* Flowchart Step 2: Voice Input Button */}
             <button
               type="button"
@@ -1391,6 +1725,12 @@ export function AIChatPage() {
                   ? 'VidhiSetu AI is analyzing Indian statutes & precedents…'
                   : 'Ask VidhiSetu about your legal rights, notice procedure, or dispute…'
               }
+=======
+            <textarea
+              ref={textareaRef}
+              className="composer-textarea"
+              placeholder="Ask VidhiSetu about your legal issue, rights, notice period, or dispute…"
+>>>>>>> origin/main
               value={inputText}
               rows={1}
               onChange={handleTextChange}
@@ -1400,6 +1740,7 @@ export function AIChatPage() {
                   handleSendMessage();
                 }
               }}
+<<<<<<< HEAD
               disabled={isAiThinking || isStreaming}
               id="chat-composer-textarea"
             />
@@ -1439,6 +1780,29 @@ export function AIChatPage() {
           </div>
         </div>
       </footer>
+=======
+            />
+
+            <button
+              type="button"
+              className={`composer-send-btn ${inputText.trim() || attachedFiles.length > 0 ? 'send-btn-active' : ''}`}
+              onClick={() => handleSendMessage()}
+              disabled={!inputText.trim() && attachedFiles.length === 0}
+              title="Send message (Enter)"
+              aria-label="Send message"
+            >
+              <ArrowUp size={18} />
+            </button>
+          </div>
+
+          <div className="chat-legal-footnote">
+            <span>
+              VidhiSetu provides informational legal guidance based on Indian law and judicial records. It does not replace professional legal representation.
+            </span>
+          </div>
+        </div>
+      </div>
+>>>>>>> origin/main
 
       {/* Document Attachment Modal */}
       {showAttachModal && (
@@ -1447,7 +1811,11 @@ export function AIChatPage() {
             <Card className="attach-modal-card">
               <h3 className="card-title">Attach Supporting Evidence</h3>
               <p className="card-subtitle">
+<<<<<<< HEAD
                 Upload rental agreements, cheques, invoices, or written correspondence to assist VidhiSetu.
+=======
+                Upload invoices, agreements, emails, or bank dishonour memos to help VidhiSetu assess your case.
+>>>>>>> origin/main
               </p>
               <div style={{ marginTop: '16px' }}>
                 <FileUpload
@@ -1460,7 +1828,11 @@ export function AIChatPage() {
                   Cancel
                 </Button>
                 <Button variant="primary" onClick={() => setShowAttachModal(false)}>
+<<<<<<< HEAD
                   Done ({attachedFiles.length} files)
+=======
+                  Attach ({attachedFiles.length} files)
+>>>>>>> origin/main
                 </Button>
               </div>
             </Card>
@@ -1470,5 +1842,8 @@ export function AIChatPage() {
     </div>
   );
 }
+<<<<<<< HEAD
 
 export default AIChatPage;
+=======
+>>>>>>> origin/main

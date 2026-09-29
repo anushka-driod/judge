@@ -13,9 +13,13 @@ export function AuthProvider({ children }) {
       setCurrentUser(user);
       return user;
     } catch (err) {
+<<<<<<< HEAD
       // Clear stale token so browser does not repeatedly error
       localStorage.removeItem('vidhisetu_auth_token');
       localStorage.removeItem('earnlaw_auth_token');
+=======
+      console.error('Failed to load user session', err);
+>>>>>>> origin/main
       setCurrentUser(null);
       return null;
     }

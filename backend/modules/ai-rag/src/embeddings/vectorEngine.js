@@ -8,6 +8,7 @@
  * - Top-K nearest neighbor search with metadata filtering
  */
 
+<<<<<<< HEAD
 const embeddingCache = new Map();
 const STOP_WORDS = new Set(['a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'have', 'i', 'in', 'is', 'it', 'me', 'my', 'of', 'on', 'or', 'the', 'to', 'was', 'were', 'with']);
 
@@ -44,12 +45,37 @@ export class VectorEngine {
     const timeout = setTimeout(() => controller.abort(), 1500); // 1.5s fast timeout
 
     try {
+=======
+export class VectorEngine {
+  /**
+   * Generates a 768-dimensional normalized embedding vector.
+   * Uses Gemini text-embedding-004 / OpenAI embedding API if key is present,
+   * or a deterministic legal-semantic hashing algorithm for local testing.
+   */
+  static async generateEmbedding(text) {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+
+    if (apiKey) {
+      try {
+        return await this.callRemoteEmbeddingAPI(text, apiKey);
+      } catch (err) {
+        console.warn('[VectorEngine] Remote embedding failed, using local semantic vector generator:', err.message);
+      }
+    }
+
+    return this.generateDeterministicLegalEmbedding(text);
+  }
+
+  static async callRemoteEmbeddingAPI(text, apiKey) {
+    if (process.env.GEMINI_API_KEY) {
+>>>>>>> origin/main
       const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'models/text-embedding-004',
+<<<<<<< HEAD
           content: { parts: [{ text: text.slice(0, 2000) }] },
         }),
         signal: controller.signal,
@@ -63,6 +89,15 @@ export class VectorEngine {
       }
     } catch (_) {
       clearTimeout(timeout);
+=======
+          content: { parts: [{ text }] },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.embedding.values;
+      }
+>>>>>>> origin/main
     }
     return this.generateDeterministicLegalEmbedding(text);
   }
@@ -114,6 +149,7 @@ export class VectorEngine {
     for (let i = 0; i < vecA.length; i++) {
       dot += vecA[i] * vecB[i];
     }
+<<<<<<< HEAD
     return Math.max(0, Math.min(1, dot));
   }
 
@@ -123,29 +159,47 @@ export class VectorEngine {
     const sharedTerms = [...termsA].filter((term) => termsB.has(term)).length;
     const denominator = Math.min(termsA.size, termsB.size);
     return { sharedTerms, score: denominator ? sharedTerms / denominator : 0 };
+=======
+    return Math.max(0, Math.min(1, (dot + 1) / 2)); // Normalized to 0.0 - 1.0 range
+>>>>>>> origin/main
   }
 
   /**
    * Searches an array of embedded chunks for the top-K semantically closest matches.
    */
+<<<<<<< HEAD
   static searchSimilarChunks(queryVector, chunkCorpus = [], { queryText = '', topK = 3, minSimilarity = 0.2, filterCategory = '' } = {}) {
+=======
+  static searchSimilarChunks(queryVector, chunkCorpus = [], { topK = 3, minSimilarity = 0.55, filterCategory = '' } = {}) {
+>>>>>>> origin/main
     const scored = chunkCorpus
       .filter((chunk) => {
         if (!filterCategory) return true;
         return chunk.category ? chunk.category.toLowerCase().includes(filterCategory.toLowerCase()) : true;
       })
       .map((chunk) => {
+<<<<<<< HEAD
         const cosineScore = this.cosineSimilarity(queryVector, chunk.embedding);
         const lexical = this.lexicalOverlap(queryText, chunk.chunkText);
         return {
           ...chunk,
           similarityScore: Number(Math.max(cosineScore, lexical.score).toFixed(4)),
           sharedTerms: lexical.sharedTerms,
+=======
+        const sim = this.cosineSimilarity(queryVector, chunk.embedding);
+        return {
+          ...chunk,
+          similarityScore: Number(sim.toFixed(4)),
+>>>>>>> origin/main
         };
       });
 
     return scored
+<<<<<<< HEAD
       .filter((c) => c.similarityScore >= minSimilarity && (c.sharedTerms >= 2 || c.similarityScore >= 0.55))
+=======
+      .filter((c) => c.similarityScore >= minSimilarity)
+>>>>>>> origin/main
       .sort((a, b) => b.similarityScore - a.similarityScore)
       .slice(0, topK);
   }

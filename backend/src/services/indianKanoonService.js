@@ -54,11 +54,15 @@ export class IndianKanoonService {
    * Supports both INDIANKANOON_API_TOKEN and INDIAN_KANOON_API_TOKEN.
    */
   static getApiToken() {
+<<<<<<< HEAD
     const token = (process.env.INDIANKANOON_API_TOKEN || process.env.INDIAN_KANOON_API_TOKEN || '').trim();
     if (!token || token.includes('your_indian_kanoon_token')) {
       return '';
     }
     return token;
+=======
+    return (process.env.INDIANKANOON_API_TOKEN || process.env.INDIAN_KANOON_API_TOKEN || '').trim();
+>>>>>>> origin/main
   }
 
   /**

@@ -1,19 +1,31 @@
 import React from 'react';
+<<<<<<< HEAD
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Scale, ShieldCheck, BookOpen, UserCheck, ArrowLeft, Briefcase } from 'lucide-react';
+=======
+import { Outlet, Link } from 'react-router-dom';
+import { Scale, ShieldCheck, BookOpen, UserCheck } from 'lucide-react';
+>>>>>>> origin/main
 import { ToastContainer } from '../common/ToastContainer';
 import './AuthLayout.css';
 
 export function AuthLayout() {
+<<<<<<< HEAD
   const location = useLocation();
   const isLogin = location.pathname === '/login';
   const isRegister = location.pathname === '/register';
 
+=======
+>>>>>>> origin/main
   return (
     <div className="auth-layout">
       <div className="auth-hero-pane">
         <div className="auth-hero-content">
+<<<<<<< HEAD
           <Link to="/" className="auth-brand">
+=======
+          <Link to="/login" className="auth-brand">
+>>>>>>> origin/main
             <div className="auth-brand-icon">
               <Scale size={28} />
             </div>
@@ -66,6 +78,7 @@ export function AuthLayout() {
       </div>
 
       <div className="auth-form-pane">
+<<<<<<< HEAD
         <header className="auth-top-nav">
           <Link to="/" className="auth-top-home-link" title="Return to VidhiSetu Homepage">
             <ArrowLeft size={16} />
@@ -93,6 +106,8 @@ export function AuthLayout() {
           </div>
         </header>
 
+=======
+>>>>>>> origin/main
         <div className="auth-form-container">
           <Outlet />
         </div>

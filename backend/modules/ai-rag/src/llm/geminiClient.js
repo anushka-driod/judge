@@ -12,7 +12,10 @@
  */
 
 import { GoogleGenAI } from '@google/genai';
+<<<<<<< HEAD
 import { networkManager } from '../../../../src/services/networkManager.js';
+=======
+>>>>>>> origin/main
 
 export class GeminiClient {
   constructor() {
@@ -21,6 +24,7 @@ export class GeminiClient {
   }
 
   /**
+<<<<<<< HEAD
    * Returns whether the Gemini API key is configured and online connectivity is active.
    * If offline, returns false immediately to skip remote network timeouts.
    * @returns {boolean}
@@ -29,6 +33,12 @@ export class GeminiClient {
     if (!networkManager.isOnline()) {
       return false;
     }
+=======
+   * Returns whether the Gemini API key is configured in the environment.
+   * @returns {boolean}
+   */
+  isConfigured() {
+>>>>>>> origin/main
     const key = this.getApiKey();
     return Boolean(key && key.trim().length > 0 && !key.includes('your_gemini_api_key'));
   }
@@ -343,11 +353,18 @@ export class GeminiClient {
       errorObj.message = 'Gemini API quota or rate limit exceeded. Please try again shortly.';
       errorObj.code = 'RATE_LIMIT';
       errorObj.status = 429;
+<<<<<<< HEAD
     } else if (message.includes('fetch failed') || message.includes('ENOTFOUND') || message.includes('ECONNREFUSED') || message.includes('ETIMEDOUT')) {
       errorObj.message = 'Unable to connect to Google Gemini API servers. Operating in offline legal guidance mode.';
       errorObj.code = 'NETWORK_ERROR';
       errorObj.status = 502;
       networkManager.recordNetworkFailure(err);
+=======
+    } else if (message.includes('fetch failed') || message.includes('ENOTFOUND') || message.includes('ECONNREFUSED')) {
+      errorObj.message = 'Unable to connect to Google Gemini API servers. Please check your network connection.';
+      errorObj.code = 'NETWORK_ERROR';
+      errorObj.status = 502;
+>>>>>>> origin/main
     } else {
       errorObj.message = `Gemini API generation error: ${message}`;
       errorObj.code = 'LLM_GENERATE_FAILED';

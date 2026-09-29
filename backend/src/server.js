@@ -4,6 +4,7 @@ import db from './config/db.js';
 
 dotenv.config();
 
+<<<<<<< HEAD
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Global Crash-Proof Process Guards (Never let unhandled errors terminate the server)
@@ -15,10 +16,14 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[CRITICAL PROCESS GUARD] Caught Unhandled Rejection:', reason);
 });
+=======
+const PORT = process.env.PORT || 5000;
+>>>>>>> origin/main
 
 async function startServer() {
   console.log('====================================================');
   console.log('EarnLaw Central Integration Server (Member 2)');
+<<<<<<< HEAD
   console.log('High-Resilience Server Engine Active');
   console.log('====================================================');
 
@@ -60,8 +65,23 @@ async function startServer() {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
+=======
+  console.log('====================================================');
+
+  // Test AnuDB PostgreSQL Connection
+  await db.testConnection();
+
+  app.listen(PORT, () => {
+    console.log(`[Member 2 Server] Listening on http://localhost:${PORT}`);
+    console.log(`- Healthcheck: http://localhost:${PORT}/health`);
+  });
+>>>>>>> origin/main
 }
 
 startServer().catch((err) => {
   console.error('Fatal Server Startup Error:', err);
+<<<<<<< HEAD
+=======
+  process.exit(1);
+>>>>>>> origin/main
 });

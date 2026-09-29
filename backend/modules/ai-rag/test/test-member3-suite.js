@@ -100,17 +100,27 @@ The employer must serve one month notice in writing or pay wages in lieu thereof
     const simRelated = VectorEngine.cosineSimilarity(vecA, vecB);
     const simUnrelated = VectorEngine.cosineSimilarity(vecA, vecUnrelated);
 
+<<<<<<< HEAD
     assert(simRelated >= 0, `Cosine similarity remains within its valid range (${simRelated.toFixed(3)})`);
     assert(simRelated > simUnrelated, `Related query score (${simRelated.toFixed(3)}) > Unrelated cheque query score (${simUnrelated.toFixed(3)})`);
 
     assert(VectorEngine.cosineSimilarity([1, 0], [1, 0]) === 1, 'Identical unit vectors score 1');
     assert(VectorEngine.cosineSimilarity([1, 0], [0, 1]) === 0, 'Unrelated orthogonal vectors score 0');
 
+=======
+    assert(simRelated >= 0.60, `Semantically related employment queries have high cosine similarity (${simRelated.toFixed(3)})`);
+    assert(simRelated > simUnrelated, `Related query score (${simRelated.toFixed(3)}) > Unrelated cheque query score (${simUnrelated.toFixed(3)})`);
+
+>>>>>>> origin/main
     const corpus = [
       { chunkId: 'c1', chunkText: textB, embedding: vecB, category: 'Employment' },
       { chunkId: 'c2', chunkText: textUnrelated, embedding: vecUnrelated, category: 'Banking' },
     ];
+<<<<<<< HEAD
     const topMatches = VectorEngine.searchSimilarChunks(vecA, corpus, { queryText: textA, topK: 1 });
+=======
+    const topMatches = VectorEngine.searchSimilarChunks(vecA, corpus, { topK: 1 });
+>>>>>>> origin/main
     assert(topMatches[0].chunkId === 'c1', 'Vector search correctly ranked employment precedent as #1');
   } catch (err) {
     console.error(err);

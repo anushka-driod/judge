@@ -134,6 +134,7 @@
   flex: 0.9;
   background-color: var(--bg-surface);
   display: flex;
+<<<<<<< HEAD
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -212,31 +213,46 @@
 
 .auth-top-lawyer-link:hover {
   background-color: #fde68a;
+=======
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+>>>>>>> origin/main
 }
 
 .auth-form-container {
   width: 100%;
   max-width: 440px;
+<<<<<<< HEAD
   margin: auto 0;
   padding: var(--space-4) 0;
+=======
+>>>>>>> origin/main
 }
 
 @media (max-width: 960px) {
   .auth-layout {
     flex-direction: column;
+<<<<<<< HEAD
     min-height: 100vh;
     overflow-y: auto;
+=======
+>>>>>>> origin/main
   }
 
   .auth-hero-pane {
     padding: var(--space-8) var(--space-6);
+<<<<<<< HEAD
     flex: none;
     overflow: visible;
+=======
+>>>>>>> origin/main
   }
 
   .auth-hero-heading {
     font-size: 1.75rem;
   }
+<<<<<<< HEAD
 
   .auth-form-pane {
     flex: none;
@@ -248,4 +264,6 @@
   .auth-form-container {
     margin: 0 auto;
   }
+=======
+>>>>>>> origin/main
 }

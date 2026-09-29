@@ -22,7 +22,10 @@ import {
   ArrowLeft,
   ShieldCheck,
 } from 'lucide-react';
+<<<<<<< HEAD
 import { GoogleAuthService } from '../../services/googleAuthService';
+=======
+>>>>>>> origin/main
 import './AuthPage.css';
 
 const ALL_INDIAN_STATES = [
@@ -75,7 +78,11 @@ const PRACTICE_AREAS_OPTIONS = [
 ];
 
 export function RegisterPage() {
+<<<<<<< HEAD
   const { register, googleAuth, logout, isAuthenticated, currentUser } = useAuth();
+=======
+  const { register, googleAuth } = useAuth();
+>>>>>>> origin/main
   const { showToast } = useUI();
   const navigate = useNavigate();
 
@@ -222,6 +229,7 @@ export function RegisterPage() {
     e.preventDefault();
     setError('');
 
+<<<<<<< HEAD
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!candidateForm.email || !emailRegex.test(candidateForm.email.trim())) {
       setError('Please enter a valid email.');
@@ -230,6 +238,10 @@ export function RegisterPage() {
 
     if (!candidateForm.password || candidateForm.password.length < 8) {
       setError('Password must meet the required security requirements.');
+=======
+    if (candidateForm.password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+>>>>>>> origin/main
       return;
     }
 
@@ -278,6 +290,7 @@ export function RegisterPage() {
     e.preventDefault();
     setError('');
 
+<<<<<<< HEAD
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!advocateForm.email || !emailRegex.test(advocateForm.email.trim())) {
       setError('Please enter a valid email.');
@@ -286,6 +299,10 @@ export function RegisterPage() {
 
     if (!advocateForm.password || advocateForm.password.length < 8) {
       setError('Password must meet the required security requirements.');
+=======
+    if (advocateForm.password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+>>>>>>> origin/main
       return;
     }
 
@@ -351,6 +368,7 @@ export function RegisterPage() {
     setLoading(true);
     setError('');
     try {
+<<<<<<< HEAD
       const googleProfile = await GoogleAuthService.promptGoogleSignIn();
       const res = await googleAuth(googleProfile);
       if (res.isNewUser) {
@@ -359,15 +377,31 @@ export function RegisterPage() {
         const userName = res.user?.name || res.name;
         setCandidateForm((prev) => ({ ...prev, email: userEmail, name: userName }));
         setAdvocateForm((prev) => ({ ...prev, email: userEmail, name: userName }));
+=======
+      const mockGoogleProfile = {
+        email: 'google.newuser@example.com',
+        name: 'Ananya Sharma',
+        picture: null,
+      };
+      const res = await googleAuth(mockGoogleProfile);
+      if (res.isNewUser) {
+        // Pre-fill email and switch to Candidate or Advocate form
+        setCandidateForm((prev) => ({ ...prev, email: res.email, name: res.name }));
+        setAdvocateForm((prev) => ({ ...prev, email: res.email, name: res.name }));
+>>>>>>> origin/main
         showToast('Google verified! Please choose your account type.', 'info');
       } else {
         showToast('Existing Google account found. Logging you in!', 'success');
         navigate('/chat');
       }
     } catch (err) {
+<<<<<<< HEAD
       if (err.message && !err.message.includes('cancelled')) {
         setError(err.message || 'Google signup failed.');
       }
+=======
+      setError(err.message || 'Google signup failed.');
+>>>>>>> origin/main
     } finally {
       setLoading(false);
     }
@@ -375,6 +409,7 @@ export function RegisterPage() {
 
   return (
     <div className="auth-page animate-fade-in">
+<<<<<<< HEAD
       {isAuthenticated && currentUser && (
         <div
           className="auth-session-banner"
@@ -435,6 +470,8 @@ export function RegisterPage() {
         </div>
       )}
 
+=======
+>>>>>>> origin/main
       {/* Step 0: Choose Account Type */}
       {selectedRole === 'choose_role' && (
         <div className="role-selection-view">

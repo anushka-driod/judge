@@ -12,7 +12,10 @@ import {
   KeyRound,
   LogOut,
   CreditCard,
+<<<<<<< HEAD
   Briefcase,
+=======
+>>>>>>> origin/main
 } from 'lucide-react';
 import { ProfileModal } from '../profile/ProfileModal';
 import './Navbar.css';
@@ -107,7 +110,13 @@ export function Navbar() {
         </div>
 
         <div className="navbar-right">
+<<<<<<< HEAD
           {currentUser ? (
+=======
+          {/* Top-right "New Case" and "Report Lawyer" buttons have been removed as requested */}
+
+          {currentUser && (
+>>>>>>> origin/main
             <div className="navbar-account-container" ref={dropdownRef}>
               {/* Compact Account Section: [Small avatar] [Short name] [Dropdown arrow] */}
               <button
@@ -191,6 +200,7 @@ export function Navbar() {
                     type="button"
                     className="account-menu-item"
                     role="menuitem"
+<<<<<<< HEAD
                     onClick={() => {
                       setIsDropdownOpen(false);
                       navigate(currentUser?.accountType === 'advocate' ? '/lawyer/dashboard' : '/lawyer/login');
@@ -204,6 +214,8 @@ export function Navbar() {
                     type="button"
                     className="account-menu-item"
                     role="menuitem"
+=======
+>>>>>>> origin/main
                     onClick={() => handleOpenModal('password')}
                   >
                     <KeyRound size={15} className="menu-icon" />
@@ -224,6 +236,7 @@ export function Navbar() {
                 </div>
               )}
             </div>
+<<<<<<< HEAD
           ) : (
             <div className="navbar-auth-actions">
               <Link to="/lawyer/login" className="navbar-lawyer-pill" title="Advocate Chambers & Consultation Portal">
@@ -237,6 +250,8 @@ export function Navbar() {
                 Register
               </Link>
             </div>
+=======
+>>>>>>> origin/main
           )}
         </div>
       </header>

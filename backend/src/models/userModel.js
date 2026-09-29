@@ -49,20 +49,30 @@ export function sanitizeUser(u) {
     ...safe
   } = u;
 
+<<<<<<< HEAD
   const metadata = safe.user_metadata || safe.metadata || {};
 
+=======
+>>>>>>> origin/main
   return {
     id: safe.id,
     name: safe.name,
     email: safe.email,
     phone: safe.phone,
     role: safe.role || 'user',
+<<<<<<< HEAD
     accountType: safe.role === 'lawyer' ? 'advocate' : (safe.role === 'admin' ? 'admin' : (metadata.accountType || 'candidate')),
     emailVerified: Boolean(safe.email_verified ?? safe.emailVerified),
     lastLoginAt: safe.last_login_at || safe.lastLoginAt || null,
     provider: metadata.provider || (safe.password_hash?.includes('google') ? 'google' : 'local'),
     picture: metadata.picture || metadata.avatar || null,
     metadata,
+=======
+    accountType: safe.role === 'lawyer' ? 'advocate' : (safe.role === 'admin' ? 'admin' : 'candidate'),
+    emailVerified: Boolean(safe.email_verified ?? safe.emailVerified),
+    lastLoginAt: safe.last_login_at || safe.lastLoginAt || null,
+    metadata: safe.user_metadata || safe.metadata || {},
+>>>>>>> origin/main
     createdAt: safe.created_at || safe.createdAt,
     updatedAt: safe.updated_at || safe.updatedAt,
   };
@@ -312,7 +322,10 @@ export const UserModel = {
     phoneOtpSessions.set(key, {
       phone: key,
       otpHash: hashOtp(plainOtp),
+<<<<<<< HEAD
       plainOtp: String(plainOtp).trim(),
+=======
+>>>>>>> origin/main
       expiresAt,
       attempts: 0,
     });
@@ -443,6 +456,7 @@ export const UserModel = {
       .slice(-limit)
       .reverse();
   },
+<<<<<<< HEAD
 
   /**
    * Update user metadata (e.g. Google profile info, provider, location)
@@ -557,6 +571,8 @@ export const UserModel = {
     }
     return null;
   },
+=======
+>>>>>>> origin/main
 };
 
 export default UserModel;

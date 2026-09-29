@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles/index.css'
 import App from './App.jsx'
 
+<<<<<<< HEAD
 // Register Service Worker for offline PWA operation
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -12,6 +13,8 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   });
 }
 
+=======
+>>>>>>> origin/main
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

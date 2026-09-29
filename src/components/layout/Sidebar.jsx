@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useCases } from '../../context/CaseContext';
+<<<<<<< HEAD
 import { useAuth } from '../../hooks/useAuth';
+=======
+>>>>>>> origin/main
 import { useUI } from '../../hooks/useUI';
 import {
   Scale,
@@ -17,13 +20,19 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+<<<<<<< HEAD
   LogIn,
   LogOut,
+=======
+>>>>>>> origin/main
 } from 'lucide-react';
 import './Sidebar.css';
 
 export function Sidebar() {
+<<<<<<< HEAD
   const { currentUser, logout } = useAuth();
+=======
+>>>>>>> origin/main
   const {
     cases,
     activeCaseId,
@@ -332,7 +341,11 @@ export function Sidebar() {
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* 2 & 3. REPORT LAWYER ISSUE & AUTH STRIP (Footer Links) */}
+=======
+        {/* 2 & 3. REPORT LAWYER ISSUE (Footer Link) */}
+>>>>>>> origin/main
         <div className="sidebar-footer">
           <NavLink
             to="/cases/case-102/complaint"
@@ -348,6 +361,7 @@ export function Sidebar() {
             <AlertOctagon size={18} className="complaint-icon" />
             {!isSidebarCollapsed && <span className="complaint-text">REPORT LAWYER ISSUE</span>}
           </NavLink>
+<<<<<<< HEAD
 
           {!isSidebarCollapsed && (
             <div className="sidebar-auth-strip">
@@ -387,6 +401,8 @@ export function Sidebar() {
               )}
             </div>
           )}
+=======
+>>>>>>> origin/main
         </div>
       </aside>
     </>

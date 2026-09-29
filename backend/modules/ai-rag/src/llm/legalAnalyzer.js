@@ -9,11 +9,14 @@
 
 import { LEGAL_SYSTEM_PROMPT } from '../prompts/legalPrompts.js';
 import { geminiClient } from './geminiClient.js';
+<<<<<<< HEAD
 import { matchLegalDomain } from '../knowledge/legalDomains.js';
 
 const HARASSMENT_REPORT_PATTERN = /\b(?:sexual\s+)?(?:harassment|harrasment|harrassment|harassing|harrasing|harrassing|harassed|harrased|molestation|molest|abuse|abusive|threatened|threatening|domestic violence)\b/i;
 const FAMILY_RELATIONSHIP_PATTERN = /\b(husband|wife|spouse|partner|father|mother|family member)\b/i;
 const BANK_TRANSACTION_CONTEXT_PATTERN = /\b(bank|account|upi|atm|card|payment|transaction|money|amount|debit|transfer)\b/i;
+=======
+>>>>>>> origin/main
 
 export class LegalAnalyzer {
   /**
@@ -24,6 +27,7 @@ export class LegalAnalyzer {
    * @returns {Promise<Object>} Structured analysis
    */
   static async analyzeQuery(query, declaredJurisdiction = '', contextOptions = {}) {
+<<<<<<< HEAD
     if (!query || !query.trim()) {
       throw new Error('Please provide your legal question or details of your issue.');
     }
@@ -78,12 +82,23 @@ export class LegalAnalyzer {
         executionMode: 'clarification_required',
       };
     }
+=======
+    if (!query || query.trim().length < 3) {
+      throw new Error('Please provide more detail about your legal problem.');
+    }
+
+    const trimmedQuery = query.trim();
+>>>>>>> origin/main
 
     // 1. Attempt Centralized Gemini LLM Analysis if configured
     if (geminiClient.isConfigured()) {
       try {
         const historyText = contextOptions.history && Array.isArray(contextOptions.history) && contextOptions.history.length > 0
+<<<<<<< HEAD
           ? `\n\nPrevious Case Conversation History (Maintain context and remember these facts):\n${contextOptions.history.slice(-8).map((m) => `${m.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${m.text}`).join('\n')}`
+=======
+          ? `\n\nPrevious Case Context:\n${contextOptions.history.slice(-3).map((m) => `${m.sender}: ${m.text}`).join('\n')}`
+>>>>>>> origin/main
           : '';
 
         const prompt = `User Legal Query: "${trimmedQuery}"\nDeclared Jurisdiction: "${declaredJurisdiction || 'Auto-detect'}"${historyText}\n\nAnalyze this legal problem according to Indian jurisprudence and output the structured JSON.`;
@@ -96,7 +111,11 @@ export class LegalAnalyzer {
         });
 
         if (result && result.data && Array.isArray(result.data.kanoon_search_queries) && result.data.kanoon_search_queries.length > 0) {
+<<<<<<< HEAD
           const guarded = this.validateAndGuardAnalysis(result.data, trimmedQuery, declaredJurisdiction, contextOptions);
+=======
+          const guarded = this.validateAndGuardAnalysis(result.data, trimmedQuery, declaredJurisdiction);
+>>>>>>> origin/main
           return {
             ...guarded,
             modelUsed: result.modelUsed,
@@ -109,6 +128,7 @@ export class LegalAnalyzer {
     }
 
     // 2. High-fidelity domain expert rule engine for offline development, tests, and resilience
+<<<<<<< HEAD
     const fallbackResult = this.analyzeWithExpertEngine(trimmedQuery, declaredJurisdiction, contextOptions);
     const guardedFallback = this.validateAndGuardAnalysis(fallbackResult, trimmedQuery, declaredJurisdiction, contextOptions);
     
@@ -137,6 +157,11 @@ export class LegalAnalyzer {
     } else {
       guardedFallback.executionMode = guardedFallback.executionMode || 'deterministic_fallback';
     }
+=======
+    const fallbackResult = this.analyzeWithExpertEngine(trimmedQuery, declaredJurisdiction);
+    const guardedFallback = this.validateAndGuardAnalysis(fallbackResult, trimmedQuery, declaredJurisdiction);
+    guardedFallback.executionMode = 'deterministic_fallback';
+>>>>>>> origin/main
     return guardedFallback;
   }
 
@@ -145,6 +170,7 @@ export class LegalAnalyzer {
    * Ensures the legal intent classification stays tightly anchored to the original facts
    * and prevents hallucinations or category drift.
    */
+<<<<<<< HEAD
   static validateAndGuardAnalysis(analysis, query, declaredJurisdiction = '', contextOptions = {}) {
     if (!analysis) return this.analyzeWithExpertEngine(query, declaredJurisdiction, contextOptions);
     const q = query.toLowerCase();
@@ -309,6 +335,12 @@ export class LegalAnalyzer {
       return analysis;
     }
 
+=======
+  static validateAndGuardAnalysis(analysis, query, declaredJurisdiction = '') {
+    if (!analysis) return this.analyzeWithExpertEngine(query, declaredJurisdiction);
+    const q = query.toLowerCase();
+
+>>>>>>> origin/main
     const isTenancyGrievance =
       q.includes('landlord') ||
       q.includes('tenant') ||
@@ -398,6 +430,7 @@ export class LegalAnalyzer {
    * Grounded in Indian statutory jurisprudence (Labour, Consumer, Property, Tenancy, RERA, NI Act).
    * Supports English, Telugu, and Telugu-English mixed vernacular (Tanglish).
    */
+<<<<<<< HEAD
   static analyzeWithExpertEngine(query, declaredJurisdiction = '', contextOptions = {}) {
     const q = query.toLowerCase();
     const historyCombined = this.isContextualFollowUp(query, contextOptions)
@@ -431,6 +464,12 @@ export class LegalAnalyzer {
           : [],
       };
     }
+=======
+  static analyzeWithExpertEngine(query, declaredJurisdiction = '') {
+    const q = query.toLowerCase();
+    const jurisdiction = declaredJurisdiction || this.detectJurisdiction(q) || 'Central / All India';
+    const isTeluguMixed = this.detectTeluguMixed(q);
+>>>>>>> origin/main
 
     // 1. Tenancy, Landlord & Security Deposit Disputes
     if (
@@ -439,8 +478,12 @@ export class LegalAnalyzer {
       q.includes('tenancy') ||
       q.includes('security deposit') ||
       (q.includes('deposit') && (q.includes('flat') || q.includes('rent') || q.includes('vacat') || q.includes('house'))) ||
+<<<<<<< HEAD
       (q.includes('rent') && (q.includes('ivvatledu') || q.includes('return') || q.includes('refund'))) ||
       ((q.includes('deposit') || q.includes('notice') || q.includes('painting') || q.includes('deduct')) && (historyCombined.includes('tenant') || historyCombined.includes('landlord')))
+=======
+      (q.includes('rent') && (q.includes('ivvatledu') || q.includes('return') || q.includes('refund')))
+>>>>>>> origin/main
     ) {
       return {
         summary: 'Tenancy dispute concerning refusal or arbitrary retention of security deposit following vacation of rented premises with due notice.',
@@ -642,6 +685,7 @@ export class LegalAnalyzer {
       };
     }
 
+<<<<<<< HEAD
     // Without a model or recognizable legal domain, ask for facts instead of guessing.
     return {
       summary: 'The legal issue cannot be classified from the information provided so far.',
@@ -660,6 +704,25 @@ export class LegalAnalyzer {
       kanoon_search_queries: [],
       relevant_acts_anticipated: [],
       executionMode: 'clarification_required',
+=======
+    // General Fallback
+    return {
+      summary: 'General civil or statutory dispute requiring preliminary legal evaluation.',
+      category: 'Civil & Commercial Law',
+      jurisdiction,
+      detected_language: isTeluguMixed ? 'Telugu-English' : 'English',
+      legal_issues: ['Breach of legal duty or obligation', 'Evaluation of legal remedies and forum'],
+      extracted_facts: [query],
+      missing_information: [
+        'Detailed timeline of events leading to dispute',
+        'Specific damages or loss suffered',
+        'Existence of written contracts or receipts',
+      ],
+      kanoon_search_queries: [
+        query.replace(/[^\w\s]/g, '').slice(0, 45).trim(),
+      ],
+      relevant_acts_anticipated: ['Code of Civil Procedure, 1908', 'Specific Relief Act, 1963'],
+>>>>>>> origin/main
     };
   }
 
@@ -677,6 +740,7 @@ export class LegalAnalyzer {
     return '';
   }
 
+<<<<<<< HEAD
   static isContextualFollowUp(query, contextOptions = {}) {
     const q = (query || '').toLowerCase();
     const history = Array.isArray(contextOptions.history) ? contextOptions.history : [];
@@ -710,6 +774,8 @@ export class LegalAnalyzer {
     return (bareProblem && !namesLegalDomain) || /^(?:i need help|help me|please help)[.!?]*$/i.test(text);
   }
 
+=======
+>>>>>>> origin/main
   static detectTeluguMixed(text) {
     const teluguMarkers = [
       'naa', 'chesadu', 'ivvatledu', 'adugutunnadu', 'cheppadu', 'undhi', 'kadu',

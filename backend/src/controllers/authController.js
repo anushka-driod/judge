@@ -123,7 +123,11 @@ export const AuthController = {
    */
   async getMe(req, res) {
     try {
+<<<<<<< HEAD
       const user = await AuthService.getCurrentUser(req.user.id, req.user);
+=======
+      const user = await AuthService.getCurrentUser(req.user.id);
+>>>>>>> origin/main
       res.json({ user });
     } catch (err) {
       res.status(err.status || 500).json({
@@ -145,6 +149,7 @@ export const AuthController = {
   },
 
   /**
+<<<<<<< HEAD
    * POST /api/auth/google
    * Authenticate via Google Identity Services / Google OAuth
    */
@@ -233,6 +238,8 @@ export const AuthController = {
   },
 
   /**
+=======
+>>>>>>> origin/main
    * POST /api/auth/logout
    */
   async logout(req, res) {

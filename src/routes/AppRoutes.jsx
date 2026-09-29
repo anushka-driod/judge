@@ -63,6 +63,7 @@ import { EscalationTrackingPage } from '../pages/complaints/EscalationTrackingPa
 // 404
 import { NotFoundPage } from '../pages/notFound/NotFoundPage';
 
+<<<<<<< HEAD
 // Landing & Marketing Page
 import { LandingPage } from '../pages/landing/LandingPage';
 
@@ -71,6 +72,12 @@ export function AppRoutes() {
     <Routes>
       {/* Public Home & Auth Routes */}
       <Route path="/" element={<LandingPage />} />
+=======
+export function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Auth Routes */}
+>>>>>>> origin/main
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -101,6 +108,7 @@ export function AppRoutes() {
       <Route path="/admin/lawyers" element={<AdminLawyersPage />} />
       <Route path="/admin/lawyers/:id" element={<AdminLawyersPage />} />
 
+<<<<<<< HEAD
       {/* Public Legal Agent & Legal Research (Accessible without authentication) */}
       <Route element={<AppLayout />}>
         {/* AI Legal Assistant - Public Citizen Agent */}
@@ -118,6 +126,9 @@ export function AppRoutes() {
       </Route>
 
       {/* Protected Routes (Require Verified Login) */}
+=======
+      {/* Protected Routes */}
+>>>>>>> origin/main
       <Route element={<ProtectedRoute />}>
         {/* Advocate Experience Screens (Unwrapped by standard citizen sidebar) */}
         <Route path="/advocate/status" element={<AdvocateStatusPage />} />
@@ -127,19 +138,48 @@ export function AppRoutes() {
         <Route path="/admin/verifications" element={<AdminVerificationPage />} />
         <Route path="/admin/payments" element={<AdminPaymentsPage />} />
 
+<<<<<<< HEAD
         {/* Protected Citizen Cases Workspace */}
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+=======
+        {/* Standard VidhiSetu Legal Assistant & Cases Workspace */}
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Navigate to="/chat" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/chat" replace />} />
+
+          {/* AI Legal Assistant */}
+          <Route path="/chat" element={<AIChatPage />} />
+          <Route path="/chat/:sessionId" element={<AIChatPage />} />
+>>>>>>> origin/main
 
           {/* Consultation Payments & Invoices */}
           <Route path="/payments" element={<CitizenPaymentsPage />} />
 
+<<<<<<< HEAD
           {/* User-Isolated Cases */}
           <Route path="/cases" element={<CasesListPage />} />
           <Route path="/cases/new" element={<NewCasePage />} />
           <Route path="/cases/:caseId" element={<CaseDetailsPage />} />
 
           {/* Booking Consultations */}
+=======
+          {/* Cases */}
+          <Route path="/cases" element={<CasesListPage />} />
+          <Route path="/cases/new" element={<NewCasePage />} />
+          <Route path="/cases/:caseId" element={<CaseDetailsPage />} />
+          <Route path="/cases/:caseId/guidance" element={<AIGuidanceResultsPage />} />
+          <Route path="/cases/:caseId/laws" element={<RelevantLawsPage />} />
+          <Route path="/judgments/:judgmentId" element={<JudgmentDetailsPage />} />
+
+          {/* Self-Help */}
+          <Route path="/cases/:caseId/self-help" element={<SelfHelpModePage />} />
+          <Route path="/cases/:caseId/action-plan" element={<ActionPlanPage />} />
+
+          {/* Lawyers & Booking */}
+          <Route path="/cases/:caseId/lawyers" element={<LawyerRecommendationsPage />} />
+          <Route path="/lawyers/:lawyerId" element={<LawyerProfilePage />} />
+>>>>>>> origin/main
           <Route path="/lawyers/:lawyerId/book" element={<BookConsultationPage />} />
           <Route path="/consultation/confirmed/:bookingId" element={<ConsultationConfirmationPage />} />
 
