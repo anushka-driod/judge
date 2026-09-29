@@ -1,0 +1,327 @@
+.relevant-judgments-component {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  width: 100%;
+}
+
+.rj-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.rj-header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rj-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(124, 58, 237, 0.12));
+  color: var(--primary-600, #4f46e5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rj-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.rj-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #64748b);
+}
+
+.rj-transparency-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Search Bar */
+.rj-search-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.rj-search-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.rj-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.rj-search-input {
+  width: 100%;
+  padding: 10px 36px 10px 38px;
+  font-size: 0.875rem;
+  background: var(--input-bg, #f8fafc);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  color: var(--text-primary, #0f172a);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rj-search-input:focus {
+  border-color: var(--primary-500, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.rj-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.rj-clear-btn:hover {
+  color: #475569;
+}
+
+/* Active Search Context */
+.rj-search-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #475569);
+  padding: 4px 2px;
+}
+
+.rj-found-pill {
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-600, #4f46e5);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Loading & Empty States */
+.rj-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  text-align: center;
+}
+
+.rj-loading-hint {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #94a3b8);
+  margin-top: 8px;
+}
+
+.rj-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--card-bg-subtle, #f8fafc);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: 12px;
+}
+
+.rj-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.rj-empty-title {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.rj-empty-desc {
+  margin: 0 0 16px 0;
+  font-size: 0.875rem;
+  color: var(--text-muted, #64748b);
+  max-width: 480px;
+}
+
+.rj-alert-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Judgment Result Cards */
+.rj-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.judgment-result-card {
+  padding: 16px 18px;
+  border-left: 4px solid var(--primary-500, #6366f1);
+  background: var(--card-bg, #ffffff);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.judgment-result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.judgment-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.judgment-court-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.judgment-court-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-700, #4338ca);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.judgment-date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+}
+
+.judgment-docid-tag {
+  font-size: 0.75rem;
+  font-family: var(--mono, monospace);
+  color: #94a3b8;
+}
+
+.judgment-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  line-height: 1.4;
+}
+
+.judgment-citation-box {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #475569);
+  background: rgba(241, 245, 249, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.judgment-snippet-box {
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.7);
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.judgment-snippet-text {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-secondary, #334155);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.judgment-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.judgment-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-600, #4f46e5);
+  text-decoration: none;
+  transition: gap 0.15s ease;
+}
+
+.judgment-view-btn:hover {
+  gap: 7px;
+  color: var(--primary-700, #4338ca);
+}
+
+.judgment-external-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #64748b);
+  text-decoration: none;
+}
+
+.judgment-external-link:hover {
+  color: var(--primary-600, #4f46e5);
+  text-decoration: underline;
+}

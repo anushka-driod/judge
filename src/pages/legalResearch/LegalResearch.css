@@ -1,0 +1,205 @@
+.legal-research-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.research-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.back-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: var(--space-2);
+}
+
+.back-nav-link:hover {
+  color: var(--accent-600);
+}
+
+.research-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.research-subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.judgment-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.research-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.statute-full-card {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.statute-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statute-badge-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.statute-icon {
+  color: var(--info-600);
+}
+
+.statute-section-tag {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  background-color: var(--info-100);
+  color: var(--info-700);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+}
+
+.statute-forum-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.statute-act-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.statute-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.statute-content-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.statute-block-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.plain-meaning-block {
+  background-color: var(--accent-50);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--accent-600);
+}
+
+.remedy-block {
+  background-color: var(--success-50);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--success-600);
+}
+
+.research-footer-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  justify-content: center;
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* Judgment breakdown styles */
+.judgment-breakdown-card {
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.judgment-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.judgment-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sec-icon {
+  color: var(--accent-600);
+}
+
+.judgment-ratio-text {
+  font-size: 1.0625rem;
+  font-style: italic;
+  color: var(--text-primary);
+  background-color: var(--bg-surface-subtle);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--primary-700);
+  line-height: 1.6;
+}
+
+.judgment-verdict-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.highlight-takeaway-section {
+  background-color: var(--accent-50);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-100);
+}
+
+.judgment-takeaway-text {
+  font-size: 0.9375rem;
+  color: var(--accent-700);
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.judgment-footer-notice {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-light);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

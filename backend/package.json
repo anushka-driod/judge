@@ -1,0 +1,23 @@
+{
+  "name": "earnlaw-backend",
+  "version": "1.0.0",
+  "description": "EarnLaw (VidhiSetu) Core Backend & AnuDB Integration Layer - Member 2",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node src/db/migrate.js",
+    "test": "node --env-file=.env --test"
+  },
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^10.0.10",
+    "pg": "^8.13.3"
+  }
+}

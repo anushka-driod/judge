@@ -1,0 +1,16 @@
+{
+  "name": "VidhiSetu – AI Legal Guidance",
+  "short_name": "VidhiSetu",
+  "description": "Evidence-grounded Indian legal assistance and rights clarity, working completely offline or online.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

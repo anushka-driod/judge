@@ -1,0 +1,14 @@
+{
+  "name": "earnlaw-member4-lawyer-case-service",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "EarnLaw Member 4: Legal Knowledge, Lawyer System, and Case Management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test/test-member4-suite.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

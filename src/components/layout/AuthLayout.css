@@ -1,0 +1,251 @@
+.auth-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.auth-hero-pane {
+  flex: 1.1;
+  background: linear-gradient(135deg, var(--primary-900) 0%, #1e293b 60%, #172554 100%);
+  color: #ffffff;
+  padding: var(--space-12) var(--space-10);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-hero-pane::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.auth-hero-content {
+  max-width: 540px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  margin-bottom: var(--space-8);
+}
+
+.auth-brand-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--accent-500), var(--accent-700));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.auth-brand-name {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.auth-hero-heading {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.5px;
+}
+
+.auth-hero-subheading {
+  font-size: 1.0625rem;
+  color: var(--primary-100);
+  line-height: 1.6;
+  margin-bottom: var(--space-8);
+}
+
+.auth-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.auth-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.auth-feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--accent-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.auth-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.auth-feature-text strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.auth-feature-text span {
+  font-size: 0.875rem;
+  color: var(--primary-100);
+}
+
+.auth-trust-badge {
+  padding: 10px 16px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.8125rem;
+  color: var(--primary-100);
+}
+
+.auth-form-pane {
+  flex: 0.9;
+  background-color: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--space-8) var(--space-6);
+  overflow-y: auto;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+.auth-top-nav {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.auth-top-home-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.auth-top-home-link:hover {
+  color: var(--accent-600);
+}
+
+.auth-top-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auth-top-tab {
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.auth-top-tab:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+.auth-top-tab-active {
+  color: var(--accent-600);
+  background-color: var(--accent-500-15);
+}
+
+.auth-top-lawyer-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #b45309;
+  background-color: #fef3c7;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.auth-top-lawyer-link:hover {
+  background-color: #fde68a;
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 440px;
+  margin: auto 0;
+  padding: var(--space-4) 0;
+}
+
+@media (max-width: 960px) {
+  .auth-layout {
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .auth-hero-pane {
+    padding: var(--space-8) var(--space-6);
+    flex: none;
+    overflow: visible;
+  }
+
+  .auth-hero-heading {
+    font-size: 1.75rem;
+  }
+
+  .auth-form-pane {
+    flex: none;
+    max-height: none;
+    overflow-y: visible;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .auth-form-container {
+    margin: 0 auto;
+  }
+}
