@@ -4,6 +4,9 @@ import { mockLawsDatabase, mockJudgmentsDatabase } from '../data/mockData';
 import { legalService } from './legalService';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 const HARASSMENT_QUERY_PATTERN = /\b(?:sexual\s+)?(?:harassment|harrasment|harrassment|harassing|harrasing|harrassing|harassed|harrased|molestation|molest|abuse|abusive|threatened|threatening|domestic violence)\b/i;
 const HARASSMENT_CONTEXT_PATTERN = /\b(workplace|work|office|online|public|school|college|university|home|when|date|ongoing|happened|occurred)\b/i;
 const DOMESTIC_RELATIONSHIP_PATTERN = /\b(husband|wife|spouse|partner|father|mother|family member)\b/i;
@@ -478,19 +481,25 @@ ${steps.join('\n')}
 
   /**
    * Conversational legal guidance assistant.
+<<<<<<< HEAD
 =======
 export const aiLegalService = {
   /**
    * Conversational legal guidance assistant.
    * Member 3 will connect this to real LangChain/RAG Indian Kanoon backend later.
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
    */
   async sendMessage(userMessage, conversationHistory = [], attachedDocs = []) {
     return request('/ai/chat', {
       method: 'POST',
       body: JSON.stringify({ message: userMessage, history: conversationHistory, attachedDocs }),
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3aab4be (dhanush commits)
     }, () => {
       const lower = userMessage.toLowerCase();
       let responseText = '';
@@ -585,7 +594,10 @@ export const aiLegalService = {
         suggestedNextSteps,
         timestamp: new Date().toISOString(),
       };
+<<<<<<< HEAD
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     });
   },
 

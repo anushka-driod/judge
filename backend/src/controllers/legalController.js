@@ -1,4 +1,8 @@
 import IndianKanoonService from '../services/indianKanoonService.js';
+<<<<<<< HEAD
+=======
+import { getCuratedJudgments, CURATED_JUDGMENTS_DATABASE } from '../../modules/ai-rag/src/kanoon/curatedJudgments.js';
+>>>>>>> 3aab4be (dhanush commits)
 
 export class LegalController {
   /**
@@ -39,6 +43,34 @@ export class LegalController {
         ...results,
       });
     } catch (err) {
+<<<<<<< HEAD
+=======
+      if ((err.code === 'TOKEN_MISSING' || err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') && process.env.USE_MEMORY_FALLBACK === 'true') {
+        const curated = getCuratedJudgments('', rawQuery);
+        const results = curated.map((j) => ({
+          id: String(j.kanoonId),
+          title: j.title,
+          court: j.court,
+          date: j.publishDate,
+          snippet: j.snippet,
+          headlineHtml: `<p>${j.snippet}</p>`,
+          docsize: (j.fullText || j.snippet).length,
+          citation: j.citation,
+          source: 'Indian Kanoon',
+          sourceUrl: j.sourceUrl,
+          metadata: { numcites: 10, numcitedby: 25, docsize: (j.fullText || j.snippet).length },
+        }));
+        return res.json({
+          success: true,
+          query: rawQuery,
+          pageNum: parseInt(pageNum, 10) || 0,
+          totalFound: results.length,
+          count: results.length,
+          categories: [],
+          results,
+        });
+      }
+>>>>>>> 3aab4be (dhanush commits)
       console.error('[LegalController] Indian Kanoon search error:', err.message);
       const status = err.status || 500;
       return res.status(status).json({
@@ -75,6 +107,30 @@ export class LegalController {
         document: doc,
       });
     } catch (err) {
+<<<<<<< HEAD
+=======
+      if ((err.code === 'TOKEN_MISSING' || err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') && process.env.USE_MEMORY_FALLBACK === 'true') {
+        const found = CURATED_JUDGMENTS_DATABASE.find((j) => String(j.kanoonId) === String(id));
+        if (found) {
+          return res.json({
+            success: true,
+            document: {
+              id: String(found.kanoonId),
+              title: found.title,
+              court: found.court,
+              publishDate: found.publishDate,
+              citation: found.citation,
+              fullText: `<p>${found.fullText || found.snippet}</p>`,
+              citeList: [],
+              citedbyList: [],
+              source: 'Indian Kanoon',
+              sourceUrl: found.sourceUrl,
+              metadata: { docsize: (found.fullText || found.snippet).length, numcites: 10, numcitedby: 25 },
+            },
+          });
+        }
+      }
+>>>>>>> 3aab4be (dhanush commits)
       console.error(`[LegalController] Fetch document ${id} error:`, err.message);
       const status = err.status || 500;
       return res.status(status).json({

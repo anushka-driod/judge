@@ -16,6 +16,9 @@
 import { LegalAnalyzer } from '../llm/legalAnalyzer.js';
 import { KanoonClient } from '../kanoon/kanoonClient.js';
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 import { getCuratedJudgments } from '../kanoon/curatedJudgments.js';
 import { matchLegalDomain } from '../knowledge/legalDomains.js';
 import { JudgmentProcessor } from '../processing/judgmentProcessor.js';
@@ -23,11 +26,14 @@ import { VectorEngine } from '../embeddings/vectorEngine.js';
 import { legalCorpusRepository } from '../storage/legalCorpusRepository.js';
 import { geminiClient } from '../llm/geminiClient.js';
 import { networkManager } from '../../../../src/services/networkManager.js';
+<<<<<<< HEAD
 =======
 import { JudgmentProcessor } from '../processing/judgmentProcessor.js';
 import { VectorEngine } from '../embeddings/vectorEngine.js';
 import { geminiClient } from '../llm/geminiClient.js';
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 import {
   RAG_GUIDANCE_SYSTEM_PROMPT,
   RAG_STRUCTURED_GUIDANCE_PROMPT,
@@ -52,6 +58,9 @@ export class RagPipeline {
     const analysis = await LegalAnalyzer.analyzeQuery(userQuery, jurisdiction, options);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     // If query is an introductory greeting, respond conversationally with domain overview
     if (analysis.isGreeting) {
       return this.buildGreetingResponse(analysis, options);
@@ -219,6 +228,7 @@ export class RagPipeline {
           similarityScore: 0.9,
         }));
       }
+<<<<<<< HEAD
 =======
     // Stage 2: Retrieve Relevant Judgments from Indian Kanoon API
     const primaryQuery = (analysis.kanoon_search_queries && analysis.kanoon_search_queries[0]) || userQuery;
@@ -311,6 +321,8 @@ export class RagPipeline {
     if (topChunks.length === 0) {
       return this.buildInsufficientEvidenceResponse(analysis, userQuery, options);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     }
 
     // Stage 7: Evidence-Grounded Guidance Generation (Gemini LLM or Grounded Fallback Engine)
@@ -405,16 +417,22 @@ export class RagPipeline {
         'Written notices and correspondence',
       ],
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       selfHelp: generationResult.selfHelp || matchLegalDomain(userQuery, analysis.category).selfHelp,
       confidence: topChunks[0]?.similarityScore > 0.65 ? 'high' : 'medium',
       modelUsed: generationResult.modelUsed || (networkManager.isOnline() ? 'Gemini 2.5 Flash' : 'VidhiSetu Indian Legal Engine (Local RAG)'),
       executionMode: !geminiClient.isConfigured() ? 'llm_unavailable' : (generationResult.executionMode || (networkManager.isOnline() ? 'gemini_llm' : 'offline_local_rag')),
       isOffline: !networkManager.isOnline(),
+<<<<<<< HEAD
 =======
       confidence: topChunks[0]?.similarityScore > 0.65 ? 'high' : 'medium',
       modelUsed: generationResult.modelUsed || 'deterministic_expert_engine',
       executionMode: generationResult.executionMode || 'deterministic_fallback',
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       disclaimer: STANDARD_DISCLAIMER,
     };
   }
@@ -422,10 +440,14 @@ export class RagPipeline {
   /**
    * Generates evidence-grounded guidance using retrieved case chunks.
 <<<<<<< HEAD
+<<<<<<< HEAD
    * Uses Gemini with retrieved evidence and falls back to comprehensive domain expert analysis when unavailable.
 =======
    * Dispatches to real Gemini LLM if configured; otherwise utilizes deterministic template engine.
 >>>>>>> origin/main
+=======
+   * Uses Gemini with retrieved evidence and falls back to comprehensive domain expert analysis when unavailable.
+>>>>>>> 3aab4be (dhanush commits)
    */
   async generateGroundedGuidance(query, analysis, chunks, options = {}) {
     const evidenceContext = chunks
@@ -442,11 +464,15 @@ Relevant Extract:
       .join('\n\n');
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     // Chat context & case continuity formatting (Multi-turn memory)
     let chatContextSection = '';
     if (options.history && Array.isArray(options.history) && options.history.length > 0) {
       const recentHistory = options.history.slice(-8);
       chatContextSection = `\nPREVIOUS CASE CONVERSATION HISTORY (REMEMBER THIS CONTEXT AND PRIOR FACTS):\n${recentHistory.map((h) => `${h.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${h.text}`).join('\n')}\n`;
+<<<<<<< HEAD
 =======
     // Chat context & case continuity formatting
     let chatContextSection = '';
@@ -454,6 +480,8 @@ Relevant Extract:
       const recentHistory = options.history.slice(-4);
       chatContextSection = `\nPREVIOUS CASE CONVERSATION HISTORY:\n${recentHistory.map((h) => `${h.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${h.text}`).join('\n')}\n`;
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     }
 
     if (geminiClient.isConfigured()) {
@@ -483,11 +511,15 @@ ${analysis.detected_language || 'English'}
 CRITICAL TASK REQUIREMENTS:
 1. Synthesize a comprehensive, evidence-grounded legal analysis for the citizen adhering strictly to the schema.
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 2. MULTI-TURN CONVERSATION MEMORY: Maintain full conversational memory. When the user asks a follow-up, provides new details, or asks about notice/timeline/deductions/process, integrate all facts previously discussed in the chat and build directly on earlier turns.
 3. SUITABLE INDIVIDUALIZED PROCESS: Provide a clear, chronological, step-by-step procedural roadmap tailored specifically to this problem (Immediate Evidence Gathering -> Statutory Notice & Cure Period -> Pre-Litigation Portals/Mediation -> Court/Tribunal Filing & Limitation -> Remedies & Damages).
 4. Multilingual: If user input was in Telugu or Tanglish, provide accessible explanations in Telugu or Tanglish in "guidance" so they clearly understand their rights, preserving Indian statutory names in English.
 5. Grounded in Evidence: Cite ONLY authentic Indian Kanoon records from the retrieved evidence. Do NOT fabricate citations or case names.
 6. Follow all safety rules: no guaranteed wins, cautious language.`;
+<<<<<<< HEAD
 =======
 2. ANCHOR INTEGRITY: You MUST keep your entire response strictly anchored to the citizen's actual grievance and category: "${analysis.category}".
    - If the dispute is a Tenancy dispute (e.g., landlord withholding security deposit), your advice MUST focus exclusively on tenancy law, deposit refund, statutory demand notice to landlord, and civil recovery / rent tribunal. Do NOT mention builder delay, RERA, or homebuyer rights!
@@ -496,6 +528,8 @@ CRITICAL TASK REQUIREMENTS:
 4. Grounded in Evidence: Cite ONLY authentic Indian Kanoon records from the retrieved evidence. Do NOT fabricate citations or case names.
 5. Follow all safety rules: no guaranteed wins, cautious language.`;
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
         const response = await geminiClient.generateStructured({
           prompt: structuredPrompt,
@@ -507,6 +541,9 @@ CRITICAL TASK REQUIREMENTS:
         if (response && response.data) {
           const guardedData = this.validateAndGuardGeneratedGuidance(response.data, analysis, query, chunks, options);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
           const domain = matchLegalDomain(query, analysis.category, options.history);
           return {
             problemSummary: guardedData.problemSummary || analysis.summary,
@@ -520,6 +557,7 @@ CRITICAL TASK REQUIREMENTS:
             guidance: guardedData.guidance || response.text,
             selfHelp: domain.selfHelp,
             disclaimer: guardedData.disclaimer || STANDARD_DISCLAIMER,
+<<<<<<< HEAD
 =======
           return {
             problemSummary: guardedData.problemSummary || analysis.summary,
@@ -533,12 +571,17 @@ CRITICAL TASK REQUIREMENTS:
             guidance: guardedData.guidance || response.text,
             disclaimer: guardedData.disclaimer || 'AI legal information based on Indian Kanoon records; does not constitute legal representation.',
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
             modelUsed: response.modelUsed,
             executionMode: guardedData.executionMode || 'gemini_llm',
           };
         }
       } catch (err) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
         console.warn(`[RagPipeline] Gemini generation failed (${err.code || err.message}); engaging comprehensive domain knowledge engine.`);
       }
     }
@@ -603,6 +646,7 @@ CRITICAL TASK REQUIREMENTS:
       modelUsed: 'VidhiSetu Indian Legal Engine (Local RAG)',
       executionMode: 'grounded_domain_engine',
     };
+<<<<<<< HEAD
 =======
         console.warn(`[RagPipeline] Gemini LLM generation failed (${err.code || err.message}), engaging high-fidelity deterministic grounded engine.`);
       }
@@ -611,6 +655,8 @@ CRITICAL TASK REQUIREMENTS:
     // High-fidelity domain expert grounded fallback synthesis
     return this.generateDeterministicGuidance(query, analysis, chunks, options);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   }
 
   /**
@@ -618,6 +664,9 @@ CRITICAL TASK REQUIREMENTS:
    */
   validateAndGuardGeneratedGuidance(data, analysis, query, chunks, options = {}) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     const withheldResponse = {
       problemSummary: analysis.summary,
       legalIssues: analysis.legal_issues || [],
@@ -633,19 +682,26 @@ CRITICAL TASK REQUIREMENTS:
 
     if (!data || !data.guidance) {
       return withheldResponse;
+<<<<<<< HEAD
 =======
     if (!data || !data.guidance) {
       return this.generateDeterministicGuidance(query, analysis, chunks, options);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     }
 
     const catLower = (analysis.category || '').toLowerCase();
     const isTenancy = catLower.includes('tenan') || catLower.includes('deposit') || catLower.includes('rent');
     const isRera = catLower.includes('rera') || catLower.includes('real estate') || catLower.includes('builder');
 <<<<<<< HEAD
+<<<<<<< HEAD
     const isDomesticSafety = catLower.includes('domestic / family safety');
 =======
 >>>>>>> origin/main
+=======
+    const isDomesticSafety = catLower.includes('domestic / family safety');
+>>>>>>> 3aab4be (dhanush commits)
 
     const guidanceLower = (data.guidance || '').toLowerCase();
     const summaryLower = (data.problemSummary || '').toLowerCase();
@@ -657,12 +713,17 @@ CRITICAL TASK REQUIREMENTS:
 
       if (mentionsRera && !mentionsTenancy) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Withholding response.');
         return withheldResponse;
 =======
         console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Engaging grounded domain synthesis.');
         return this.generateDeterministicGuidance(query, analysis, chunks, options);
 >>>>>>> origin/main
+=======
+        console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Withholding response.');
+        return withheldResponse;
+>>>>>>> 3aab4be (dhanush commits)
       }
     }
 
@@ -671,6 +732,9 @@ CRITICAL TASK REQUIREMENTS:
       const mentionsLandlord = guidanceLower.includes('landlord') && !guidanceLower.includes('builder');
       if (mentionsLandlord) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
         console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (Tenancy instead of RERA). Withholding response.');
         return withheldResponse;
       }
@@ -682,10 +746,13 @@ CRITICAL TASK REQUIREMENTS:
       if (!isOnTopic || mentionsUnrelatedHousing) {
         console.warn('[RagPipeline Guard] Withholding legal guidance that drifted from domestic/family safety.');
         return withheldResponse;
+<<<<<<< HEAD
 =======
         console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (Tenancy instead of RERA). Engaging grounded domain synthesis.');
         return this.generateDeterministicGuidance(query, analysis, chunks, options);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       }
     }
 
@@ -693,6 +760,9 @@ CRITICAL TASK REQUIREMENTS:
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   buildGreetingResponse(analysis, options = {}) {
     const greetingText = `Hello! I am **VidhiSetu AI**, your Indian legal assistant.
 
@@ -766,7 +836,13 @@ Please describe what happened in your own words, and I will guide you through yo
       modelUsed: 'conversational_intro',
       executionMode: 'conversational_intro',
       disclaimer: STANDARD_DISCLAIMER,
+<<<<<<< HEAD
 =======
+=======
+    };
+  }
+
+>>>>>>> 3aab4be (dhanush commits)
   /**
    * Deterministic grounded template engine for offline / test / fallback scenarios
    */
@@ -823,7 +899,10 @@ Please describe what happened in your own words, and I will guide you through yo
       disclaimer: 'This guidance is based on Indian Kanoon precedents and statutory provisions. It does not constitute formal legal representation.',
       modelUsed: 'deterministic_expert_engine',
       executionMode: 'deterministic_fallback',
+<<<<<<< HEAD
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     };
   }
 
@@ -852,6 +931,9 @@ Please describe what happened in your own words, and I will guide you through yo
 
   buildInsufficientEvidenceResponse(analysis, query, options = {}) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     const category = (analysis.category || '').toLowerCase();
     const isDomesticSafety = category.includes('domestic / family safety');
     const isHarassment = category.includes('harassment');
@@ -871,9 +953,12 @@ Please describe what happened in your own words, and I will guide you through yo
       : isHarassment
         ? 'I’m sorry you’re dealing with sexual harassment. Your message does not yet say what happened or what support you need, and I do not have relevant retrieved legal records to make a grounded legal assessment. Are you in immediate danger? If so, contact local emergency services. You can share where this happened, when it happened, whether it is ongoing, and what support you need. I will keep this separate from any earlier issue in the chat.'
       : 'Available legal records and previous court judgments on Indian Kanoon are currently insufficient to provide high-confidence guidance on this specific query. I have not substituted unrelated cases or an offline legal template. Please add the relevant facts or consult a qualified advocate.';
+<<<<<<< HEAD
 =======
     const text = 'Available legal records and previous court judgments on Indian Kanoon are currently insufficient to provide high-confidence statutory guidance on this specific query. A professional consultation with a licensed advocate is strongly advised.\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*';
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     return {
       summary: analysis.summary,
       problemSummary: analysis.summary,
@@ -896,12 +981,17 @@ Please describe what happened in your own words, and I will guide you through yo
       missing_information: analysis.missing_information,
       missingInformation: analysis.missing_information,
 <<<<<<< HEAD
+<<<<<<< HEAD
       suggestedNextSteps: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
       nextActions: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
 =======
       suggestedNextSteps: ['Consult a licensed advocate for personalized advice'],
       nextActions: ['Consult a licensed advocate for personalized advice'],
 >>>>>>> origin/main
+=======
+      suggestedNextSteps: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
+      nextActions: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
+>>>>>>> 3aab4be (dhanush commits)
       confidence: 'low',
       modelUsed: 'none',
       executionMode: 'insufficient_evidence',
@@ -909,6 +999,9 @@ Please describe what happened in your own words, and I will guide you through yo
     };
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
   buildClarificationResponse(analysis) {
     const text = analysis.clarificationPrompt || 'I can help. What kind of problem are you dealing with? Please tell me what happened, who was involved, where and when it happened, and what outcome you want. If anyone is in immediate danger, contact local emergency services now.';
@@ -940,8 +1033,11 @@ Please describe what happened in your own words, and I will guide you through yo
       disclaimer: STANDARD_DISCLAIMER,
     };
   }
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 }
 
 export default RagPipeline;

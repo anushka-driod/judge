@@ -20,17 +20,23 @@ import {
   Clock,
 } from 'lucide-react';
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 import { GoogleAuthService } from '../../services/googleAuthService';
 import './AuthPage.css';
 
 export function LoginPage() {
   const { login, sendOtp, verifyOtp, googleAuth, completeGoogleProfile, logout, isAuthenticated, currentUser } = useAuth();
+<<<<<<< HEAD
 =======
 import './AuthPage.css';
 
 export function LoginPage() {
   const { login, sendOtp, verifyOtp, googleAuth, completeGoogleProfile } = useAuth();
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   const { showToast } = useUI();
   const navigate = useNavigate();
 
@@ -124,9 +130,13 @@ export function LoginPage() {
   const [remainingAttempts, setRemainingAttempts] = useState(null);
   const [maskedMobile, setMaskedMobile] = useState('');
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [simulatedOtp, setSimulatedOtp] = useState('');
 =======
 >>>>>>> origin/main
+=======
+  const [simulatedOtp, setSimulatedOtp] = useState('');
+>>>>>>> 3aab4be (dhanush commits)
   const otpInputRefs = useRef([]);
 
   // Resend cooldown timer
@@ -186,11 +196,17 @@ export function LoginPage() {
       setOtpExpirySeconds(300);
       setMaskedMobile(res?.maskedPhone || `+91 ******${cleanPhone.slice(-4)}`);
 <<<<<<< HEAD
+<<<<<<< HEAD
       if (res?.otpPreview) {
         setSimulatedOtp(res.otpPreview);
       }
 =======
 >>>>>>> origin/main
+=======
+      if (res?.otpPreview) {
+        setSimulatedOtp(res.otpPreview);
+      }
+>>>>>>> 3aab4be (dhanush commits)
       showToast(res?.message || 'OTP dispatched to your mobile number.', 'success');
       setTimeout(() => {
         if (otpInputRefs.current[0]) otpInputRefs.current[0].focus();
@@ -260,11 +276,15 @@ export function LoginPage() {
 
     try {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       const googleProfile = await GoogleAuthService.promptGoogleSignIn();
       const res = await googleAuth(googleProfile);
 
       if (res.isNewUser) {
         // First-time sign-in: allow role and location customization
+<<<<<<< HEAD
 =======
       // Simulate Google Identity Provider response
       const mockGoogleProfile = {
@@ -280,6 +300,8 @@ export function LoginPage() {
       if (res.isNewUser) {
         // First-time sign-in: require role and location selection per spec
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
         setGoogleOnboarding(res);
       } else {
         showToast('Signed in with Google!', 'success');
@@ -287,12 +309,18 @@ export function LoginPage() {
       }
     } catch (err) {
 <<<<<<< HEAD
+<<<<<<< HEAD
       if (err.message && !err.message.includes('cancelled')) {
         setError(err.message || 'Google authentication failed. Please try again.');
       }
 =======
       setError(err.message || 'Google authentication failed. Please try again.');
 >>>>>>> origin/main
+=======
+      if (err.message && !err.message.includes('cancelled')) {
+        setError(err.message || 'Google authentication failed. Please try again.');
+      }
+>>>>>>> 3aab4be (dhanush commits)
     } finally {
       setLoading(false);
     }
@@ -363,6 +391,9 @@ export function LoginPage() {
       </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       {isAuthenticated && currentUser && (
         <div
           className="auth-session-banner"
@@ -423,8 +454,11 @@ export function LoginPage() {
         </div>
       )}
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       {error && <Alert type="danger" onClose={() => setError('')}>{error}</Alert>}
 
       {/* Mode Switcher Tabs */}
@@ -613,6 +647,9 @@ export function LoginPage() {
               </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
               {simulatedOtp && (
                 <div
                   style={{
@@ -654,8 +691,11 @@ export function LoginPage() {
                 </div>
               )}
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
               <div className="otp-input-group" onPaste={handlePaste} style={{ marginBottom: '16px' }}>
                 {otpDigits.map((digit, idx) => (
                   <input

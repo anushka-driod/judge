@@ -13,9 +13,13 @@ import {
   LogOut,
   CreditCard,
 <<<<<<< HEAD
+<<<<<<< HEAD
   Briefcase,
 =======
 >>>>>>> origin/main
+=======
+  Briefcase,
+>>>>>>> 3aab4be (dhanush commits)
 } from 'lucide-react';
 import { ProfileModal } from '../profile/ProfileModal';
 import './Navbar.css';
@@ -111,12 +115,16 @@ export function Navbar() {
 
         <div className="navbar-right">
 <<<<<<< HEAD
+<<<<<<< HEAD
           {currentUser ? (
 =======
           {/* Top-right "New Case" and "Report Lawyer" buttons have been removed as requested */}
 
           {currentUser && (
 >>>>>>> origin/main
+=======
+          {currentUser ? (
+>>>>>>> 3aab4be (dhanush commits)
             <div className="navbar-account-container" ref={dropdownRef}>
               {/* Compact Account Section: [Small avatar] [Short name] [Dropdown arrow] */}
               <button
@@ -201,6 +209,9 @@ export function Navbar() {
                     className="account-menu-item"
                     role="menuitem"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
                     onClick={() => {
                       setIsDropdownOpen(false);
                       navigate(currentUser?.accountType === 'advocate' ? '/lawyer/dashboard' : '/lawyer/login');
@@ -214,8 +225,11 @@ export function Navbar() {
                     type="button"
                     className="account-menu-item"
                     role="menuitem"
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
                     onClick={() => handleOpenModal('password')}
                   >
                     <KeyRound size={15} className="menu-icon" />
@@ -237,6 +251,9 @@ export function Navbar() {
               )}
             </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
           ) : (
             <div className="navbar-auth-actions">
               <Link to="/lawyer/login" className="navbar-lawyer-pill" title="Advocate Chambers & Consultation Portal">
@@ -250,8 +267,11 @@ export function Navbar() {
                 Register
               </Link>
             </div>
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
           )}
         </div>
       </header>

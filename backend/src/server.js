@@ -5,6 +5,9 @@ import db from './config/db.js';
 dotenv.config();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Global Crash-Proof Process Guards (Never let unhandled errors terminate the server)
@@ -16,14 +19,20 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[CRITICAL PROCESS GUARD] Caught Unhandled Rejection:', reason);
 });
+<<<<<<< HEAD
 =======
 const PORT = process.env.PORT || 5000;
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
 async function startServer() {
   console.log('====================================================');
   console.log('EarnLaw Central Integration Server (Member 2)');
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   console.log('High-Resilience Server Engine Active');
   console.log('====================================================');
 
@@ -65,6 +74,7 @@ async function startServer() {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
+<<<<<<< HEAD
 =======
   console.log('====================================================');
 
@@ -76,12 +86,17 @@ async function startServer() {
     console.log(`- Healthcheck: http://localhost:${PORT}/health`);
   });
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 }
 
 startServer().catch((err) => {
   console.error('Fatal Server Startup Error:', err);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   process.exit(1);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 });

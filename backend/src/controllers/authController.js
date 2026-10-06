@@ -124,10 +124,14 @@ export const AuthController = {
   async getMe(req, res) {
     try {
 <<<<<<< HEAD
+<<<<<<< HEAD
       const user = await AuthService.getCurrentUser(req.user.id, req.user);
 =======
       const user = await AuthService.getCurrentUser(req.user.id);
 >>>>>>> origin/main
+=======
+      const user = await AuthService.getCurrentUser(req.user.id, req.user);
+>>>>>>> 3aab4be (dhanush commits)
       res.json({ user });
     } catch (err) {
       res.status(err.status || 500).json({
@@ -150,6 +154,9 @@ export const AuthController = {
 
   /**
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
    * POST /api/auth/google
    * Authenticate via Google Identity Services / Google OAuth
    */
@@ -238,8 +245,11 @@ export const AuthController = {
   },
 
   /**
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
    * POST /api/auth/logout
    */
   async logout(req, res) {

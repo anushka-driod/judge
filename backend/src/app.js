@@ -15,9 +15,13 @@ import paymentRoutes from './routes/paymentRoutes.js';
 // Member 3: AI + RAG + Legal Research Pipeline
 import { RagPipeline } from '../modules/ai-rag/src/rag/ragPipeline.js';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { networkManager } from './services/networkManager.js';
 =======
 >>>>>>> origin/main
+=======
+import { networkManager } from './services/networkManager.js';
+>>>>>>> 3aab4be (dhanush commits)
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +31,9 @@ const app = express();
 const ragPipeline = new RagPipeline();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // 1. Security & Parsing Middlewares - Configured CORS with FRONTEND_URL & credentials
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -58,6 +65,7 @@ app.options('*', cors());
 // Allow large documents, evidence scans, agreements up to 200MB
 app.use(express.json({ limit: '200mb' }));
 app.use(express.urlencoded({ limit: '200mb', extended: true }));
+<<<<<<< HEAD
 =======
 // 1. Security & Parsing Middlewares
 app.use(cors({
@@ -68,6 +76,8 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
 // 2. Healthcheck Route
 app.get(['/health', '/api/health'], (req, res) => {
@@ -77,17 +87,23 @@ app.get(['/health', '/api/health'], (req, res) => {
     version: '2.0.0',
     unified_engine: 'Single Localhost Architecture',
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     offline_ready: true,
     active_subsystems: [
       'Member 1: React 19 Frontend Client',
       'Member 2: Core Auth, Persistence & AnuDB',
       'Member 3: AI Legal Research & Kanoon RAG Pipeline (Offline Capable)',
+<<<<<<< HEAD
 =======
     active_subsystems: [
       'Member 1: React 19 Frontend Client',
       'Member 2: Core Auth, Persistence & AnuDB',
       'Member 3: AI Legal Research & Kanoon RAG Pipeline',
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       'Member 4: Lawyer Matching Engine & Case Management',
     ],
     timestamp: new Date().toISOString(),
@@ -95,6 +111,9 @@ app.get(['/health', '/api/health'], (req, res) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // 2b. System Network & Offline Status
 app.get(['/api/system/status', '/api/network/status'], async (req, res) => {
   const isOnline = await networkManager.checkConnectivity();
@@ -119,8 +138,11 @@ app.post('/api/system/toggle-offline', (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // 3. Mount Member 2: Auth Routes
 app.use('/api/auth', authRoutes);
 
@@ -155,12 +177,17 @@ app.post(['/api/legal/analyze', '/api/ai/chat'], async (req, res) => {
       success: true,
       reply: analysis.guidance,
 <<<<<<< HEAD
+<<<<<<< HEAD
       detectedLaws: analysis.relevant_laws || analysis.relevantLaws || [],
       detectedPrecedents: analysis.similar_cases || analysis.relevantJudgments || [],
 =======
       detectedLaws: analysis.relevant_laws,
       detectedPrecedents: analysis.similar_cases,
 >>>>>>> origin/main
+=======
+      detectedLaws: analysis.relevant_laws || analysis.relevantLaws || [],
+      detectedPrecedents: analysis.similar_cases || analysis.relevantJudgments || [],
+>>>>>>> 3aab4be (dhanush commits)
       suggestedNextSteps: analysis.suggestedNextSteps || (analysis.missing_information || []).map((m) => `Clarify: ${m}`),
       ...analysis,
       timestamp: new Date().toISOString(),
@@ -176,6 +203,9 @@ app.post(['/api/legal/analyze', '/api/ai/chat'], async (req, res) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // 6b. SSE Streaming Legal Guidance & Chat Endpoint
 app.post('/api/ai/chat/stream', async (req, res) => {
   const query = req.body.query || req.body.message || '';
@@ -255,8 +285,11 @@ app.post('/api/ai/chat/stream', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // 6. Mount Dedicated Lawyer Portal & Admin Oversight Routes
 app.use('/api/lawyer', lawyerRoutes);
 app.use('/api/admin', adminRoutes);
@@ -268,6 +301,9 @@ app.use('/api', paymentRoutes);
 app.use('/api', lawyerCaseRoutes);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // 9. Catch Unmatched /api/* routes cleanly with JSON instead of hanging
 app.all('/api/*', (req, res) => {
   res.status(404).json({
@@ -300,6 +336,7 @@ app.use((err, req, res, next) => {
     error: err.message || 'An unexpected server error occurred.',
     code: err.code || 'INTERNAL_SERVER_ERROR',
   });
+<<<<<<< HEAD
 =======
 // 7. Serve Static Frontend Production Assets (Single Localhost Unified Serving)
 app.use(express.static(distPath));
@@ -311,6 +348,8 @@ app.get('*', (req, res, next) => {
   }
   res.sendFile(path.join(distPath, 'index.html'));
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 });
 
 export default app;

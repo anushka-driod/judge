@@ -50,10 +50,15 @@ export function sanitizeUser(u) {
   } = u;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const metadata = safe.user_metadata || safe.metadata || {};
 
 =======
 >>>>>>> origin/main
+=======
+  const metadata = safe.user_metadata || safe.metadata || {};
+
+>>>>>>> 3aab4be (dhanush commits)
   return {
     id: safe.id,
     name: safe.name,
@@ -61,18 +66,24 @@ export function sanitizeUser(u) {
     phone: safe.phone,
     role: safe.role || 'user',
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     accountType: safe.role === 'lawyer' ? 'advocate' : (safe.role === 'admin' ? 'admin' : (metadata.accountType || 'candidate')),
     emailVerified: Boolean(safe.email_verified ?? safe.emailVerified),
     lastLoginAt: safe.last_login_at || safe.lastLoginAt || null,
     provider: metadata.provider || (safe.password_hash?.includes('google') ? 'google' : 'local'),
     picture: metadata.picture || metadata.avatar || null,
     metadata,
+<<<<<<< HEAD
 =======
     accountType: safe.role === 'lawyer' ? 'advocate' : (safe.role === 'admin' ? 'admin' : 'candidate'),
     emailVerified: Boolean(safe.email_verified ?? safe.emailVerified),
     lastLoginAt: safe.last_login_at || safe.lastLoginAt || null,
     metadata: safe.user_metadata || safe.metadata || {},
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     createdAt: safe.created_at || safe.createdAt,
     updatedAt: safe.updated_at || safe.updatedAt,
   };
@@ -323,9 +334,13 @@ export const UserModel = {
       phone: key,
       otpHash: hashOtp(plainOtp),
 <<<<<<< HEAD
+<<<<<<< HEAD
       plainOtp: String(plainOtp).trim(),
 =======
 >>>>>>> origin/main
+=======
+      plainOtp: String(plainOtp).trim(),
+>>>>>>> 3aab4be (dhanush commits)
       expiresAt,
       attempts: 0,
     });
@@ -457,6 +472,9 @@ export const UserModel = {
       .reverse();
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
   /**
    * Update user metadata (e.g. Google profile info, provider, location)
@@ -571,8 +589,11 @@ export const UserModel = {
     }
     return null;
   },
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 };
 
 export default UserModel;

@@ -1,31 +1,46 @@
 import React from 'react';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Scale, ShieldCheck, BookOpen, UserCheck, ArrowLeft, Briefcase } from 'lucide-react';
 =======
 import { Outlet, Link } from 'react-router-dom';
 import { Scale, ShieldCheck, BookOpen, UserCheck } from 'lucide-react';
 >>>>>>> origin/main
+=======
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Scale, ShieldCheck, BookOpen, UserCheck, ArrowLeft, Briefcase } from 'lucide-react';
+>>>>>>> 3aab4be (dhanush commits)
 import { ToastContainer } from '../common/ToastContainer';
 import './AuthLayout.css';
 
 export function AuthLayout() {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   const location = useLocation();
   const isLogin = location.pathname === '/login';
   const isRegister = location.pathname === '/register';
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   return (
     <div className="auth-layout">
       <div className="auth-hero-pane">
         <div className="auth-hero-content">
 <<<<<<< HEAD
+<<<<<<< HEAD
           <Link to="/" className="auth-brand">
 =======
           <Link to="/login" className="auth-brand">
 >>>>>>> origin/main
+=======
+          <Link to="/" className="auth-brand">
+>>>>>>> 3aab4be (dhanush commits)
             <div className="auth-brand-icon">
               <Scale size={28} />
             </div>
@@ -79,6 +94,9 @@ export function AuthLayout() {
 
       <div className="auth-form-pane">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
         <header className="auth-top-nav">
           <Link to="/" className="auth-top-home-link" title="Return to VidhiSetu Homepage">
             <ArrowLeft size={16} />
@@ -106,8 +124,11 @@ export function AuthLayout() {
           </div>
         </header>
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
         <div className="auth-form-container">
           <Outlet />
         </div>

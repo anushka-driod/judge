@@ -64,6 +64,9 @@ import { EscalationTrackingPage } from '../pages/complaints/EscalationTrackingPa
 import { NotFoundPage } from '../pages/notFound/NotFoundPage';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 // Landing & Marketing Page
 import { LandingPage } from '../pages/landing/LandingPage';
 
@@ -72,12 +75,15 @@ export function AppRoutes() {
     <Routes>
       {/* Public Home & Auth Routes */}
       <Route path="/" element={<LandingPage />} />
+<<<<<<< HEAD
 =======
 export function AppRoutes() {
   return (
     <Routes>
       {/* Public Auth Routes */}
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -109,6 +115,9 @@ export function AppRoutes() {
       <Route path="/admin/lawyers/:id" element={<AdminLawyersPage />} />
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       {/* Public Legal Agent & Legal Research (Accessible without authentication) */}
       <Route element={<AppLayout />}>
         {/* AI Legal Assistant - Public Citizen Agent */}
@@ -126,9 +135,12 @@ export function AppRoutes() {
       </Route>
 
       {/* Protected Routes (Require Verified Login) */}
+<<<<<<< HEAD
 =======
       {/* Protected Routes */}
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       <Route element={<ProtectedRoute />}>
         {/* Advocate Experience Screens (Unwrapped by standard citizen sidebar) */}
         <Route path="/advocate/status" element={<AdvocateStatusPage />} />
@@ -138,6 +150,7 @@ export function AppRoutes() {
         <Route path="/admin/verifications" element={<AdminVerificationPage />} />
         <Route path="/admin/payments" element={<AdminPaymentsPage />} />
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         {/* Protected Citizen Cases Workspace */}
         <Route element={<AppLayout />}>
@@ -152,17 +165,26 @@ export function AppRoutes() {
           <Route path="/chat" element={<AIChatPage />} />
           <Route path="/chat/:sessionId" element={<AIChatPage />} />
 >>>>>>> origin/main
+=======
+        {/* Protected Citizen Cases Workspace */}
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+>>>>>>> 3aab4be (dhanush commits)
 
           {/* Consultation Payments & Invoices */}
           <Route path="/payments" element={<CitizenPaymentsPage />} />
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
           {/* User-Isolated Cases */}
           <Route path="/cases" element={<CasesListPage />} />
           <Route path="/cases/new" element={<NewCasePage />} />
           <Route path="/cases/:caseId" element={<CaseDetailsPage />} />
 
           {/* Booking Consultations */}
+<<<<<<< HEAD
 =======
           {/* Cases */}
           <Route path="/cases" element={<CasesListPage />} />
@@ -180,6 +202,8 @@ export function AppRoutes() {
           <Route path="/cases/:caseId/lawyers" element={<LawyerRecommendationsPage />} />
           <Route path="/lawyers/:lawyerId" element={<LawyerProfilePage />} />
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
           <Route path="/lawyers/:lawyerId/book" element={<BookConsultationPage />} />
           <Route path="/consultation/confirmed/:bookingId" element={<ConsultationConfirmationPage />} />
 

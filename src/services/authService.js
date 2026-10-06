@@ -47,13 +47,19 @@ export const authService = {
       localStorage.setItem('vidhisetu_auth_token', res.token);
       localStorage.setItem('earnlaw_auth_token', res.token);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       if (res.user) {
         try {
           localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
         } catch (_) {}
       }
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     }
     return res;
   },
@@ -204,19 +210,26 @@ export const authService = {
   /**
    * Social Authentication (Continue with Google).
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
    * Sends Google credential or verified profile payload to backend.
    * Backend returns { isNewUser: boolean, token, user }.
    */
   async googleAuth(googlePayload) {
+<<<<<<< HEAD
 =======
    * Returns { isNewUser: boolean, token, user } or { isNewUser: true, email, name, picture }.
    */
   async googleAuth(googleProfile) {
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     const res = await request(
       '/auth/google',
       {
         method: 'POST',
+<<<<<<< HEAD
 <<<<<<< HEAD
         body: JSON.stringify(googlePayload),
 =======
@@ -228,15 +241,32 @@ export const authService = {
         if (isExisting) {
           const token = `vst_token_usr_001`;
           localStorage.setItem('vidhisetu_auth_token', token);
+=======
+        body: JSON.stringify(googlePayload),
+      },
+      () => {
+        const email = googlePayload?.email || "google.citizen@example.com";
+        const isExisting = email === "aarav.mehta@example.com";
+        if (isExisting) {
+          const token = "vst_token_usr_001";
+          localStorage.setItem("vidhisetu_auth_token", token);
+>>>>>>> 3aab4be (dhanush commits)
           return { isNewUser: false, token, user: mockCurrentUser };
         }
         return {
           isNewUser: true,
+<<<<<<< HEAD
           email: googleProfile.email,
           name: googleProfile.name,
           picture: googleProfile.picture,
         };
 >>>>>>> origin/main
+=======
+          email,
+          name: googlePayload?.name || "Google User",
+          picture: googlePayload?.picture || null,
+        };
+>>>>>>> 3aab4be (dhanush commits)
       }
     );
 
@@ -244,11 +274,17 @@ export const authService = {
       localStorage.setItem('vidhisetu_auth_token', res.token);
       localStorage.setItem('earnlaw_auth_token', res.token);
 <<<<<<< HEAD
+<<<<<<< HEAD
       if (res.user) {
         localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
       }
 =======
 >>>>>>> origin/main
+=======
+      if (res.user) {
+        localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
+      }
+>>>>>>> 3aab4be (dhanush commits)
     }
     return res;
   },
@@ -263,19 +299,30 @@ export const authService = {
         method: 'POST',
         body: JSON.stringify(profileData),
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3aab4be (dhanush commits)
       },
       () => {
         const user = {
           ...mockCurrentUser,
           ...profileData,
           emailVerified: true,
+<<<<<<< HEAD
           verificationStatus: profileData.accountType === 'advocate' ? 'pending' : undefined,
         };
         const token = `vst_token_${Date.now()}`;
         localStorage.setItem('vidhisetu_auth_token', token);
         return { success: true, token, user };
 >>>>>>> origin/main
+=======
+          verificationStatus: profileData.accountType === "advocate" ? "pending" : undefined,
+        };
+        const token = `vst_token_${Date.now()}`;
+        localStorage.setItem("vidhisetu_auth_token", token);
+        return { success: true, token, user };
+>>>>>>> 3aab4be (dhanush commits)
       }
     );
 
@@ -283,11 +330,17 @@ export const authService = {
       localStorage.setItem('vidhisetu_auth_token', res.token);
       localStorage.setItem('earnlaw_auth_token', res.token);
 <<<<<<< HEAD
+<<<<<<< HEAD
       if (res.user) {
         localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
       }
 =======
 >>>>>>> origin/main
+=======
+      if (res.user) {
+        localStorage.setItem('vidhisetu_user_profile', JSON.stringify(res.user));
+      }
+>>>>>>> 3aab4be (dhanush commits)
     }
     return res;
   },
@@ -444,6 +497,9 @@ export const authService = {
    */
   async getCurrentUser() {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
     if (!token) return null;
 
@@ -486,6 +542,7 @@ export const authService = {
       }
       return null;
     }
+<<<<<<< HEAD
 =======
     return request('/auth/me', {}, () => {
       const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
@@ -499,6 +556,8 @@ export const authService = {
       return mockCurrentUser;
     });
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   },
 
   /**
@@ -506,6 +565,9 @@ export const authService = {
    */
   async logout() {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     try {
       await request('/auth/logout', { method: 'POST' }).catch(() => null);
     } finally {
@@ -513,10 +575,13 @@ export const authService = {
       localStorage.removeItem('earnlaw_auth_token');
       localStorage.removeItem('vidhisetu_user_profile');
     }
+<<<<<<< HEAD
 =======
     localStorage.removeItem('vidhisetu_auth_token');
     localStorage.removeItem('earnlaw_auth_token');
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     return true;
   },
 };

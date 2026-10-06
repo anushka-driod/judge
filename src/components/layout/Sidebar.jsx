@@ -2,9 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useCases } from '../../context/CaseContext';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useAuth } from '../../hooks/useAuth';
 =======
 >>>>>>> origin/main
+=======
+import { useAuth } from '../../hooks/useAuth';
+>>>>>>> 3aab4be (dhanush commits)
 import { useUI } from '../../hooks/useUI';
 import {
   Scale,
@@ -21,18 +25,27 @@ import {
   ChevronLeft,
   ChevronRight,
 <<<<<<< HEAD
+<<<<<<< HEAD
   LogIn,
   LogOut,
 =======
 >>>>>>> origin/main
+=======
+  LogIn,
+  LogOut,
+>>>>>>> 3aab4be (dhanush commits)
 } from 'lucide-react';
 import './Sidebar.css';
 
 export function Sidebar() {
 <<<<<<< HEAD
+<<<<<<< HEAD
   const { currentUser, logout } = useAuth();
 =======
 >>>>>>> origin/main
+=======
+  const { currentUser, logout } = useAuth();
+>>>>>>> 3aab4be (dhanush commits)
   const {
     cases,
     activeCaseId,
@@ -342,10 +355,14 @@ export function Sidebar() {
         </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         {/* 2 & 3. REPORT LAWYER ISSUE & AUTH STRIP (Footer Links) */}
 =======
         {/* 2 & 3. REPORT LAWYER ISSUE (Footer Link) */}
 >>>>>>> origin/main
+=======
+        {/* 2 & 3. REPORT LAWYER ISSUE & AUTH STRIP (Footer Links) */}
+>>>>>>> 3aab4be (dhanush commits)
         <div className="sidebar-footer">
           <NavLink
             to="/cases/case-102/complaint"
@@ -362,6 +379,9 @@ export function Sidebar() {
             {!isSidebarCollapsed && <span className="complaint-text">REPORT LAWYER ISSUE</span>}
           </NavLink>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
           {!isSidebarCollapsed && (
             <div className="sidebar-auth-strip">
@@ -401,8 +421,11 @@ export function Sidebar() {
               )}
             </div>
           )}
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
         </div>
       </aside>
     </>

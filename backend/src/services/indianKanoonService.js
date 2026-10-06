@@ -55,14 +55,20 @@ export class IndianKanoonService {
    */
   static getApiToken() {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     const token = (process.env.INDIANKANOON_API_TOKEN || process.env.INDIAN_KANOON_API_TOKEN || '').trim();
     if (!token || token.includes('your_indian_kanoon_token')) {
       return '';
     }
     return token;
+<<<<<<< HEAD
 =======
     return (process.env.INDIANKANOON_API_TOKEN || process.env.INDIAN_KANOON_API_TOKEN || '').trim();
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   }
 
   /**

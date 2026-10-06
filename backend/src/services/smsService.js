@@ -83,6 +83,9 @@ export const SmsService = {
     );
     const hasCustom = Boolean(process.env.SMS_GATEWAY_URL && !process.env.SMS_GATEWAY_URL.includes('your-sms'));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     const isSimulation = !hasFast2Sms && !hasTwilio && !hasCustom;
 
     return {
@@ -93,6 +96,7 @@ export const SmsService = {
       hasTwilio,
       hasCustom,
       isSimulation,
+<<<<<<< HEAD
 =======
 
     return {
@@ -102,6 +106,8 @@ export const SmsService = {
       hasTwilio,
       hasCustom,
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     };
   },
 
@@ -257,6 +263,9 @@ export const SmsService = {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     // 4. No real SMS Gateway configured in .env -> Fallback to Simulated Mode
     const allowSimulation = process.env.ALLOW_SIMULATED_SMS !== 'false';
     if (allowSimulation) {
@@ -276,9 +285,12 @@ export const SmsService = {
       };
     }
 
+<<<<<<< HEAD
 =======
     // 4. No SMS Gateway configured in .env
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     console.warn(`[SMS Service] No active SMS provider configured in backend/.env for ${masked}.`);
     const error = new Error(
       'SMS Gateway is not configured. To send real SMS to mobile phones, please set FAST2SMS_API_KEY or TWILIO credentials in backend/.env.'

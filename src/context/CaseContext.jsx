@@ -293,6 +293,9 @@ export function CaseProvider({ children }) {
 
   /**
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
    * Update a specific message in a case (e.g. for streaming response updates)
    */
   const updateMessageInCase = (caseId, messageId, patch) => {
@@ -330,8 +333,11 @@ export function CaseProvider({ children }) {
   };
 
   /**
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
    * Pin or unpin a case. Pinned cases stay at the top.
    */
   const togglePinCase = (caseId) => {
@@ -432,10 +438,15 @@ export function CaseProvider({ children }) {
         createChatCase,
         addMessageToCase,
 <<<<<<< HEAD
+<<<<<<< HEAD
         updateMessageInCase,
         removeLastMessage,
 =======
 >>>>>>> origin/main
+=======
+        updateMessageInCase,
+        removeLastMessage,
+>>>>>>> 3aab4be (dhanush commits)
         togglePinCase,
         renameCase,
         deleteCase,

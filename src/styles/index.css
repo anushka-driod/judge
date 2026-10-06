@@ -12,9 +12,13 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 <<<<<<< HEAD
+<<<<<<< HEAD
   overflow-x: hidden;
 =======
 >>>>>>> origin/main
+=======
+  overflow-x: hidden;
+>>>>>>> 3aab4be (dhanush commits)
 }
 
 body {
@@ -26,6 +30,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   overflow-x: hidden;
 }
 
@@ -33,8 +40,11 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 }
 
 /* Headings */
@@ -156,6 +166,9 @@ input, textarea, select {
 .text-center { text-align: center; }
 .cursor-pointer { cursor: pointer; }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
 /* Apply the shared black-and-gold palette to legacy page surfaces. */
 :root {
@@ -201,5 +214,8 @@ body,
   background-color: var(--accent-600);
   border-color: var(--accent-600);
 }
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)

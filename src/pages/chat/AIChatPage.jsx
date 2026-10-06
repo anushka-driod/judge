@@ -1,15 +1,21 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useCases } from '../../context/CaseContext';
 import { aiLegalService } from '../../services/aiLegalService';
 import { MarkdownMessage } from '../../components/chat/MarkdownMessage';
+<<<<<<< HEAD
 =======
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCases } from '../../context/CaseContext';
 import { aiLegalService } from '../../services/aiLegalService';
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { FileUpload } from '../../components/common/FileUpload';
@@ -29,6 +35,9 @@ import {
   Sparkles,
   ArrowUp,
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   ArrowDown,
   Copy,
   Check,
@@ -49,9 +58,12 @@ import {
   Video,
 } from 'lucide-react';
 import { mockLawyers } from '../../data/mockData';
+<<<<<<< HEAD
 =======
 } from 'lucide-react';
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 import './AIChatPage.css';
 
 export function AIChatPage() {
@@ -61,15 +73,23 @@ export function AIChatPage() {
     createChatCase,
     addMessageToCase,
 <<<<<<< HEAD
+<<<<<<< HEAD
     updateMessageInCase,
     removeLastMessage,
 =======
 >>>>>>> origin/main
+=======
+    updateMessageInCase,
+    removeLastMessage,
+>>>>>>> 3aab4be (dhanush commits)
     startFreshChat,
   } = useCases();
 
   const navigate = useNavigate();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   const location = useLocation();
 
   // Input & composer state
@@ -200,6 +220,7 @@ export function AIChatPage() {
       }
     }
   }, [streamingText, isStreaming]);
+<<<<<<< HEAD
 =======
 
   const [inputText, setInputText] = useState('');
@@ -220,6 +241,8 @@ export function AIChatPage() {
     scrollToBottom();
   }, [currentMessages, isAiThinking]);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
   // Autofocus input when starting a fresh case conversation
   useEffect(() => {
@@ -229,6 +252,9 @@ export function AIChatPage() {
   }, [activeCaseId]);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   // Refocus input whenever AI generation completes, errors, or is stopped
   const wasGeneratingRef = useRef(false);
   useEffect(() => {
@@ -242,9 +268,12 @@ export function AIChatPage() {
   }, [isAiThinking, isStreaming]);
 
   // Adjust textarea height dynamically up to 180px
+<<<<<<< HEAD
 =======
   // Adjust textarea height dynamically
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   const handleTextChange = (e) => {
     setInputText(e.target.value);
     if (textareaRef.current) {
@@ -254,6 +283,9 @@ export function AIChatPage() {
   };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   const handleClarificationAnswer = (question) => {
     setInputText('My answer: ');
     requestAnimationFrame(() => {
@@ -402,11 +434,14 @@ export function AIChatPage() {
     if (isSubmittingRef.current || isAiThinking || isStreaming) return;
 
     isSubmittingRef.current = true;
+<<<<<<< HEAD
 =======
   const handleSendMessage = async (textToSend = inputText) => {
     const trimmed = textToSend.trim();
     if (!trimmed && attachedFiles.length === 0) return;
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
     const userMessage = {
       id: `usr-msg-${Date.now()}`,
@@ -417,6 +452,9 @@ export function AIChatPage() {
     };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
     let targetCaseId = currentCaseIdRef.current || activeCaseId;
 
     // New Case Flow: If no active case, create one automatically
@@ -424,6 +462,7 @@ export function AIChatPage() {
       const createdCase = createChatCase(trimmed);
       targetCaseId = createdCase.id;
       currentCaseIdRef.current = targetCaseId;
+<<<<<<< HEAD
 =======
     let targetCaseId = activeCaseId;
 
@@ -432,20 +471,29 @@ export function AIChatPage() {
       const createdCase = createChatCase(trimmed);
       targetCaseId = createdCase.id;
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
     } else {
       addMessageToCase(targetCaseId, userMessage);
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     // Reset composer immediately so input is cleared and ready for next turn
 =======
 >>>>>>> origin/main
+=======
+    // Reset composer immediately so input is cleared and ready for next turn
+>>>>>>> 3aab4be (dhanush commits)
     setInputText('');
     setAttachedFiles([]);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
     // Always scroll to bottom when user explicitly sends a message
     isNearBottomRef.current = true;
@@ -685,6 +733,7 @@ export function AIChatPage() {
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 60);
+<<<<<<< HEAD
 =======
     setIsAiThinking(true);
 
@@ -721,6 +770,8 @@ export function AIChatPage() {
       setIsAiThinking(false);
     }
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   };
 
   const handleStarterClick = (starterText) => {
@@ -730,14 +781,20 @@ export function AIChatPage() {
   const starterCards = [
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       icon: '🏠',
       title: 'Security Deposit Withheld',
       desc: 'Landlord refuses deposit refund or made arbitrary deductions',
       prompt: 'My landlord is withholding my ₹70,000 security deposit after I vacated the house with proper 30-day notice and claims ₹25,000 for painting.',
     },
     {
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       icon: '🏢',
       title: 'Wrongful Job Dismissal',
       desc: 'Terminated without 30 days statutory notice or severance pay',
@@ -751,14 +808,20 @@ export function AIChatPage() {
     },
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       icon: '🛡️',
       title: 'Cyber Fraud & Unauthorized Debit',
       desc: 'Unrecognized UPI/bank debit and 1930 reporting helpline',
       prompt: '₹45,000 was debited from my bank account via unauthorized UPI transactions without any OTP or alert. What immediate steps and legal notice should I issue?',
     },
     {
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
       icon: '📦',
       title: 'Defective Product & Refund',
       desc: 'E-commerce platform refused return for damaged goods',
@@ -766,6 +829,9 @@ export function AIChatPage() {
     },
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       icon: '🏗️',
       title: 'Builder Possession Delay',
       desc: 'RERA delayed handover compensation or 100% full refund',
@@ -783,6 +849,7 @@ export function AIChatPage() {
       desc: 'Ancestral property share dispute among legal heirs',
       prompt: 'My siblings are refusing to give me my lawful share of our ancestral residential property after our father passed away without leaving a will. What legal steps should I take?',
     },
+<<<<<<< HEAD
 =======
       icon: '🏠',
       title: 'Builder Possession Delay',
@@ -790,11 +857,16 @@ export function AIChatPage() {
       prompt: 'My builder delayed flat possession by over 14 months beyond the date promised in the Agreement for Sale. Can I claim full refund under RERA?',
     },
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
   ];
 
   return (
     <div className="vidhisetu-chat-layout animate-fade-in">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       {/* 1. Header Toolbar */}
       <header className="chat-top-toolbar">
         <div className="chat-top-left">
@@ -840,12 +912,15 @@ export function AIChatPage() {
       >
         <div className="chat-inner-column">
           {/* Empty State / Welcome Screen */}
+<<<<<<< HEAD
 =======
       {/* Scrollable Conversation Stream */}
       <div className="chat-scroll-area">
         <div className="chat-inner-column">
           {/* Empty State / New Case Screen */}
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
           {currentMessages.length === 0 ? (
             <div className="chat-empty-hero animate-fade-in">
               <div className="hero-badge-container">
@@ -854,6 +929,9 @@ export function AIChatPage() {
                 </div>
               </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
               <h1 className="hero-title">Public AI Legal Agent</h1>
               <p className="hero-subtitle">
                 Individualized Legal Procedures • Authentic Kanoon Precedents • Multi-Turn Memory
@@ -876,6 +954,7 @@ export function AIChatPage() {
 
               <p className="hero-explanation">
                 Explain any legal grievance in your own words (English, Telugu, or Tanglish). VidhiSetu tailors a suitable legal roadmap for your specific issue, cites authentic Indian judicial precedents, and remembers your facts as you ask follow-up questions.
+<<<<<<< HEAD
 =======
               <h1 className="hero-title">VidhiSetu AI</h1>
               <p className="hero-subtitle">
@@ -885,6 +964,8 @@ export function AIChatPage() {
                 Describe your dispute in everyday words. VidhiSetu researches relevant Indian statutes,
                 court precedents, and guides you on self-help or advocate consultation.
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
               </p>
 
               <div className="hero-starters-grid">
@@ -908,6 +989,9 @@ export function AIChatPage() {
             /* Active Conversation Messages */
             <div className="chat-messages-list">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
               {currentMessages.map((msg, index) => {
                 const isLastAiMessage =
                   msg.sender === 'ai' && index === currentMessages.length - 1;
@@ -1405,6 +1489,7 @@ export function AIChatPage() {
                           {streamingMeta.detectedLaws.slice(0, 2).map((law, idx) => (
                             <div key={idx} className="source-card">
                               <strong>{law.act || law.act_name || law.name}</strong>
+<<<<<<< HEAD
 =======
               {currentMessages.map((msg) => (
                 <div
@@ -1472,17 +1557,23 @@ export function AIChatPage() {
                               </strong>
                               {law.plainMeaning && <p>{law.plainMeaning}</p>}
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
                   </div>
                 </div>
               )}
 
               {/* AI Thinking Animation (Initial phase before tokens arrive) */}
+<<<<<<< HEAD
 =======
 
                     {/* Cited Judicial Precedents (Indian Kanoon) */}
@@ -1602,6 +1693,8 @@ export function AIChatPage() {
 
               {/* AI Thinking Animation */}
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
               {isAiThinking && (
                 <div className="chat-message-row message-from-ai">
                   <div className="message-avatar">
@@ -1623,17 +1716,25 @@ export function AIChatPage() {
               )}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
               {/* Bottom anchor for scrolling */}
               <div ref={messagesEndRef} className="scroll-sentinel" />
 =======
               <div ref={messagesEndRef} />
 >>>>>>> origin/main
+=======
+              {/* Bottom anchor for scrolling */}
+              <div ref={messagesEndRef} className="scroll-sentinel" />
+>>>>>>> 3aab4be (dhanush commits)
             </div>
           )}
         </div>
       </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
       {/* 3. Floating Jump to Bottom Button */}
       {showScrollBottomBtn && (
         <button
@@ -1652,17 +1753,23 @@ export function AIChatPage() {
       <footer className="chat-bottom-dock">
         <div className="chat-dock-inner">
           {/* File Attachment Tray */}
+<<<<<<< HEAD
 =======
       {/* 6. Message Input Box Fixed at Bottom (ChatGPT style) */}
       <div className="chat-bottom-dock">
         <div className="chat-dock-inner">
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
           {attachedFiles.length > 0 && (
             <div className="chat-attached-tray">
               {attachedFiles.map((f, i) => (
                 <span key={i} className="tray-chip">
                   <FileText size={14} /> {f.name}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
                   <button
                     type="button"
                     className="tray-chip-remove"
@@ -1671,14 +1778,20 @@ export function AIChatPage() {
                   >
                     ×
                   </button>
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
                 </span>
               ))}
             </div>
           )}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
           {/* Voice Input Listening State Indicator */}
           {isListening && (
             <div className="voice-listening-banner animate-fade-in">
@@ -1688,24 +1801,34 @@ export function AIChatPage() {
           )}
 
           {/* Composer Input Box */}
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
           <div className="chat-composer-box">
             <button
               type="button"
               className="composer-attach-btn"
               onClick={() => setShowAttachModal(true)}
 <<<<<<< HEAD
+<<<<<<< HEAD
               title="Attach Agreements, Invoices, Dishonour Memos, or Notice Copies"
 =======
               title="Attach Agreements, Receipts, or Bounced Cheques"
 >>>>>>> origin/main
+=======
+              title="Attach Agreements, Invoices, Dishonour Memos, or Notice Copies"
+>>>>>>> 3aab4be (dhanush commits)
               aria-label="Attach Documents"
             >
               <Paperclip size={18} />
             </button>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
             {/* Flowchart Step 2: Voice Input Button */}
             <button
               type="button"
@@ -1725,12 +1848,15 @@ export function AIChatPage() {
                   ? 'VidhiSetu AI is analyzing Indian statutes & precedents…'
                   : 'Ask VidhiSetu about your legal rights, notice procedure, or dispute…'
               }
+<<<<<<< HEAD
 =======
             <textarea
               ref={textareaRef}
               className="composer-textarea"
               placeholder="Ask VidhiSetu about your legal issue, rights, notice period, or dispute…"
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
               value={inputText}
               rows={1}
               onChange={handleTextChange}
@@ -1741,6 +1867,9 @@ export function AIChatPage() {
                 }
               }}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
               disabled={isAiThinking || isStreaming}
               id="chat-composer-textarea"
             />
@@ -1780,6 +1909,7 @@ export function AIChatPage() {
           </div>
         </div>
       </footer>
+<<<<<<< HEAD
 =======
             />
 
@@ -1803,6 +1933,8 @@ export function AIChatPage() {
         </div>
       </div>
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
       {/* Document Attachment Modal */}
       {showAttachModal && (
@@ -1812,10 +1944,14 @@ export function AIChatPage() {
               <h3 className="card-title">Attach Supporting Evidence</h3>
               <p className="card-subtitle">
 <<<<<<< HEAD
+<<<<<<< HEAD
                 Upload rental agreements, cheques, invoices, or written correspondence to assist VidhiSetu.
 =======
                 Upload invoices, agreements, emails, or bank dishonour memos to help VidhiSetu assess your case.
 >>>>>>> origin/main
+=======
+                Upload rental agreements, cheques, invoices, or written correspondence to assist VidhiSetu.
+>>>>>>> 3aab4be (dhanush commits)
               </p>
               <div style={{ marginTop: '16px' }}>
                 <FileUpload
@@ -1829,10 +1965,14 @@ export function AIChatPage() {
                 </Button>
                 <Button variant="primary" onClick={() => setShowAttachModal(false)}>
 <<<<<<< HEAD
+<<<<<<< HEAD
                   Done ({attachedFiles.length} files)
 =======
                   Attach ({attachedFiles.length} files)
 >>>>>>> origin/main
+=======
+                  Done ({attachedFiles.length} files)
+>>>>>>> 3aab4be (dhanush commits)
                 </Button>
               </div>
             </Card>
@@ -1843,7 +1983,12 @@ export function AIChatPage() {
   );
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 export default AIChatPage;
 =======
 >>>>>>> origin/main
+=======
+
+export default AIChatPage;
+>>>>>>> 3aab4be (dhanush commits)

@@ -14,12 +14,18 @@ export function AuthProvider({ children }) {
       return user;
     } catch (err) {
 <<<<<<< HEAD
+<<<<<<< HEAD
       // Clear stale token so browser does not repeatedly error
       localStorage.removeItem('vidhisetu_auth_token');
       localStorage.removeItem('earnlaw_auth_token');
 =======
       console.error('Failed to load user session', err);
 >>>>>>> origin/main
+=======
+      // Clear stale token so browser does not repeatedly error
+      localStorage.removeItem('vidhisetu_auth_token');
+      localStorage.removeItem('earnlaw_auth_token');
+>>>>>>> 3aab4be (dhanush commits)
       setCurrentUser(null);
       return null;
     }

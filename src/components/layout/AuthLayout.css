@@ -135,6 +135,9 @@
   background-color: var(--bg-surface);
   display: flex;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -213,46 +216,67 @@
 
 .auth-top-lawyer-link:hover {
   background-color: #fde68a;
+<<<<<<< HEAD
 =======
   align-items: center;
   justify-content: center;
   padding: var(--space-8) var(--space-6);
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 }
 
 .auth-form-container {
   width: 100%;
   max-width: 440px;
 <<<<<<< HEAD
+<<<<<<< HEAD
   margin: auto 0;
   padding: var(--space-4) 0;
 =======
 >>>>>>> origin/main
+=======
+  margin: auto 0;
+  padding: var(--space-4) 0;
+>>>>>>> 3aab4be (dhanush commits)
 }
 
 @media (max-width: 960px) {
   .auth-layout {
     flex-direction: column;
 <<<<<<< HEAD
+<<<<<<< HEAD
     min-height: 100vh;
     overflow-y: auto;
 =======
 >>>>>>> origin/main
+=======
+    min-height: 100vh;
+    overflow-y: auto;
+>>>>>>> 3aab4be (dhanush commits)
   }
 
   .auth-hero-pane {
     padding: var(--space-8) var(--space-6);
 <<<<<<< HEAD
+<<<<<<< HEAD
     flex: none;
     overflow: visible;
 =======
 >>>>>>> origin/main
+=======
+    flex: none;
+    overflow: visible;
+>>>>>>> 3aab4be (dhanush commits)
   }
 
   .auth-hero-heading {
     font-size: 1.75rem;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3aab4be (dhanush commits)
 
   .auth-form-pane {
     flex: none;
@@ -264,6 +288,9 @@
   .auth-form-container {
     margin: 0 auto;
   }
+<<<<<<< HEAD
 =======
 >>>>>>> origin/main
+=======
+>>>>>>> 3aab4be (dhanush commits)
 }
