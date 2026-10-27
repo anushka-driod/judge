@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const publicBase = 'https://suspected-sensor-mai-there.trycloudflare.com';
+const publicBase = process.env.PUBLIC_URL || 'http://localhost:5000';
 const JWT_SECRET = process.env.JWT_SECRET || 'f1d04cd2f0adad6edc11b66083e4fe2f537d2a696ae3f770bcd256a4df9ba5f56bb11a8aa8d174c8bda886debce6b6c312a565cee180292dc45c8dc95c5e366d';
 
 // Generate valid session token for verified test user
