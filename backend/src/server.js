@@ -1,10 +1,6 @@
-import dotenv from 'dotenv';
+import './config/env.js';
 import app from './app.js';
 import db from './config/db.js';
-
-if (!(process.env.NODE_ENV === 'test' && process.env.VIDHISETU_TEST_MODE === 'isolated')) {
-  dotenv.config();
-}
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
 

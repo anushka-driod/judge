@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "migrate": "node src/db/migrate.js",
-    "test": "node --import ./tests/isolated-test-setup.js --test tests/phase1-security.test.js tests/auth-otp.test.js"
+    "test:cors": "node --import ./tests/isolated-test-setup.js --test tests/cors.test.js",
+    "test": "node --import ./tests/isolated-test-setup.js --test tests/phase1-security.test.js tests/auth-otp.test.js tests/cors.test.js"
   },
   "dependencies": {
     "@google/genai": "^2.24.0",

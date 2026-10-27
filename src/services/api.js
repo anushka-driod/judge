@@ -1,4 +1,24 @@
-const BASE_URL = import.meta.env?.VITE_API_BASE_URL || '/api';
+/**
+ * Resolves the backend API base URL safely across production and development.
+ * In production:
+ * - If VITE_API_BASE_URL is unconfigured or points to localhost/127.0.0.1, defaults to '/api'
+ *   (which uses Vercel rewrites to https://vidhisetu-app.onrender.com/api or unified Docker serving).
+ * - Otherwise uses the explicitly configured production backend URL.
+ * In development:
+ * - Defaults to VITE_API_BASE_URL or '/api'.
+ */
+export function getApiBaseUrl() {
+  const envUrl = import.meta.env?.VITE_API_BASE_URL;
+  if (import.meta.env?.PROD) {
+    if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
+      return '/api';
+    }
+    return envUrl.replace(/\/+$/, '');
+  }
+  return (envUrl || '/api').replace(/\/+$/, '');
+}
+
+export const BASE_URL = getApiBaseUrl();
 
 /**
  * Universal request wrapper.

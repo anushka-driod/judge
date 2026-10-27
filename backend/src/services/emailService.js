@@ -1,8 +1,5 @@
+import '../config/env.js';
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-if (!(process.env.NODE_ENV === 'test' && process.env.VIDHISETU_TEST_MODE === 'isolated')) {
-  dotenv.config();
-}
 
 let transporter = null;
 let isConfigured = false;
@@ -35,15 +32,27 @@ export function resetMockEmailTransport() {
   mockEmailTransport = null;
 }
 
+function isRecipientAccepted(acceptedList, recipient) {
+  if (!Array.isArray(acceptedList) || acceptedList.length === 0) return false;
+  const target = String(recipient || '').toLowerCase().trim();
+  return acceptedList.some((item) => {
+    const cleanItem = String(item).toLowerCase().trim().replace(/[<>]/g, '');
+    return cleanItem === target || cleanItem.includes(target) || target.includes(cleanItem);
+  });
+}
+
 function getFromAddress() {
-  const fromAddress = process.env.EMAIL_FROM?.trim()
-    || process.env.SMTP_FROM?.trim()
-    || process.env.SMTP_USER?.trim()
-    || process.env.GMAIL_USER?.trim();
-  if (!fromAddress) {
-    throw new Error('Email sender is not configured. Set EMAIL_FROM, SMTP_FROM, SMTP_USER, or GMAIL_USER.');
+  const rawUser = process.env.SMTP_USER || process.env.GMAIL_USER || '';
+  const cleanUser = String(rawUser).trim().replace(/\s+/g, '');
+  const explicitFrom = (process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
+
+  if (explicitFrom) {
+    return explicitFrom;
   }
-  return fromAddress;
+  if (cleanUser) {
+    return `"VidhiSetu Platform" <${cleanUser}>`;
+  }
+  throw new Error('Email sender is not configured. Set EMAIL_FROM, SMTP_FROM, SMTP_USER, or GMAIL_USER.');
 }
 
 /**
@@ -138,6 +147,13 @@ export function initTransporter(overrideConfig = null) {
 
 // Initial transporter setup on load
 initTransporter();
+
+export function getTransporter() {
+  if (!transporter || !isConfigured) {
+    initTransporter();
+  }
+  return transporter;
+}
 
 /**
  * Mask email address for secure presentation (e.g. dhanush.demo@gmail.com -> d******@gmail.com)
@@ -389,10 +405,11 @@ export const EmailService = {
     `;
 
     // 2. If real SMTP is configured, attempt sending real email directly to user's entered email
-    if (transporter && isConfigured) {
+    const activeTransporter = getTransporter();
+    if (activeTransporter && isConfigured) {
       try {
         const fromAddress = getFromAddress();
-        const info = await transporter.sendMail({
+        const info = await activeTransporter.sendMail({
           from: fromAddress,
           to: cleanRecipient,
           subject,
@@ -400,7 +417,8 @@ export const EmailService = {
           html: htmlContent,
         });
 
-        const isAccepted = Array.isArray(info.accepted) && info.accepted.includes(cleanRecipient);
+        const isAccepted = isRecipientAccepted(info.accepted, cleanRecipient) ||
+          (Array.isArray(info.accepted) && info.accepted.length > 0 && (!Array.isArray(info.rejected) || info.rejected.length === 0));
         logEmailAudit({
           eventId,
           purpose: 'CITIZEN_EMAIL_OTP',
@@ -565,17 +583,19 @@ export const EmailService = {
       </div>
     `;
 
-    if (transporter && isConfigured) {
+    const activeTransporter = getTransporter();
+    if (activeTransporter && isConfigured) {
       try {
         const fromAddress = getFromAddress();
-        const info = await transporter.sendMail({
+        const info = await activeTransporter.sendMail({
           from: fromAddress,
           to: cleanRecipient,
           subject,
           text: `Verify your VidhiSetu account. Link: ${verifyLink} ${otpCode ? `or enter code: ${otpCode}` : ''} (expires in 5 minutes).`,
           html: htmlContent,
         });
-        const isAccepted = Array.isArray(info.accepted) && info.accepted.includes(cleanRecipient);
+        const isAccepted = isRecipientAccepted(info.accepted, cleanRecipient) ||
+          (Array.isArray(info.accepted) && info.accepted.length > 0 && (!Array.isArray(info.rejected) || info.rejected.length === 0));
         logEmailAudit({
           eventId,
           purpose: 'CITIZEN_EMAIL_VERIFICATION',
@@ -639,7 +659,8 @@ export const EmailService = {
    * Check if real SMTP transporter is configured
    */
   isSmtpConfigured() {
-    return Boolean(transporter && isConfigured);
+    const activeTransporter = getTransporter();
+    return Boolean(activeTransporter && isConfigured);
   },
 
   /**
@@ -800,17 +821,19 @@ export const EmailService = {
       </div>
     `;
 
-    if (transporter && isConfigured) {
+    const activeTransporter = getTransporter();
+    if (activeTransporter && isConfigured) {
       try {
         const fromAddress = getFromAddress();
-        const info = await transporter.sendMail({
+        const info = await activeTransporter.sendMail({
           from: fromAddress,
           to: targetEmail,
           subject,
           text: `[New Advocate Application] ID: ${appId} | Name: ${advocateData.name} | Email: ${advocateData.email} | Bar: ${advocateData.barNumber} | Status: ${reviewStatus}. Review at: ${reviewLink}`,
           html: htmlContent,
         });
-        const isAccepted = Array.isArray(info.accepted) && info.accepted.includes(targetEmail);
+        const isAccepted = isRecipientAccepted(info.accepted, targetEmail) ||
+          (Array.isArray(info.accepted) && info.accepted.length > 0 && (!Array.isArray(info.rejected) || info.rejected.length === 0));
         logEmailAudit({
           eventId,
           purpose: 'ADMIN_ADVOCATE_NOTIFICATION',
@@ -1012,17 +1035,19 @@ export const EmailService = {
       </div>
     `;
 
-    if (transporter && isConfigured) {
+    const activeTransporter = getTransporter();
+    if (activeTransporter && isConfigured) {
       try {
         const fromAddress = getFromAddress();
-        const info = await transporter.sendMail({
+        const info = await activeTransporter.sendMail({
           from: fromAddress,
           to: cleanEmail,
           subject,
           text: `Advocate verification status updated to ${statusText}. Remarks: ${remarks || 'None'}`,
           html: htmlContent,
         });
-        const isAccepted = Array.isArray(info.accepted) && info.accepted.includes(cleanEmail);
+        const isAccepted = isRecipientAccepted(info.accepted, cleanEmail) ||
+          (Array.isArray(info.accepted) && info.accepted.length > 0 && (!Array.isArray(info.rejected) || info.rejected.length === 0));
         logEmailAudit({
           eventId,
           purpose: 'ADVOCATE_STATUS_UPDATE',
@@ -1178,17 +1203,19 @@ export const EmailService = {
       </div>
     `;
 
-    if (transporter && isConfigured) {
+    const activeTransporter = getTransporter();
+    if (activeTransporter && isConfigured) {
       try {
         const fromAddress = getFromAddress();
-        const info = await transporter.sendMail({
+        const info = await activeTransporter.sendMail({
           from: fromAddress,
           to: targetEmail,
           subject: emailSubject,
           text: `Support Request #${requestId}\nCategory: ${category}\nUser: ${userName} (${maskEmailAddress(userEmail)})\nSubject: ${subject}\n\nDescription:\n${description}`,
           html: htmlContent,
         });
-        const isAccepted = Array.isArray(info.accepted) && info.accepted.includes(targetEmail);
+        const isAccepted = isRecipientAccepted(info.accepted, targetEmail) ||
+          (Array.isArray(info.accepted) && info.accepted.length > 0 && (!Array.isArray(info.rejected) || info.rejected.length === 0));
         logEmailAudit({
           eventId,
           purpose: 'SUPPORT_NOTIFICATION',
@@ -1240,6 +1267,10 @@ export const EmailService = {
         requestId,
       };
     }
+  },
+
+  getTransporter() {
+    return getTransporter();
   },
 
   isMockMode(recipient = '') {

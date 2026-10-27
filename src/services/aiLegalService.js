@@ -1,4 +1,4 @@
-import { request } from './api';
+import { request, BASE_URL } from './api';
 
 import { legalService } from './legalService';
 
@@ -13,7 +13,6 @@ export const aiLegalService = {
     attachedDocs = [],
     { onMeta, onChunk, onComplete, onError, signal, conversationId } = {}
   ) {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
     const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
 
     try {

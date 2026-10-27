@@ -5,6 +5,7 @@ import { useCases } from '../../context/CaseContext';
 import { useAuth } from '../../hooks/useAuth';
 import { aiLegalService } from '../../services/aiLegalService';
 import { lawyerService } from '../../services/lawyerService';
+import { BASE_URL } from '../../services/api';
 import { MarkdownMessage } from '../../components/chat/MarkdownMessage';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
@@ -124,7 +125,7 @@ function AIChatSessionPage() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    fetch('/api/system/status')
+    fetch(`${BASE_URL}/system/status`)
       .then((res) => res.json())
       .then((data) => {
         if (data.offlineMode || !data.isOnline) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useUI } from '../../hooks/useUI';
 import { authService } from '../../services/authService';
+import { BASE_URL } from '../../services/api';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Alert } from '../../components/common/Alert';
@@ -88,7 +89,12 @@ export function AdminVerificationPage() {
   const downloadDocument = async (document) => {
     try {
       const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
-      const response = await fetch(document.url, {
+      const targetUrl = document.url.startsWith('http')
+        ? document.url
+        : document.url.startsWith('/api') && BASE_URL !== '/api'
+          ? `${BASE_URL.replace(/\/api$/, '')}${document.url}`
+          : document.url;
+      const response = await fetch(targetUrl, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error(`Document download failed with status ${response.status}.`);

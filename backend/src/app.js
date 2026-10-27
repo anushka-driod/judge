@@ -1,11 +1,9 @@
-import dotenv from 'dotenv';
-if (!(process.env.NODE_ENV === 'test' && process.env.VIDHISETU_TEST_MODE === 'isolated')) {
-  dotenv.config();
-}
+import './config/env.js';
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createCorsOptions } from './config/corsConfig.js';
 
 // Domain Routers
 import authRoutes from './routes/authRoutes.js';
@@ -36,43 +34,10 @@ const agentOrchestrator = new AgentOrchestrator();
 
 
 
-// 1. Security & Parsing Middlewares - Configured CORS with FRONTEND_URL & credentials
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.BACKEND_URL,
-  process.env.API_URL,
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:3000',
-].filter(Boolean);
-
-const isAllowedTunnelOrCloud = (origin) => {
-  if (!origin) return true;
-  return /^(https?:\/\/)?([a-zA-Z0-9-]+\.)*(trycloudflare\.com|loca\.lt|ngrok-free\.app|ngrok\.io|vercel\.app|onrender\.com|railway\.app)(:\d+)?$/i.test(origin);
-};
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow non-browser requests (mobile, curl, server-to-server)
-    if (!origin) return callback(null, true);
-    if (
-      allowedOrigins.indexOf(origin) !== -1 ||
-      process.env.NODE_ENV !== 'production' ||
-      process.env.ALLOW_ALL_CORS === 'true' ||
-      isAllowedTunnelOrCloud(origin)
-    ) {
-      return callback(null, true);
-    }
-    return callback(new Error(`Origin ${origin} not allowed by CORS policy`));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-}));
-app.options('*', cors());
+// 1. Security & Parsing Middlewares - Configured CORS for production domains, local dev, and preflight
+const corsOptions = createCorsOptions();
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Allow large documents, evidence scans, agreements up to 200MB
 app.use(express.json({ limit: '200mb' }));

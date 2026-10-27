@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useUI } from '../../hooks/useUI';
+import { BASE_URL } from '../../services/api';
 import {
   LifeBuoy,
   Scale,
@@ -40,8 +41,8 @@ export function AdminSupportPage() {
     try {
       const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
       const url = statusFilter === 'all'
-        ? '/api/admin/support'
-        : `/api/admin/support?status=${statusFilter}`;
+        ? `${BASE_URL}/admin/support`
+        : `${BASE_URL}/admin/support?status=${statusFilter}`;
 
       const res = await fetch(url, {
         headers: {
@@ -80,7 +81,7 @@ export function AdminSupportPage() {
     setUpdating(true);
     try {
       const token = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
-      const res = await fetch(`/api/admin/support/${selectedTicket.id}`, {
+      const res = await fetch(`${BASE_URL}/admin/support/${selectedTicket.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
