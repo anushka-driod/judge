@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+if (!(process.env.NODE_ENV === 'test' && process.env.VIDHISETU_TEST_MODE === 'isolated')) {
+  dotenv.config();
+}
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';

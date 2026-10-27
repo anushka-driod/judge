@@ -14,13 +14,15 @@ export const AgentTools = {
   async search_laws_and_statutes({ query, category }) {
     try {
       const domain = matchLegalDomain(query, category);
-      if (domain && Array.isArray(domain.acts) && domain.acts.length > 0) {
+      // Only return statutes if query matched a specific substantive legal category (avoid catch-all default pollution)
+      if (domain && domain.category !== 'Civil & Statutory Legal Guidance' && Array.isArray(domain.acts) && domain.acts.length > 0) {
         const statutes = domain.acts.map((a) => ({
           act: a.act,
           section: a.section,
           title: `${a.section} - ${a.act}`,
           plainMeaning: a.plainMeaning,
           applicability: a.applicability,
+          summary: a.plainMeaning,
         }));
         return {
           tool: 'search_laws_and_statutes',
@@ -50,6 +52,7 @@ export const AgentTools = {
    */
   async search_kanoon_precedents({ query, maxResults = 3 }) {
     let results = [];
+    let isCurated = false;
     try {
       const client = new KanoonClient();
       const retrieved = await client.searchJudgments(query);
@@ -61,25 +64,17 @@ export const AgentTools = {
           excerpt: j.snippet || j.keyExtract || '',
           ratio: j.whyRelevant || j.snippet || '',
           url: j.sourceUrl,
+          source: 'Indian Kanoon Live API',
         }));
-      }
-      if (results.length === 0) {
-        const domain = matchLegalDomain(query);
-        if (domain && Array.isArray(domain.precedents) && domain.precedents.length > 0) {
-          results = domain.precedents.slice(0, maxResults).map((j) => ({
-            title: j.title,
-            court: j.court,
-            citation: j.citation,
-            excerpt: j.keyExtract || j.snippet || '',
-            ratio: j.whyRelevant || j.keyExtract || '',
-            url: j.sourceUrl,
-          }));
-        }
       }
     } catch (err) {
       console.warn('[AgentTools] Remote Kanoon search failed:', err.message);
+    }
+
+    // Only if Indian Kanoon returned no results AND the query specifically matches a well-defined legal dispute category, check verified domain precedents
+    if (results.length === 0) {
       const domain = matchLegalDomain(query);
-      if (domain && Array.isArray(domain.precedents) && domain.precedents.length > 0) {
+      if (domain && domain.category !== 'Civil & Statutory Legal Guidance' && Array.isArray(domain.precedents) && domain.precedents.length > 0) {
         results = domain.precedents.slice(0, maxResults).map((j) => ({
           title: j.title,
           court: j.court,
@@ -87,7 +82,9 @@ export const AgentTools = {
           excerpt: j.keyExtract || j.snippet || '',
           ratio: j.whyRelevant || j.keyExtract || '',
           url: j.sourceUrl,
+          source: 'Indian Kanoon Curated Record',
         }));
+        isCurated = true;
       }
     }
 
@@ -96,7 +93,8 @@ export const AgentTools = {
       query,
       retrievedCount: results.length,
       precedents: results,
-      retrievalStatus: results.length > 0 ? 'retrieved' : 'no_precedents_found',
+      retrievalStatus: results.length > 0 ? (isCurated ? 'curated_retrieved' : 'retrieved') : 'no_precedents_found',
+      sourceType: isCurated ? 'curated' : (results.length > 0 ? 'live_api' : 'none'),
     };
   },
 

@@ -13,6 +13,7 @@
  */
 
 import { CURATED_JUDGMENTS_DATABASE } from '../../modules/ai-rag/src/kanoon/curatedJudgments.js';
+import { geminiClient } from '../../modules/ai-rag/src/llm/geminiClient.js';
 
 const BASE_URL = 'https://api.indiankanoon.org';
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -131,6 +132,12 @@ export class IndianKanoonService {
       }
 
       const data = await response.json();
+      if (data && data.errmsg) {
+        const err = new Error(`Indian Kanoon API message: ${data.errmsg}`);
+        err.code = 'KANOON_API_ERROR';
+        err.status = 404;
+        throw err;
+      }
       return data;
     } catch (err) {
       clearTimeout(timeout);
@@ -243,6 +250,9 @@ export class IndianKanoonService {
         headers,
       });
 
+      if (!rawData || (!rawData.title && !rawData.doc && !rawData.text)) {
+        throw new Error(`Document ${cleanDocId} returned no substantive document body from Indian Kanoon.`);
+      }
       return this.normalizeDocument(rawData, cleanDocId);
     } catch (err) {
       console.warn(`[IndianKanoonService] Remote document fetch failed (${err.code || err.message}) for docId ${cleanDocId}, checking curated archive.`);
@@ -296,14 +306,50 @@ export class IndianKanoonService {
 
     const rawText = cleanHtmlSnippet(doc.fullText || doc.snippet || '');
 
-    const facts = this.extractCaseFacts(rawText, doc);
-    const legalIssues = this.extractLegalIssues(rawText, doc);
-    const reasoning = this.extractCourtReasoning(rawText, doc);
-    const holding = this.extractHolding(rawText, doc);
-    const outcome = this.extractFinalOutcome(rawText, doc);
+    let facts = this.extractCaseFacts(rawText, doc);
+    let legalIssues = this.extractLegalIssues(rawText, doc);
+    let reasoning = this.extractCourtReasoning(rawText, doc);
+    let holding = this.extractHolding(rawText, doc);
+    let outcome = this.extractFinalOutcome(rawText, doc);
     const citations = doc.citeList && doc.citeList.length > 0
       ? doc.citeList.map((c) => (typeof c === 'object' ? (c.title || c.citation) : String(c))).slice(0, 8)
       : this.extractCitationsFromText(rawText);
+
+    if (geminiClient.isConfigured() && rawText.length > 100) {
+      try {
+        const prompt = `You are a judicial research analyst for VidhiSetu. Analyze this authentic Indian Kanoon judgment strictly using the provided text:
+Case Title: ${doc.title}
+Adjudicating Court: ${doc.court}
+Official Citation: ${doc.citation || 'N/A'}
+
+Judgment Text:
+${rawText.slice(0, 16000)}
+
+Output structured JSON:
+- facts: array of 3 to 5 material factual sentences
+- legalIssues: array of 2 to 3 substantive legal issues framed
+- reasoning: array of 3 to 4 points of judicial reasoning and statutory analysis
+- holding: 1 to 2 clear sentences describing the binding legal principle (ratio decidendi)
+- outcome: concise statement of the final disposition (e.g. appeal allowed, dismissed, penalty awarded)
+- teluguHolding: Telugu translation of the holding if language requested is te
+- teluguOutcome: Telugu translation of the outcome if language requested is te`;
+
+        const llmResult = await geminiClient.generateStructured({
+          prompt,
+          timeoutMs: 15000,
+        });
+
+        if (llmResult?.data) {
+          if (Array.isArray(llmResult.data.facts) && llmResult.data.facts.length > 0) facts = llmResult.data.facts;
+          if (Array.isArray(llmResult.data.legalIssues) && llmResult.data.legalIssues.length > 0) legalIssues = llmResult.data.legalIssues;
+          if (Array.isArray(llmResult.data.reasoning) && llmResult.data.reasoning.length > 0) reasoning = llmResult.data.reasoning;
+          if (llmResult.data.holding) holding = llmResult.data.holding;
+          if (llmResult.data.outcome) outcome = llmResult.data.outcome;
+        }
+      } catch (llmErr) {
+        console.warn(`[IndianKanoonService] Gemini deep analysis fallback to heuristic extraction for ${docId}:`, llmErr.message);
+      }
+    }
 
     let teluguSummary = null;
     if (language === 'te' || language === 'Telugu') {

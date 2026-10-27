@@ -47,10 +47,18 @@ export class GeminiClient {
    */
   getModel() {
     const configured = (process.env.GEMINI_MODEL || '').trim();
-    if (!configured || configured.includes('3.8')) {
-      return 'gemini-2.5-flash';
+    if (configured) {
+      if (
+        configured === 'gemini-2.5-flash' ||
+        configured === 'gemini-2.0-flash' ||
+        configured === 'gemini-1.5-flash' ||
+        configured === 'gemini-1.5-pro'
+      ) {
+        return 'gemini-3.5-flash-lite';
+      }
+      return configured;
     }
-    return configured;
+    return 'gemini-3.5-flash-lite';
   }
 
   /**
@@ -134,21 +142,32 @@ export class GeminiClient {
       const classifiedError = this.classifyError(err, primaryModel, durationMs);
 
       // Resilient fallback across active Gemini models for high demand (503), quota (429), not found (404), or timeout (504)
-      const allCandidates = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      const allCandidates = [
+        'gemini-3.5-flash-lite',
+        'gemini-3-flash-preview',
+        'gemini-3.1-flash-lite-preview',
+        'gemini-flash-lite-latest',
+        'gemini-3.8-flash',
+      ];
       const triedModels = options._triedModels ? new Set(options._triedModels) : new Set([primaryModel]);
       triedModels.add(primaryModel);
       const remainingCandidates = allCandidates.filter((m) => !triedModels.has(m));
 
       const isRecoverableError =
+        classifiedError.status === 404 ||
         classifiedError.status === 429 ||
         classifiedError.status === 503 ||
         classifiedError.status === 504 ||
         classifiedError.code === 'MODEL_UNAVAILABLE' ||
         classifiedError.code === 'RATE_LIMIT' ||
+        classifiedError.code === 'TIMEOUT' ||
         classifiedError.message.includes('high demand') ||
         classifiedError.message.includes('not found') ||
+        classifiedError.message.includes('no longer available') ||
         classifiedError.message.includes('quota') ||
-        classifiedError.message.includes('UNAVAILABLE');
+        classifiedError.message.includes('exceeded') ||
+        classifiedError.message.includes('UNAVAILABLE') ||
+        classifiedError.message.includes('timed out');
 
       if (isRecoverableError && remainingCandidates.length > 0) {
         const nextModel = remainingCandidates[0];
@@ -229,21 +248,32 @@ export class GeminiClient {
       const classifiedError = this.classifyError(err, primaryModel, durationMs);
 
       // Resilient fallback across active Gemini models for high demand (503), quota (429), not found (404), or timeout (504)
-      const allCandidates = ['gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.7-flash'];
+      const allCandidates = [
+        'gemini-3.5-flash-lite',
+        'gemini-3-flash-preview',
+        'gemini-3.1-flash-lite-preview',
+        'gemini-flash-lite-latest',
+        'gemini-3.8-flash',
+      ];
       const triedModels = options._triedModels ? new Set(options._triedModels) : new Set([primaryModel]);
       triedModels.add(primaryModel);
       const remainingCandidates = allCandidates.filter((m) => !triedModels.has(m));
 
       const isRecoverableError =
+        classifiedError.status === 404 ||
         classifiedError.status === 429 ||
         classifiedError.status === 503 ||
         classifiedError.status === 504 ||
         classifiedError.code === 'MODEL_UNAVAILABLE' ||
         classifiedError.code === 'RATE_LIMIT' ||
+        classifiedError.code === 'TIMEOUT' ||
         classifiedError.message.includes('high demand') ||
         classifiedError.message.includes('not found') ||
+        classifiedError.message.includes('no longer available') ||
         classifiedError.message.includes('quota') ||
-        classifiedError.message.includes('UNAVAILABLE');
+        classifiedError.message.includes('exceeded') ||
+        classifiedError.message.includes('UNAVAILABLE') ||
+        classifiedError.message.includes('timed out');
 
       if (isRecoverableError && remainingCandidates.length > 0) {
         const nextModel = remainingCandidates[0];

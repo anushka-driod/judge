@@ -873,9 +873,15 @@ function AIChatSessionPage() {
                             <div className="agent-badge-title">
                               <Sparkles size={14} className="agent-sparkle-icon" />
                               <span>Agentic Multi-Step Reasoning</span>
-                              {msg.agentSteps && msg.agentSteps.length > 0 && (
-                                <span className="agent-step-count-pill">{msg.agentSteps.length} tools executed</span>
-                              )}
+                              {msg.agentSteps && msg.agentSteps.length > 0 && (() => {
+                                const completed = msg.agentSteps.filter((s) => s.status === 'completed').length;
+                                const skipped = msg.agentSteps.filter((s) => s.status === 'skipped').length;
+                                const unavailable = msg.agentSteps.filter((s) => s.status === 'unavailable' || s.status === 'failed').length;
+                                const label = (skipped > 0 || unavailable > 0)
+                                  ? `${completed} completed${skipped > 0 ? ` · ${skipped} skipped` : ''}${unavailable > 0 ? ` · ${unavailable} unavailable` : ''}`
+                                  : `${completed} action${completed === 1 ? '' : 's'} completed`;
+                                return <span className="agent-step-count-pill">{label}</span>;
+                              })()}
                             </div>
                             {msg.language && (
                               <span className="agent-lang-pill">
