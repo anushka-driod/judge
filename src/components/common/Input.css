@@ -39,7 +39,7 @@
   padding: 11px 14px;
   font-size: 0.9375rem;
   color: var(--text-primary);
-  background-color: var(--bg-surface);
+  background-color: var(--bg-surface-subtle);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
@@ -50,8 +50,8 @@
 }
 
 .input-field:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: var(--accent-500);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22);
   outline: none;
 }
 

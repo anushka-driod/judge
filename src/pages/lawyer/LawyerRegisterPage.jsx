@@ -25,27 +25,106 @@ export function LawyerRegisterPage() {
     email: '',
     phone: '',
     password: '',
-    photoUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400',
+    photoUrl: '',
     barRegistrationNumber: '',
-    stateBarCouncil: 'Bar Council of Karnataka',
-    yearOfEnrollment: '2016',
-    yearsOfExperience: '8',
-    specializations: ['tenancy_disputes', 'consumer_protection'],
-    jurisdiction: 'Karnataka High Court & City Civil Court',
-    primaryCourt: 'City Civil Court Bengaluru',
-    city: 'Bengaluru',
-    languages: ['English', 'Kannada', 'Hindi'],
-    consultationModes: ['video', 'voice', 'chat'],
-    consultationFee: '1000',
+    stateBarCouncil: '',
+    yearOfEnrollment: '',
+    yearsOfExperience: '',
+    specializations: [],
+    jurisdiction: '',
+    primaryCourt: '',
+    city: '',
+    state: '',
+    languages: [],
+    consultationModes: [],
+    consultationFee: '',
     bio: '',
-    documents: [
-      { name: 'Bar_Enrollment_Certificate.pdf', type: 'Bar Enrollment Certificate', url: '#' },
-      { name: 'Bar_Council_ID_Card.pdf', type: 'Bar ID / Registration Proof', url: '#' },
-    ],
+    documents: [],
   });
+
+  const [uploadingDoc, setUploadingDoc] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileUpload = async (e, docType) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      setError('File size exceeds the 20MB limit.');
+      return;
+    }
+
+    const allowed = ['.pdf', '.png', '.jpg', '.jpeg'];
+    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+    if (!allowed.includes(ext)) {
+      setError(`Invalid file type "${ext}". Allowed formats: PDF, PNG, JPG, JPEG.`);
+      return;
+    }
+
+    setError('');
+    setUploadingDoc(true);
+
+    try {
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error(`Could not read ${file.name}.`));
+        reader.readAsDataURL(file);
+      });
+      const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+      const derivedType = file.type || (ext === '.pdf' ? 'application/pdf' : ext === '.png' ? 'image/png' : 'image/jpeg');
+      const document = {
+        id: `vdoc_${Date.now()}`,
+        filename: file.name,
+        filetype: derivedType,
+        base64Data,
+        documentType: docType,
+        name: file.name,
+        type: docType,
+        sizeFormatted: `${Math.round(file.size / 1024)} KB`,
+      };
+      setFormData((prev) => ({
+        ...prev,
+        documents: [
+          ...prev.documents.filter((item) => {
+            if (docType === 'Bar Enrollment Certificate') {
+              return item.type !== 'Bar Enrollment Certificate' && item.documentType !== 'Bar Enrollment Certificate';
+            }
+            return (
+              item.type !== 'Advocate Identity Card' &&
+              item.type !== 'Bar ID / Registration Proof' &&
+              item.documentType !== 'Advocate Identity Card' &&
+              item.documentType !== 'Bar ID / Registration Proof'
+            );
+          }),
+          document,
+        ],
+      }));
+    } catch (readErr) {
+      setError(readErr.message || 'Could not process selected document.');
+    } finally {
+      setUploadingDoc(false);
+    }
+  };
+
+  const removeDocument = (docType) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: prev.documents.filter((d) => {
+        if (docType === 'Bar Enrollment Certificate') {
+          return d.type !== 'Bar Enrollment Certificate' && d.documentType !== 'Bar Enrollment Certificate';
+        }
+        return (
+          d.type !== 'Advocate Identity Card' &&
+          d.type !== 'Bar ID / Registration Proof' &&
+          d.documentType !== 'Advocate Identity Card' &&
+          d.documentType !== 'Bar ID / Registration Proof'
+        );
+      }),
+    }));
   };
 
   const handleSpecializationToggle = (spec) => {
@@ -62,12 +141,73 @@ export function LawyerRegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Step 1 validation
+    if (!formData.name?.trim()) { setError('Full legal name is required.'); setStep(1); return; }
+    if (!formData.email?.trim()) { setError('Email address is required.'); setStep(1); return; }
+    if (!formData.phone?.trim() || formData.phone.replace(/[^\d]/g, '').length < 10) {
+      setError('A valid 10-digit mobile number is required.'); setStep(1); return;
+    }
+    if (!formData.password || formData.password.length < 8) {
+      setError('Password must be at least 8 characters long.'); setStep(1); return;
+    }
+    if (!formData.city?.trim()) { setError('City is required.'); setStep(1); return; }
+    if (!formData.state?.trim()) { setError('State is required.'); setStep(1); return; }
+
+    // Step 2 validation
+    if (!formData.barRegistrationNumber?.trim()) { setError('Bar Council Registration Number is required.'); setStep(2); return; }
+    if (!formData.stateBarCouncil) { setError('Please select your State Bar Council.'); setStep(2); return; }
+    if (!formData.yearOfEnrollment) { setError('Year of enrollment is required.'); setStep(2); return; }
+    if (formData.yearsOfExperience === '' || Number(formData.yearsOfExperience) < 0) {
+      setError('Years of practice experience is required.'); setStep(2); return;
+    }
+    if (!formData.languages || !formData.languages.length) {
+      setError('Please specify at least one language for consultations.'); setStep(2); return;
+    }
+    if (!formData.primaryCourt?.trim()) { setError('Primary Court of practice is required.'); setStep(2); return; }
+
+    // Step 3 validation
+    if (!formData.specializations || !formData.specializations.length) {
+      setError('Please select at least one legal specialization.'); setStep(3); return;
+    }
+    if (!Number(formData.consultationFee) || Number(formData.consultationFee) <= 0) {
+      setError('Please enter a valid consultation fee.'); setStep(3); return;
+    }
+
+    // Step 4 document checks
+    const hasEnrollmentCert = formData.documents?.some((d) => d.type === 'Bar Enrollment Certificate' || d.documentType === 'Bar Enrollment Certificate');
+    const hasIdCard = formData.documents?.some((d) =>
+      d.type === 'Advocate Identity Card' ||
+      d.documentType === 'Advocate Identity Card' ||
+      d.type === 'Bar ID / Registration Proof' ||
+      d.documentType === 'Bar ID / Registration Proof'
+    );
+
+    if (!hasEnrollmentCert) {
+      setError('Please attach your Bar Enrollment Certificate.');
+      setStep(4);
+      return;
+    }
+    if (!hasIdCard) {
+      setError('Please attach your Bar Council Identity Card / Certificate of Practice.');
+      setStep(4);
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       const res = await lawyerPortalClient.register(formData);
-      navigate('/lawyer/verification-status');
+      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`, {
+        state: {
+          email: formData.email,
+          phone: formData.phone,
+          maskedEmail: res?.maskedEmail,
+          maskedPhone: res?.maskedPhone,
+          message: res?.message || 'Enter the verification code sent to your registered contact.',
+        },
+      });
     } catch (err) {
       setError(err.message || 'Registration failed. Please check your details.');
     } finally {
@@ -266,7 +406,7 @@ export function LawyerRegisterPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Bengaluru"
+                    placeholder="Enter your city"
                     value={formData.city}
                     onChange={(e) => handleInputChange('city', e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
@@ -274,6 +414,21 @@ export function LawyerRegisterPage() {
                 </div>
 
                 <div>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '6px' }}>
+                    State / Jurisdiction *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter your state"
+                    value={formData.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
+                  />
+                </div>
+              </div>
+
+              <div>
                   <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '6px' }}>
                     Profile Photo URL
                   </label>
@@ -283,7 +438,6 @@ export function LawyerRegisterPage() {
                     onChange={(e) => handleInputChange('photoUrl', e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
                   />
-                </div>
               </div>
 
               <div>
@@ -303,10 +457,16 @@ export function LawyerRegisterPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!formData.name || !formData.email || !formData.password) {
-                      setError('Please fill in required fields.');
-                      return;
+                    if (!formData.name?.trim()) { setError('Full legal name is required.'); return; }
+                    if (!formData.email?.trim()) { setError('Email address is required.'); return; }
+                    if (!formData.phone?.trim() || formData.phone.replace(/[^\d]/g, '').length < 10) {
+                      setError('A valid 10-digit mobile number is required.'); return;
                     }
+                    if (!formData.password || formData.password.length < 8) {
+                      setError('Password must be at least 8 characters long.'); return;
+                    }
+                    if (!formData.city?.trim()) { setError('City is required.'); return; }
+                    if (!formData.state?.trim()) { setError('State is required.'); return; }
                     setError('');
                     setStep(2);
                   }}
@@ -344,10 +504,12 @@ export function LawyerRegisterPage() {
                     State Bar Council *
                   </label>
                   <select
+                    required
                     value={formData.stateBarCouncil}
                     onChange={(e) => handleInputChange('stateBarCouncil', e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
                   >
+                    <option value="">Select your Bar Council</option>
                     <option value="Bar Council of Karnataka">Bar Council of Karnataka</option>
                     <option value="Bar Council of Delhi">Bar Council of Delhi</option>
                     <option value="Bar Council of Maharashtra & Goa">Bar Council of Maharashtra & Goa</option>
@@ -366,6 +528,7 @@ export function LawyerRegisterPage() {
                     type="number"
                     min="1970"
                     max="2026"
+                    required
                     value={formData.yearOfEnrollment}
                     onChange={(e) => handleInputChange('yearOfEnrollment', e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
@@ -382,8 +545,23 @@ export function LawyerRegisterPage() {
                     type="number"
                     min="0"
                     max="60"
+                    required
                     value={formData.yearsOfExperience}
                     onChange={(e) => handleInputChange('yearsOfExperience', e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '6px' }}>
+                    Languages *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Comma-separated language names"
+                    value={formData.languages.join(', ')}
+                    onChange={(e) => handleInputChange('languages', e.target.value.split(',').map((value) => value.trim()).filter(Boolean))}
                     style={{ width: '100%', padding: '10px 14px', background: '#101626', border: '1px solid #22304d', borderRadius: '8px', color: '#fff' }}
                   />
                 </div>
@@ -410,8 +588,28 @@ export function LawyerRegisterPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!formData.barRegistrationNumber) {
+                    if (!formData.barRegistrationNumber?.trim()) {
                       setError('Bar Council Registration Number is required.');
+                      return;
+                    }
+                    if (!formData.stateBarCouncil) {
+                      setError('Please select your State Bar Council.');
+                      return;
+                    }
+                    if (!formData.yearOfEnrollment) {
+                      setError('Year of Enrollment is required.');
+                      return;
+                    }
+                    if (formData.yearsOfExperience === '' || Number(formData.yearsOfExperience) < 0) {
+                      setError('Years of practice experience is required.');
+                      return;
+                    }
+                    if (!formData.languages || !formData.languages.length) {
+                      setError('Please specify at least one language.');
+                      return;
+                    }
+                    if (!formData.primaryCourt?.trim()) {
+                      setError('Primary Court of practice is required.');
                       return;
                     }
                     setError('');
@@ -481,55 +679,207 @@ export function LawyerRegisterPage() {
                 <button type="button" onClick={() => setStep(2)} className="lp-btn-action">
                   <ArrowLeft size={16} /> Back
                 </button>
-                <button type="button" onClick={() => setStep(4)} className="lp-btn-action lp-btn-primary">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!formData.specializations || !formData.specializations.length) {
+                      setError('Please select at least one legal specialization.');
+                      return;
+                    }
+                    if (!Number(formData.consultationFee) || Number(formData.consultationFee) <= 0) {
+                      setError('Please specify a valid 30-minute consultation fee.');
+                      return;
+                    }
+                    setError('');
+                    setStep(4);
+                  }}
+                  className="lp-btn-action lp-btn-primary"
+                >
                   Continue to Documents <ArrowRight size={16} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: Verification Documents */}
+          {/* STEP 4: Genuine Verification Documents Upload */}
           {step === 4 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div
                 style={{
-                  padding: '14px',
-                  background: 'rgba(212, 175, 55, 0.1)',
-                  border: '1px solid rgba(212, 175, 55, 0.3)',
-                  borderRadius: '8px',
-                  fontSize: '0.8125rem',
-                  color: '#fef08a',
+                  padding: '16px',
+                  background: 'rgba(212, 175, 55, 0.08)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '10px',
+                  fontSize: '0.85rem',
+                  lineHeight: 1.5,
+                  color: '#e5c07b',
                 }}
               >
-                <ShieldCheck size={20} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} />
-                <strong>Mandatory Verification Policy:</strong> In accordance with Bar Council regulations, all applications enter <strong>PENDING</strong> review. Only verified counsel with approved documentation can accept consultations or access client case information.
+                <ShieldCheck size={20} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px', color: '#d4af37' }} />
+                <strong>Mandatory Verification Policy:</strong> Real Bar enrollment certificate and identification proof must be submitted. All advocate applications route to the administrative review council and remain <strong>PENDING</strong> until approved.
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {formData.documents.map((doc, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: '14px',
-                      background: '#101626',
-                      border: '1px solid #22304d',
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
+              {/* Document 1: Bar Enrollment Certificate */}
+              <div
+                style={{
+                  padding: '18px',
+                  background: '#12141c',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '10px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#fff' }}>
+                      1. Bar Enrollment Certificate *
+                    </h4>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                      Official state bar council certificate of enrollment (PDF, PNG, or JPG up to 20MB)
+                    </p>
+                  </div>
+                  {formData.documents.some((d) => d.type === 'Bar Enrollment Certificate') && (
+                    <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: 700, background: 'rgba(52, 211, 153, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                      ✓ Attached
+                    </span>
+                  )}
+                </div>
+
+                {formData.documents.some((d) => d.type === 'Bar Enrollment Certificate') ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: '#0a0b0e', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <FileText size={20} color="#60a5fa" />
+                      <FileText size={20} color="#d4af37" />
                       <div>
-                        <strong style={{ fontSize: '0.875rem' }}>{doc.name}</strong>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>{doc.type}</p>
+                        <strong style={{ fontSize: '0.875rem', color: '#fff' }}>
+                          {formData.documents.find((d) => d.type === 'Bar Enrollment Certificate')?.name}
+                        </strong>
+                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#a1a1aa' }}>
+                          {formData.documents.find((d) => d.type === 'Bar Enrollment Certificate')?.sizeFormatted || 'Uploaded'}
+                        </p>
                       </div>
                     </div>
-                    <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: 600 }}>Attached</span>
+                    <button
+                      type="button"
+                      onClick={() => removeDocument('Bar Enrollment Certificate')}
+                      style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                    >
+                      Remove
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  <label
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '20px',
+                      border: '2px dashed rgba(212, 175, 55, 0.35)',
+                      borderRadius: '8px',
+                      background: 'rgba(212, 175, 55, 0.02)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <UploadCloud size={28} color="#d4af37" style={{ marginBottom: '8px' }} />
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#f1f2f6' }}>
+                      Click to browse or drag & drop Bar Certificate
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#71717a', marginTop: '4px' }}>
+                      Accepted: .pdf, .png, .jpg, .jpeg
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={(e) => handleFileUpload(e, 'Bar Enrollment Certificate')}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                )}
               </div>
+
+              {/* Document 2: Bar Council ID Card / Certificate of Practice */}
+              <div
+                style={{
+                  padding: '18px',
+                  background: '#12141c',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '10px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#fff' }}>
+                      2. Bar Council ID / Certificate of Practice *
+                    </h4>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                      Current advocate photo ID card or All India Bar Examination (AIBE) pass certificate
+                    </p>
+                  </div>
+                  {formData.documents.some((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card') && (
+                    <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: 700, background: 'rgba(52, 211, 153, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                      ✓ Attached
+                    </span>
+                  )}
+                </div>
+
+                {formData.documents.some((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card') ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: '#0a0b0e', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <FileText size={20} color="#d4af37" />
+                      <div>
+                        <strong style={{ fontSize: '0.875rem', color: '#fff' }}>
+                          {formData.documents.find((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card')?.name}
+                        </strong>
+                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#a1a1aa' }}>
+                          {formData.documents.find((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card')?.sizeFormatted || 'Uploaded'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeDocument('Advocate Identity Card')}
+                      style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '20px',
+                      border: '2px dashed rgba(212, 175, 55, 0.35)',
+                      borderRadius: '8px',
+                      background: 'rgba(212, 175, 55, 0.02)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <UploadCloud size={28} color="#d4af37" style={{ marginBottom: '8px' }} />
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#f1f2f6' }}>
+                      Click to browse or drag & drop Bar ID / Proof
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#71717a', marginTop: '4px' }}>
+                      Accepted: .pdf, .png, .jpg, .jpeg
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={(e) => handleFileUpload(e, 'Advocate Identity Card')}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {uploadingDoc && (
+                <div style={{ textAlign: 'center', color: '#d4af37', fontSize: '0.85rem' }}>
+                  ⏳ Uploading and validating document securely...
+                </div>
+              )}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
                 <button type="button" onClick={() => setStep(3)} className="lp-btn-action">
@@ -537,9 +887,27 @@ export function LawyerRegisterPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={
+                    loading ||
+                    uploadingDoc ||
+                    !formData.documents.some((d) => d.type === 'Bar Enrollment Certificate' || d.documentType === 'Bar Enrollment Certificate') ||
+                    !formData.documents.some((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card')
+                  }
                   className="lp-btn-action lp-btn-primary"
-                  style={{ padding: '12px 24px', fontSize: '1rem' }}
+                  style={{
+                    padding: '12px 28px',
+                    fontSize: '1rem',
+                    opacity:
+                      !formData.documents.some((d) => d.type === 'Bar Enrollment Certificate' || d.documentType === 'Bar Enrollment Certificate') ||
+                      !formData.documents.some((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card')
+                        ? 0.6
+                        : 1,
+                    cursor:
+                      !formData.documents.some((d) => d.type === 'Bar Enrollment Certificate' || d.documentType === 'Bar Enrollment Certificate') ||
+                      !formData.documents.some((d) => d.type === 'Advocate Identity Card' || d.type === 'Bar ID / Registration Proof' || d.documentType === 'Advocate Identity Card')
+                        ? 'not-allowed'
+                        : 'pointer',
+                  }}
                 >
                   {loading ? 'Submitting Application...' : 'Submit Bar Council Application'}
                 </button>

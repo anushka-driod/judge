@@ -1,0 +1,13 @@
+node_modules
+*/node_modules
+.git
+.github
+.vscode
+.env
+.env.*
+!.env.example
+dist
+dist-ssr
+*.log
+uploads
+backend/uploads

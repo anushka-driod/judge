@@ -6,6 +6,7 @@ import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Button } from '../../components/common/Button';
 import { Alert } from '../../components/common/Alert';
+import { FileUpload } from '../../components/common/FileUpload';
 import {
   User,
   Mail,
@@ -22,15 +23,17 @@ import {
   ArrowLeft,
   ShieldCheck,
 } from 'lucide-react';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { GoogleAuthService } from '../../services/googleAuthService';
-=======
->>>>>>> origin/main
-=======
-import { GoogleAuthService } from '../../services/googleAuthService';
->>>>>>> 3aab4be (dhanush commits)
 import './AuthPage.css';
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error(`Unable to read ${file.name}.`));
+    reader.readAsDataURL(file);
+  });
+}
 
 const ALL_INDIAN_STATES = [
   { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
@@ -82,15 +85,7 @@ const PRACTICE_AREAS_OPTIONS = [
 ];
 
 export function RegisterPage() {
-<<<<<<< HEAD
-<<<<<<< HEAD
   const { register, googleAuth, logout, isAuthenticated, currentUser } = useAuth();
-=======
-  const { register, googleAuth } = useAuth();
->>>>>>> origin/main
-=======
-  const { register, googleAuth, logout, isAuthenticated, currentUser } = useAuth();
->>>>>>> 3aab4be (dhanush commits)
   const { showToast } = useUI();
   const navigate = useNavigate();
 
@@ -105,8 +100,8 @@ export function RegisterPage() {
     email: '',
     phone: '',
     country: 'India',
-    state: 'Karnataka',
-    city: 'Bengaluru',
+    state: '',
+    city: '',
     password: '',
     confirmPassword: '',
   });
@@ -116,17 +111,23 @@ export function RegisterPage() {
     name: '',
     email: '',
     phone: '',
-    barCouncilState: 'Karnataka',
+    barCouncilState: '',
     barNumber: '',
-    experienceYears: '3',
-    primaryCourt: 'High Court of Karnataka',
+    enrollmentNumber: '',
+    enrollmentYear: '',
+    barCouncil: '',
+    experienceYears: '',
+    primaryCourt: '',
     country: 'India',
-    state: 'Karnataka',
-    city: 'Bengaluru',
-    consultationFee: '800',
-    practiceAreas: ['Consumer Protection & Disputes'],
-    languages: ['English', 'Kannada'],
+    state: '',
+    city: '',
+    officeAddress: '',
+    consultationFee: '',
+    practiceAreas: [],
+    languages: [],
     profileBio: '',
+    certificateDoc: null,
+    advocateIdDoc: null,
     password: '',
     confirmPassword: '',
   });
@@ -237,10 +238,7 @@ export function RegisterPage() {
     e.preventDefault();
     setError('');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!candidateForm.email || !emailRegex.test(candidateForm.email.trim())) {
       setError('Please enter a valid email.');
@@ -248,14 +246,7 @@ export function RegisterPage() {
     }
 
     if (!candidateForm.password || candidateForm.password.length < 8) {
-      setError('Password must meet the required security requirements.');
-<<<<<<< HEAD
-=======
-    if (candidateForm.password.length < 8) {
       setError('Password must be at least 8 characters long.');
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       return;
     }
 
@@ -282,14 +273,14 @@ export function RegisterPage() {
         },
       });
 
-      showToast('Account created! Please enter verification code.', 'info');
+      showToast(res?.message || 'Account created. Check the reported verification delivery status.', 'info');
       navigate(`/verify-email?email=${encodeURIComponent(candidateForm.email)}`, {
         state: {
           email: candidateForm.email,
           phone: candidateForm.phone,
           maskedEmail: res?.maskedEmail,
           maskedPhone: res?.maskedPhone,
-          message: res?.message || 'Verification code dispatched to your registered contact details.',
+          message: res?.message || 'Enter the verification code sent to your registered contact.',
         },
       });
     } catch (err) {
@@ -304,10 +295,7 @@ export function RegisterPage() {
     e.preventDefault();
     setError('');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!advocateForm.email || !emailRegex.test(advocateForm.email.trim())) {
       setError('Please enter a valid email.');
@@ -315,14 +303,7 @@ export function RegisterPage() {
     }
 
     if (!advocateForm.password || advocateForm.password.length < 8) {
-      setError('Password must meet the required security requirements.');
-<<<<<<< HEAD
-=======
-    if (advocateForm.password.length < 8) {
       setError('Password must be at least 8 characters long.');
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       return;
     }
 
@@ -331,19 +312,45 @@ export function RegisterPage() {
       return;
     }
 
-    if (!advocateForm.enrollmentNumber.trim()) {
+    const cleanEnrollment = (advocateForm.enrollmentNumber || advocateForm.barNumber || '').trim();
+    if (!cleanEnrollment) {
       setError('Bar Council Enrollment Number is required.');
+      return;
+    }
+    if (!advocateForm.state || !advocateForm.city.trim() || !advocateForm.primaryCourt.trim()) {
+      setError('Enter your actual state, city of practice, and primary court.');
+      return;
+    }
+    if (!advocateForm.certificateDoc || !advocateForm.advocateIdDoc) {
+      setError('Upload both the Bar Enrollment Certificate and Advocate Identity Card.');
+      return;
+    }
+    if (!advocateForm.practiceAreas.length || !advocateForm.languages.length || Number(advocateForm.consultationFee) <= 0) {
+      setError('Select at least one practice area and language, and enter a valid consultation fee.');
       return;
     }
 
     setLoading(true);
     try {
+      const [certificateData, identityData] = await Promise.all([
+        readFileAsDataUrl(advocateForm.certificateDoc),
+        readFileAsDataUrl(advocateForm.advocateIdDoc),
+      ]);
       const res = await register({
         name: advocateForm.name,
         email: advocateForm.email,
         phone: advocateForm.phone,
         password: advocateForm.password,
         accountType: 'advocate',
+        barNumber: cleanEnrollment,
+        enrollmentNumber: cleanEnrollment,
+        barCouncilState: advocateForm.barCouncil || advocateForm.state,
+        primaryCourt: advocateForm.primaryCourt,
+        experienceYears: Number(advocateForm.experienceYears),
+        practiceAreas: advocateForm.practiceAreas,
+        languages: advocateForm.languages,
+        consultationFee: Number(advocateForm.consultationFee),
+        profileBio: advocateForm.profileBio,
         city: advocateForm.city,
         state: advocateForm.state,
         location: {
@@ -353,27 +360,37 @@ export function RegisterPage() {
         },
         advocateDetails: {
           barCouncil: advocateForm.barCouncil,
-          enrollmentNumber: advocateForm.enrollmentNumber.trim(),
-          enrollmentState: advocateForm.enrollmentState,
+          enrollmentNumber: cleanEnrollment,
+          enrollmentState: advocateForm.state,
           enrollmentYear: advocateForm.enrollmentYear,
           practiceAreas: advocateForm.practiceAreas,
           experienceYears: Number(advocateForm.experienceYears),
           officeAddress: advocateForm.officeAddress,
           documents: [
-            { id: `doc-cert-${Date.now()}`, name: advocateForm.certificateDoc, type: 'Bar Enrollment Certificate' },
-            { id: `doc-id-${Date.now()}`, name: advocateForm.advocateIdDoc, type: 'Bar Council Photo ID' },
+            {
+              filename: advocateForm.certificateDoc.name,
+              filetype: advocateForm.certificateDoc.type,
+              base64Data: certificateData,
+              documentType: 'Bar Enrollment Certificate',
+            },
+            {
+              filename: advocateForm.advocateIdDoc.name,
+              filetype: advocateForm.advocateIdDoc.type,
+              base64Data: identityData,
+              documentType: 'Advocate Identity Card',
+            },
           ],
         },
       });
 
-      showToast('Advocate application submitted! Please enter verification code.', 'info');
+      showToast(res?.message || 'Advocate application submitted. Check the reported verification delivery status.', 'info');
       navigate(`/verify-email?email=${encodeURIComponent(advocateForm.email)}`, {
         state: {
           email: advocateForm.email,
           phone: advocateForm.phone,
           maskedEmail: res?.maskedEmail,
           maskedPhone: res?.maskedPhone,
-          message: res?.message || 'Verification code dispatched to your registered mobile and email.',
+          message: res?.message || 'Enter the verification code sent to your registered contact.',
         },
       });
     } catch (err) {
@@ -388,10 +405,6 @@ export function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
       const googleProfile = await GoogleAuthService.promptGoogleSignIn();
       const res = await googleAuth(googleProfile);
       if (res.isNewUser) {
@@ -400,40 +413,15 @@ export function RegisterPage() {
         const userName = res.user?.name || res.name;
         setCandidateForm((prev) => ({ ...prev, email: userEmail, name: userName }));
         setAdvocateForm((prev) => ({ ...prev, email: userEmail, name: userName }));
-<<<<<<< HEAD
-=======
-      const mockGoogleProfile = {
-        email: 'google.newuser@example.com',
-        name: 'Ananya Sharma',
-        picture: null,
-      };
-      const res = await googleAuth(mockGoogleProfile);
-      if (res.isNewUser) {
-        // Pre-fill email and switch to Candidate or Advocate form
-        setCandidateForm((prev) => ({ ...prev, email: res.email, name: res.name }));
-        setAdvocateForm((prev) => ({ ...prev, email: res.email, name: res.name }));
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
         showToast('Google verified! Please choose your account type.', 'info');
       } else {
         showToast('Existing Google account found. Logging you in!', 'success');
         navigate('/chat');
       }
     } catch (err) {
-<<<<<<< HEAD
-<<<<<<< HEAD
       if (err.message && !err.message.includes('cancelled')) {
         setError(err.message || 'Google signup failed.');
       }
-=======
-      setError(err.message || 'Google signup failed.');
->>>>>>> origin/main
-=======
-      if (err.message && !err.message.includes('cancelled')) {
-        setError(err.message || 'Google signup failed.');
-      }
->>>>>>> 3aab4be (dhanush commits)
     } finally {
       setLoading(false);
     }
@@ -441,10 +429,7 @@ export function RegisterPage() {
 
   return (
     <div className="auth-page animate-fade-in">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
       {isAuthenticated && currentUser && (
         <div
           className="auth-session-banner"
@@ -505,11 +490,7 @@ export function RegisterPage() {
         </div>
       )}
 
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
       {/* Step 0: Choose Account Type */}
       {selectedRole === 'choose_role' && (
         <div className="role-selection-view">
@@ -906,6 +887,35 @@ export function RegisterPage() {
                   />
                 </div>
 
+                <div className="form-row-2">
+                  <Input
+                    label="Primary Court"
+                    placeholder="Enter the court where you primarily practice"
+                    value={advocateForm.primaryCourt}
+                    onChange={(e) => setAdvocateForm({ ...advocateForm, primaryCourt: e.target.value })}
+                    required
+                  />
+                  <Input
+                    label="Consultation Fee (INR)"
+                    type="number"
+                    min={1}
+                    value={advocateForm.consultationFee}
+                    onChange={(e) => setAdvocateForm({ ...advocateForm, consultationFee: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <Input
+                  label="Languages"
+                  placeholder="Comma-separated, e.g. English, Hindi"
+                  value={advocateForm.languages.join(', ')}
+                  onChange={(e) => setAdvocateForm({
+                    ...advocateForm,
+                    languages: e.target.value.split(',').map((language) => language.trim()).filter(Boolean),
+                  })}
+                  required
+                />
+
                 <Input
                   label="Office / Chamber Address"
                   placeholder="e.g. #402, High Court Chambers, Fort, Mumbai"
@@ -963,26 +973,34 @@ export function RegisterPage() {
               <>
                 <div className="doc-upload-block">
                   <span className="doc-upload-label">1. Bar Enrollment Certificate</span>
-                  <span className="doc-upload-helper">
-                    Issued by your State Bar Council upon formal enrollment (PDF / JPG up to 10MB)
-                  </span>
-                  <div className="doc-item-row">
-                    <FileText size={20} className="doc-icon" />
-                    <span className="doc-name">{advocateForm.certificateDoc}</span>
-                    <span className="doc-status-tag">Ready for upload</span>
-                  </div>
+                  <span className="doc-upload-helper">Select the original certificate issued by your State Bar Council.</span>
+                  <FileUpload
+                    label=""
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    multiple={false}
+                    maxSizeMB={20}
+                    helperText="PDF, PNG, or JPEG up to 20MB"
+                    onFilesSelected={(files) => setAdvocateForm({
+                      ...advocateForm,
+                      certificateDoc: files[0] || null,
+                    })}
+                  />
                 </div>
 
                 <div className="doc-upload-block">
                   <span className="doc-upload-label">2. Advocate Identity Card</span>
-                  <span className="doc-upload-helper">
-                    Valid photo identity card issued by the Bar Council or High Court Bar Association
-                  </span>
-                  <div className="doc-item-row">
-                    <FileText size={20} className="doc-icon" />
-                    <span className="doc-name">{advocateForm.advocateIdDoc}</span>
-                    <span className="doc-status-tag">Ready for upload</span>
-                  </div>
+                  <span className="doc-upload-helper">Select your Bar Council or High Court Bar Association identity card.</span>
+                  <FileUpload
+                    label=""
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    multiple={false}
+                    maxSizeMB={20}
+                    helperText="PDF, PNG, or JPEG up to 20MB"
+                    onFilesSelected={(files) => setAdvocateForm({
+                      ...advocateForm,
+                      advocateIdDoc: files[0] || null,
+                    })}
+                  />
                 </div>
 
                 <div className="alert-box-notice" style={{ padding: '12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '0.8rem', color: '#166534', marginBottom: '1rem' }}>

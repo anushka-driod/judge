@@ -1,0 +1,234 @@
+[
+  {
+    "id": "usr_39401de8a6a71a91",
+    "name": "Rohan Sharma",
+    "email": "signin.test.1793018045596@gmail.com",
+    "phone": "+919876543210",
+    "password_hash": "$2a$10$testhashplaceholder",
+    "role": "user",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {},
+    "created_at": "2026-10-26T12:34:05.596Z",
+    "updated_at": "2026-10-26T12:34:05.596Z"
+  },
+  {
+    "id": "usr_bbc5ac2171b26b05",
+    "name": "Persistence Citizen",
+    "email": "restart.user.1793018074203@gmail.com",
+    "phone": null,
+    "password_hash": "$2a$10$restartpasswordhash",
+    "role": "user",
+    "email_verified": false,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {},
+    "created_at": "2026-10-26T12:34:34.203Z",
+    "updated_at": "2026-10-26T12:34:34.203Z"
+  },
+  {
+    "id": "usr_450502ea67d10650",
+    "name": "Rohan Sharma",
+    "email": "signin.test.1793018266472@gmail.com",
+    "phone": "+919876543210",
+    "password_hash": "$2a$10$testhashplaceholder",
+    "role": "user",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {},
+    "created_at": "2026-10-26T12:37:46.473Z",
+    "updated_at": "2026-10-26T12:37:46.473Z"
+  },
+  {
+    "id": "usr_98db59ed8660c389",
+    "name": "Persistence Citizen",
+    "email": "restart.user.1793018271897@gmail.com",
+    "phone": null,
+    "password_hash": "$2a$10$restartpasswordhash",
+    "role": "user",
+    "email_verified": false,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {},
+    "created_at": "2026-10-26T12:37:51.897Z",
+    "updated_at": "2026-10-26T12:37:51.897Z"
+  },
+  {
+    "id": "usr_48f3cb23869c278c",
+    "name": "Rohan Sharma",
+    "email": "signin.test.1793018375487@gmail.com",
+    "phone": "+919876543210",
+    "password_hash": "$2a$10$testhashplaceholder",
+    "role": "user",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {},
+    "created_at": "2026-10-26T12:39:35.488Z",
+    "updated_at": "2026-10-26T12:39:35.488Z"
+  },
+  {
+    "id": "usr_5852e79e6886d747",
+    "name": "Persistence Citizen",
+    "email": "restart.user.1793018380940@gmail.com",
+    "phone": null,
+    "password_hash": "$2a$10$restartpasswordhash",
+    "role": "user",
+    "email_verified": false,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {},
+    "created_at": "2026-10-26T12:39:40.940Z",
+    "updated_at": "2026-10-26T12:39:40.940Z"
+  },
+  {
+    "id": "usr_fdd3b0ca225e6ae3",
+    "name": "Ananya Sharma",
+    "email": "anushkareddy1208+citizen1793021208908@gmail.com",
+    "phone": "+919820084954",
+    "password_hash": "$2b$10$7bEwWiuMvbQJi5aOUfyp.uX4MeCuAvjFUGAww7Mew..Qi6twJXsr.",
+    "role": "user",
+    "email_verified": false,
+    "otp_code": "fac1b2af8032ab15baaabf8e035186c8d797925dd92950421b3f1ad28b71ad13",
+    "otp_expires_at": "2026-10-26T13:31:50.376Z",
+    "otp_attempts": 0,
+    "user_metadata": {
+      "location": {
+        "country": "India",
+        "state": "Karnataka",
+        "city": "Bengaluru"
+      }
+    },
+    "created_at": "2026-10-26T13:26:49.180Z",
+    "updated_at": "2026-10-26T13:26:50.376Z"
+  },
+  {
+    "id": "usr_4b38cf74d06c005c",
+    "name": "Adv. Ananya Deshmukh",
+    "email": "advocate_test_1793021583473@vidhisetu.in",
+    "phone": "+91 98765 43210",
+    "password_hash": "$2b$10$2Fy8gyDWtBK/RNoNnVbnFuu.uf3TbtNQzEh4JieBBTrbGbH9afWe.",
+    "role": "lawyer",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {
+      "lawyerId": "law-mah-3655",
+      "barRegistrationNumber": "MAH/3473/2020"
+    },
+    "created_at": "2026-10-26T13:33:03.835Z",
+    "updated_at": "2026-10-26T13:33:03.835Z"
+  },
+  {
+    "id": "usr_6405d8c79901a2c8",
+    "name": "Unverified Advocate Candidate",
+    "email": "pending_adv_1793021583473@vidhisetu.in",
+    "phone": "+91 99999 11111",
+    "password_hash": "$2b$10$cvjevhCLLHyppD1Z6xHZ7O0BeZ5j1boysNOKnww7pn9aB5/dTrIUG",
+    "role": "lawyer",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {
+      "lawyerId": "law-del-7087",
+      "barRegistrationNumber": "DEL/PENDING/1793021583473"
+    },
+    "created_at": "2026-10-26T13:33:17.239Z",
+    "updated_at": "2026-10-26T13:33:17.239Z"
+  },
+  {
+    "id": "usr_d3d357baf7c09894",
+    "name": " Anushka Reddy",
+    "email": "anushkareddy1208@gmail.com",
+    "phone": "+919347259623",
+    "password_hash": "$2b$10$p2XohjgfN.9Thd4N9eS2au87sVnU00WEE.aW2G4bbWc00KY63jLtm",
+    "role": "user",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {
+      "location": {
+        "country": "India",
+        "state": "Telangana",
+        "city": "hyderabad"
+      }
+    },
+    "created_at": "2026-10-26T15:11:37.813Z",
+    "updated_at": "2026-10-26T15:12:15.605Z"
+  },
+  {
+    "id": "usr_44436907a9ef9ee8",
+    "name": "adithya",
+    "email": "adithyadubbasi1409@gmail.com",
+    "phone": "+919030143659",
+    "password_hash": "$2b$10$J1SOXxcCTQrChDhP189JW.zxrzQ7HTjOuuXSfYzp/DnBytjHkVjha",
+    "role": "user",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {
+      "location": {
+        "country": "India",
+        "state": "Telangana",
+        "city": "hyderabad"
+      }
+    },
+    "created_at": "2026-10-26T15:48:08.561Z",
+    "updated_at": "2026-10-26T15:48:51.822Z",
+    "last_login_at": "2026-10-26T18:23:46.914Z"
+  },
+  {
+    "id": "usr_c80e074887dfe4c3",
+    "name": "adithya",
+    "email": "adithyadubbasi007@gmail.com",
+    "phone": "+916281937920",
+    "password_hash": "$2b$10$Q4MVfawel5N/A4oIdppOuO.dUjTyj.tFvqyyMu5MHghk3BthMp8Ia",
+    "role": "user",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {
+      "location": {
+        "country": "India",
+        "state": "Telangana",
+        "city": "Hyderabad"
+      }
+    },
+    "created_at": "2026-10-26T18:25:23.860Z",
+    "updated_at": "2026-10-26T18:26:03.760Z"
+  },
+  {
+    "id": "usr_09055dde16e199c1",
+    "name": "Anushka",
+    "email": "anushkareddy3129@gmail.com",
+    "phone": "+919705937165",
+    "password_hash": "$2b$10$QcFgOIeWLdMoX13TtZHJ5OvsGaaEPyuf83A0bf.Xz5rcec2Tq8XJK",
+    "role": "lawyer",
+    "email_verified": true,
+    "otp_code": null,
+    "otp_expires_at": null,
+    "otp_attempts": 0,
+    "user_metadata": {
+      "location": {
+        "country": null,
+        "state": "Telangana",
+        "city": "Hyderabad"
+      }
+    },
+    "created_at": "2026-10-26T19:44:55.547Z",
+    "updated_at": "2026-10-26T19:45:28.618Z"
+  }
+]

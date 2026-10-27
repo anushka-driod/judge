@@ -1,3 +1,4 @@
+import './tests/helpers/safeTestEnvironment.js';
 import app from './src/app.js';
 import http from 'node:http';
 import PaymentGatewayService from './src/services/paymentGatewayService.js';
@@ -295,3 +296,4 @@ async function runTests() {
 }
 
 runTests();
+import './tests/helpers/safeTestEnvironment.js';

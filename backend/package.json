@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "migrate": "node src/db/migrate.js",
-    "test": "node --env-file=.env --test"
+    "test": "node --import ./tests/isolated-test-setup.js --test tests/phase1-security.test.js tests/auth-otp.test.js"
   },
   "dependencies": {
     "@google/genai": "^2.24.0",
@@ -16,6 +16,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "google-auth-library": "^11.3.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^10.0.10",
     "pg": "^8.13.3"

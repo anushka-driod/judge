@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 /**
  * Comprehensive LLM & RAG Integration Test Suite
  * Vidhi Setu Backend - Phase 9 & Verification
@@ -17,16 +18,8 @@
 import { GeminiClient, geminiClient } from '../modules/ai-rag/src/llm/geminiClient.js';
 import { LegalAnalyzer } from '../modules/ai-rag/src/llm/legalAnalyzer.js';
 import { RagPipeline } from '../modules/ai-rag/src/rag/ragPipeline.js';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { getCuratedJudgments } from '../modules/ai-rag/src/kanoon/curatedJudgments.js';
 import { LegalCorpusRepository } from '../modules/ai-rag/src/storage/legalCorpusRepository.js';
-=======
->>>>>>> origin/main
-=======
-import { getCuratedJudgments } from '../modules/ai-rag/src/kanoon/curatedJudgments.js';
-import { LegalCorpusRepository } from '../modules/ai-rag/src/storage/legalCorpusRepository.js';
->>>>>>> 3aab4be (dhanush commits)
 
 let total = 0;
 let passed = 0;
@@ -46,10 +39,7 @@ async function runSuite() {
   console.log('Vidhi Setu — Centralized LLM & Grounded RAG Test Suite');
   console.log('================================================================\n');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   console.log('0. Testing Persistent Legal Corpus Repository:');
   const corpusCalls = [];
   const corpusText = 'Unauthorized electronic bank debit customer liability under RBI directions.';
@@ -109,11 +99,7 @@ async function runSuite() {
   assert(corpusMatches.chunks[0]?.kanoonId === '173294821', 'Retrieves and reranks a judgment from the database corpus');
   assert(corpusMatches.judgments[0]?.sourceUrl.includes('indiankanoon.org'), 'Returns persisted Kanoon source metadata');
 
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   // Test 1: Model Configuration
   console.log('1. Testing Model Configuration:');
   const defaultModel = geminiClient.getModel();
@@ -182,10 +168,7 @@ async function runSuite() {
     `Detected language identified: ${analysisTanglish.detected_language}`
   );
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   const harassmentQuery = 'i have sexual harrasment issue';
   const harassmentAfterTenancy = await LegalAnalyzer.analyzeQuery(
     harassmentQuery,
@@ -287,14 +270,9 @@ async function runSuite() {
   assert(harassmentResult.guidance.toLowerCase().includes('sexual harassment'), 'Responds to the harassment concern directly');
   assert(!/landlord|deposit|tenancy/i.test(harassmentResult.guidance), 'Does not return unrelated tenancy guidance');
 
-<<<<<<< HEAD
-=======
   // Test 6: RAG-to-LLM Context Handoff & Source Preservation
   console.log('\n6. Testing RAG Context Handoff & Source Metadata Preservation:');
-  const pipeline = new RagPipeline();
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+  const tenancyPipeline = new RagPipeline();
   const tenancyQuery = 'My landlord refused to refund my security deposit of 70000 after I vacated the flat with proper notice.';
   const ragResult = await pipeline.processLegalQuery(tenancyQuery, 'Karnataka');
 
@@ -326,20 +304,12 @@ async function runSuite() {
   };
   const updateResult = await pipeline.processLegalQuery(updateQuery, 'Karnataka', historyOptions);
   assert(updateResult.category.includes('Tenancy') || updateResult.category.includes('Property'), 'Maintained case anchor in Tenancy');
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   assert(
     updateResult.similar_cases.length > 0 || updateResult.executionMode === 'insufficient_evidence',
     'Returns relevant precedents or explicitly reports insufficient retrieval evidence'
   );
-<<<<<<< HEAD
-=======
   assert(updateResult.similar_cases.length > 0, 'Retrieved judicial precedents for updated case position');
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 
   // Test 9: Real Gemini API Verification (Conditional)
   console.log('\n9. Testing Real Gemini API Call (if configured):');
@@ -356,10 +326,7 @@ async function runSuite() {
       console.warn(`  [INFO] Real Gemini call error: ${err.message}`);
     }
   } else {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     console.log('  [INFO] GEMINI_API_KEY is not set. The RAG pipeline must avoid substituting an offline template.');
     assert(ragResult.executionMode === 'llm_unavailable', 'Fails closed instead of presenting a canned legal answer');
     const unclassifiedDetailedIssue = await pipeline.processLegalQuery(
@@ -368,13 +335,8 @@ async function runSuite() {
     assert(unclassifiedDetailedIssue.executionMode === 'llm_unavailable', 'Reports missing AI capability for an unfamiliar detailed legal issue');
     assert(!/landlord|deposit|tenancy|civil law/i.test(unclassifiedDetailedIssue.reply), 'Does not substitute an unrelated preset answer for an unfamiliar issue');
     assert(unclassifiedDetailedIssue.missing_information.length === 0, 'Does not repeat generic intake questions after a detailed user account');
-<<<<<<< HEAD
-=======
     console.log('  [INFO] GEMINI_API_KEY is not yet populated with a live key. Fallback engine verified.');
     assert(ragResult.executionMode === 'deterministic_fallback' || ragResult.executionMode === 'gemini_llm', 'Gracefully used grounded engine');
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
   }
 
   console.log('\n================================================================');
@@ -390,3 +352,4 @@ runSuite().catch((err) => {
   console.error('Fatal Test Error:', err);
   process.exit(1);
 });
+import './helpers/safeTestEnvironment.js';

@@ -139,7 +139,7 @@ export const PaymentController = {
       // Identify user from auth token or request
       const citizenId = req.user?.id || req.body.userId || 'usr_001';
       const citizenName = req.user?.name || req.body.userName || 'Citizen';
-      const citizenEmail = req.user?.email || req.body.userEmail || 'citizen@vidhisetu.in';
+      const citizenEmail = req.user?.email || req.body.userEmail || null;
       const citizenPhone = req.user?.phone || req.body.userPhone || '+91 98450 00000';
 
       // 1. Fetch lawyer and verify availability

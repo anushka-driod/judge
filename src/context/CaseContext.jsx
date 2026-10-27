@@ -1,14 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { caseService } from '../services/caseService';
+import { conversationService } from '../services/conversationService';
 import { useAuth } from '../hooks/useAuth';
 
 const CaseContext = createContext(null);
-
-// Helper to get user-specific storage key so users never share or leak chat/case data
-function getUserStorageKey(email) {
-  if (!email) return 'vidhisetu_cases_guest';
-  return `vidhisetu_cases_${email.toLowerCase().trim()}`;
-}
 
 // Seed conversations for default demo accounts
 const initialSeedCases = [
@@ -111,103 +106,102 @@ const initialSeedCases = [
       {
         id: 'seed-103-2',
         sender: 'ai',
-        text: `Under tenancy jurisprudence and the **Karnataka Rent Control & Tenancy principles**:\n\n1. **Ordinary Wear & Tear**: Landlords cannot deduct standard wall painting or wear-and-tear costs from your deposit unless explicitly stipulated in a signed agreement.\n2. **Right to Refund**: Deposit must be refunded within 30 days of handing over vacant possession.\n3. **Legal Redress**: Issue an advocate demand notice followed by a summary recovery suit under Order 37 of CPC or approaching the Rent Court.`,
+        text: `Under tenancy jurisprudence and the **Karnataka Rent Control & Tenancy principles**:\n\n1. **Ordinary Wear & Tear**: Landlords cannot deduct standard wall painting or wear-and-tear costs from your deposit unless explicitly stipulated in a signed agreement.\n2. **Right to Refund**: Deposit must be refunded within 30 days of handing over vacant possession.\n3. **Legal Redress**: Issue an advocate demand notice followed by a summary recovery suit under Order 37 of CPC or approaching the Rent Court.\n\n*Next steps:* Issue formal pre-litigation demand notice giving 7 days.`,
         detectedLaws: [
           {
-            act: 'Indian Contract Act, 1872',
-            section: 'Section 73',
-            title: 'Compensation for breach of contract',
+            act: 'Transfer of Property Act, 1882',
+            section: 'Section 108',
+            title: 'Rights and liabilities of lessor and lessee',
           },
         ],
+        detectedPrecedents: [],
         suggestedNextSteps: [
-          'Gather move-out photos and handover confirmation messages',
-          'Send formal demand notice giving 7 days to transfer ₹70,000',
+          'Collect original lease agreement and move-out inspection handover',
+          'Send 7-Day Pre-Litigation Legal Demand Notice via Registered Post',
         ],
         timestamp: '09:02 AM',
       },
     ],
   },
 ];
+void initialSeedCases;
 
 export function CaseProvider({ children }) {
-  const { currentUser } = useAuth();
-  const userEmail = currentUser?.email?.toLowerCase()?.trim() || '';
-  const storageKey = getUserStorageKey(userEmail);
+  const { currentUser, isAuthenticated } = useAuth();
+  const userId = currentUser?.id ? String(currentUser.id) : null;
+  const sessionKey = userId ? `user:${userId}` : 'anonymous';
+  return (
+    <CaseSessionProvider key={sessionKey} userId={userId} isAuthenticated={isAuthenticated}>
+      {children}
+    </CaseSessionProvider>
+  );
+}
 
-  // Initialize cases for this specific user
-  const [cases, setCases] = useState(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      console.warn('Failed to parse saved cases:', e);
+function CaseSessionProvider({ children, userId, isAuthenticated }) {
+  const activeUserIdRef = useRef(userId);
+  const [cases, setCases] = useState([]);
+  const [activeCaseId, setActiveCaseId] = useState(null);
+  const [conversationError, setConversationError] = useState('');
+
+  useEffect(() => {
+    activeUserIdRef.current = userId;
+    let isMounted = true;
+    if (!isAuthenticated || !userId) {
+      setCases([]);
+      setActiveCaseId(null);
+      setConversationError('');
+      return () => {
+        isMounted = false;
+      };
     }
 
-    const isDemo = !userEmail || userEmail.includes('aarav') || userEmail.includes('rajesh');
-    return isDemo ? initialSeedCases : [];
-  });
-
-  const [activeCaseId, setActiveCaseId] = useState(() => cases[0]?.id || null);
-
-  // Reload user-specific cases whenever authenticated user/email changes
-  useEffect(() => {
-    const key = getUserStorageKey(userEmail);
-    try {
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setCases(parsed);
-          setActiveCaseId(parsed[0]?.id || null);
-          return;
+    async function loadBackendConversations() {
+      try {
+        const res = await conversationService.getConversations();
+        const convList = res?.conversations || (Array.isArray(res) ? res : []);
+        const formatted = convList.map((conversation) => ({
+          id: conversation.id,
+          title: conversation.title || 'Legal Consultation',
+          category: conversation.category || 'General Legal Guidance',
+          isPinned: Boolean(conversation.isPinned ?? conversation.is_pinned),
+          createdAt: conversation.createdAt || conversation.created_at || new Date().toISOString(),
+          updatedAt: conversation.updatedAt || conversation.updated_at || new Date().toISOString(),
+          messages: Array.isArray(conversation.messages) ? conversation.messages : [],
+          messageCount: conversation.message_count || conversation.messageCount || 0,
+        }));
+        if (isMounted && activeUserIdRef.current === userId) {
+          setCases(formatted);
+          setActiveCaseId(formatted[0]?.id || null);
+          setConversationError('');
+        }
+      } catch (err) {
+        if (isMounted && activeUserIdRef.current === userId) {
+          console.error("Unable to load this account's conversations:", err);
+          setConversationError(err.message || 'Unable to load saved conversations.');
         }
       }
-    } catch (e) {
-      console.warn('Failed to load user cases from storage:', e);
     }
 
-    // If no saved history for this user
-    const isDemo = !userEmail || userEmail.includes('aarav') || userEmail.includes('rajesh');
-    if (isDemo) {
-      setCases(initialSeedCases);
-      setActiveCaseId(initialSeedCases[0]?.id || null);
-    } else {
-      // Create an isolated fresh welcome chat inquiry specifically for this new user
-      const freshCase = {
-        id: `case-${Date.now()}`,
-        userId: currentUser?.id,
-        userEmail: userEmail,
-        title: 'New Legal Inquiry',
-        category: 'General Civil Inquiry',
-        isPinned: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        messages: [
-          {
-            id: `welcome-${Date.now()}`,
-            sender: 'ai',
-            text: `Hello ${currentUser?.name || 'there'}! I am VidhiSetu, your AI legal assistant.\n\nDescribe any legal question, contract, consumer issue, or workplace dispute in plain words to get started.`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-        ],
-      };
-      setCases([freshCase]);
-      setActiveCaseId(freshCase.id);
-    }
-  }, [userEmail, currentUser?.id]);
+    loadBackendConversations();
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, isAuthenticated]);
 
-  // Persist cases to user's isolated storage whenever cases update
+  // Lazy-load complete messages for active conversation if needed
   useEffect(() => {
-    if (!storageKey) return;
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(cases));
-    } catch (e) {
-      console.warn('Failed to persist cases to localStorage:', e);
+    if (!activeCaseId || !userId) return;
+    const targetCase = cases.find((c) => c.id === activeCaseId);
+    if (targetCase && (!targetCase.messages || targetCase.messages.length === 0)) {
+      conversationService.getConversationById(activeCaseId).then((res) => {
+        if (activeUserIdRef.current === userId && res?.conversation?.messages?.length > 0) {
+          setCases((prev) =>
+            prev.map((c) => (c.id === activeCaseId ? { ...c, messages: res.conversation.messages } : c))
+          );
+        }
+      }).catch((error) => console.error('Unable to load conversation messages:', error));
     }
-  }, [cases, storageKey]);
+  }, [activeCaseId, cases, userId]);
 
   // Derived sorted list: Pinned first, then newest updatedAt
   const sortedCases = [...cases].sort((a, b) => {
@@ -233,10 +227,20 @@ export function CaseProvider({ children }) {
   /**
    * Starts a brand new case from the first user message.
    */
-  const createChatCase = (firstMessageText, initialAiResponse = null) => {
+  const createChatCase = async (firstMessageText, initialAiResponse = null) => {
+    if (!isAuthenticated || !userId) {
+      throw new Error('Sign in before starting a private legal conversation.');
+    }
     const newId = `case-${Date.now()}`;
     const generatedTitle = generateTitleFromText(firstMessageText);
     const now = new Date().toISOString();
+
+    const userMsg = {
+      id: `msg-${Date.now()}-usr`,
+      sender: 'user',
+      text: firstMessageText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
 
     const newCase = {
       id: newId,
@@ -245,14 +249,7 @@ export function CaseProvider({ children }) {
       isPinned: false,
       createdAt: now,
       updatedAt: now,
-      messages: [
-        {
-          id: `msg-${Date.now()}-usr`,
-          sender: 'user',
-          text: firstMessageText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        },
-      ],
+      messages: [userMsg],
     };
 
     if (initialAiResponse) {
@@ -267,6 +264,30 @@ export function CaseProvider({ children }) {
       });
     }
 
+    await conversationService.createConversation({
+      id: newId,
+      title: generatedTitle,
+      category: 'Legal Consultation',
+      isPinned: false,
+      initialMessage: userMsg,
+    });
+    if (activeUserIdRef.current !== userId) {
+      throw new Error('Your account changed before the conversation could be opened. Please try again.');
+    }
+    setConversationError('');
+    if (initialAiResponse) {
+      await conversationService.addMessage(newId, {
+        id: newCase.messages[1].id,
+        sender: 'ai',
+        text: newCase.messages[1].text,
+        meta: {
+          detectedLaws: initialAiResponse.detectedLaws || [],
+          detectedPrecedents: initialAiResponse.detectedPrecedents || [],
+          suggestedNextSteps: initialAiResponse.suggestedNextSteps || [],
+        },
+      });
+    }
+
     setCases((prev) => [newCase, ...prev]);
     setActiveCaseId(newId);
     return newCase;
@@ -276,6 +297,9 @@ export function CaseProvider({ children }) {
    * Appends a message to an existing case.
    */
   const addMessageToCase = (caseId, message) => {
+    if (!isAuthenticated || !userId) {
+      return Promise.resolve(false);
+    }
     const now = new Date().toISOString();
     setCases((prev) =>
       prev.map((c) => {
@@ -289,13 +313,39 @@ export function CaseProvider({ children }) {
         return c;
       })
     );
+
+    // Sync to backend database
+    const ownerAtStart = userId;
+    return conversationService.addMessage(caseId, {
+      id: message.id,
+      sender: message.sender,
+      text: message.text,
+      meta: {
+        detectedEmotion: message.detectedEmotion,
+        detectedLaws: message.detectedLaws,
+        detectedPrecedents: message.detectedPrecedents,
+        suggestedNextSteps: message.suggestedNextSteps,
+        factGatheringQuestions: message.factGatheringQuestions,
+        agentSteps: message.agentSteps,
+      },
+    }).then(() => {
+      if (activeUserIdRef.current === ownerAtStart) setConversationError('');
+      return true;
+    }).catch((error) => {
+      console.error('Failed to persist chat message:', error);
+      if (activeUserIdRef.current === ownerAtStart) {
+        setCases((prev) => prev.map((c) => (
+          c.id === caseId
+            ? { ...c, messages: (c.messages || []).filter((item) => item.id !== message.id) }
+            : c
+        )));
+        setConversationError(error.message || 'Failed to save this chat message.');
+      }
+      return false;
+    });
   };
 
   /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
    * Update a specific message in a case (e.g. for streaming response updates)
    */
   const updateMessageInCase = (caseId, messageId, patch) => {
@@ -333,16 +383,18 @@ export function CaseProvider({ children }) {
   };
 
   /**
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
    * Pin or unpin a case. Pinned cases stay at the top.
    */
   const togglePinCase = (caseId) => {
     setCases((prev) =>
-      prev.map((c) => (c.id === caseId ? { ...c, isPinned: !c.isPinned } : c))
+      prev.map((c) => {
+        if (c.id === caseId) {
+          const nextPinned = !c.isPinned;
+          conversationService.updateConversation(caseId, { isPinned: nextPinned }).catch(() => null);
+          return { ...c, isPinned: nextPinned };
+        }
+        return c;
+      })
     );
   };
 
@@ -355,6 +407,7 @@ export function CaseProvider({ children }) {
     setCases((prev) =>
       prev.map((c) => (c.id === caseId ? { ...c, title: trimmed } : c))
     );
+    conversationService.updateConversation(caseId, { title: trimmed }).catch(() => null);
   };
 
   /**
@@ -368,6 +421,7 @@ export function CaseProvider({ children }) {
       }
       return remaining;
     });
+    conversationService.deleteConversation(caseId).catch(() => null);
   };
 
   /**
@@ -433,20 +487,13 @@ export function CaseProvider({ children }) {
         rawCases: cases,
         activeCaseId,
         activeCase,
+        conversationError,
         selectCase,
         startFreshChat,
         createChatCase,
         addMessageToCase,
-<<<<<<< HEAD
-<<<<<<< HEAD
         updateMessageInCase,
         removeLastMessage,
-=======
->>>>>>> origin/main
-=======
-        updateMessageInCase,
-        removeLastMessage,
->>>>>>> 3aab4be (dhanush commits)
         togglePinCase,
         renameCase,
         deleteCase,

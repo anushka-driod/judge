@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 /**
  * Verification of the 3 User Test Cases from the prompt
  *
@@ -82,3 +83,4 @@ async function runVerification() {
 }
 
 runVerification().catch(console.error);
+import './helpers/safeTestEnvironment.js';

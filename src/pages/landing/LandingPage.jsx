@@ -64,7 +64,7 @@ export function LandingPage() {
           </Link>
 
           <nav className="landing-nav-links">
-            <Link to="/chat" className="landing-nav-link" style={{ fontWeight: 600, color: 'var(--color-primary-light, #2563eb)' }}>
+            <Link to="/chat" className="landing-nav-link" style={{ fontWeight: 600, color: 'var(--accent-400)' }}>
               <Scale size={15} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
               <span>Public Legal Agent</span>
             </Link>

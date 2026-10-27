@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -122,3 +123,4 @@ console.log(`VERIFICATION SUMMARY: ${passed} / ${total} tests passed successfull
 console.log('================================================================\n');
 
 if (passed !== total) process.exit(1);
+import './helpers/safeTestEnvironment.js';

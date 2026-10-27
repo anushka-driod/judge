@@ -1,5 +1,10 @@
 import { Router } from 'express';
 import { LawyerCaseController } from '../controllers/lawyerCaseController.js';
+import {
+  authenticateToken,
+  optionalAuthenticateToken,
+  requireRoles,
+} from '../../../../src/middleware/authMiddleware.js';
 
 const router = Router();
 
@@ -12,11 +17,13 @@ router.post('/legal/cases/relationships', LawyerCaseController.addCaseRelationsh
 
 // 2. Lawyer Directory & Recommendations
 router.get('/lawyers', LawyerCaseController.getLawyers);
-router.get('/lawyers/recommendations', LawyerCaseController.getRecommendations);
+router.get(['/lawyers/recommendations', '/lawyers/recommended'], LawyerCaseController.getRecommendations);
 router.get('/lawyers/:id', LawyerCaseController.getLawyerById);
 
 // 3. Consultations
-router.post('/consultations', LawyerCaseController.bookConsultation);
+router.post(['/consultations', '/consultations/book'], optionalAuthenticateToken, LawyerCaseController.bookConsultation);
+router.get('/consultations', optionalAuthenticateToken, LawyerCaseController.getMyConsultations);
+router.get('/consultations/:id', optionalAuthenticateToken, LawyerCaseController.getConsultationById);
 
 // 4. Case Action Plans & Self-Help Roadmaps
 router.get('/cases/:id/actions', LawyerCaseController.getActionPlan);
@@ -37,13 +44,15 @@ router.post('/reminders', LawyerCaseController.createReminder);
 router.get('/reminders', LawyerCaseController.getReminders);
 router.patch('/reminders/:id/dismiss', LawyerCaseController.dismissReminder);
 
-// 8. Second Opinions
+// 8. Second Opinions & Notifications
+router.get('/notifications', LawyerCaseController.getNotifications);
 router.post('/second-opinions', LawyerCaseController.requestSecondOpinion);
 
 // 9. Complaints & Grievances
 router.post('/complaints', LawyerCaseController.fileComplaint);
 
 // 10. Admin Management Panel
+router.use('/admin', authenticateToken, requireRoles('admin'));
 router.post('/admin/lawyers/:id/verify', LawyerCaseController.adminVerifyLawyer);
 router.post('/admin/lawyers/:id/reject', LawyerCaseController.adminRejectLawyer);
 router.get('/admin/complaints', LawyerCaseController.adminGetComplaints);

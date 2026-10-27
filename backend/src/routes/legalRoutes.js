@@ -9,5 +9,7 @@ router.get('/document/:id', LegalController.getDocument);
 router.get('/document/:id/metadata', LegalController.getDocumentMetadata);
 router.get('/document/:id/fragments', LegalController.getDocumentFragments);
 router.get('/document/:id/courtcopy', LegalController.getCourtCopy);
+router.get('/document/:id/analysis', LegalController.analyzeJudgment);
+router.get('/document/:id/pdf', LegalController.downloadJudgmentPdf);
 
 export default router;

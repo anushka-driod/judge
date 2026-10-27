@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 async function runEndToEndFlowTest() {
   console.log('================================================================');
   console.log('Vidhi Setu — Indian Kanoon End-to-End User Flow Integration Test');
@@ -113,3 +114,4 @@ async function runEndToEndFlowTest() {
 }
 
 runEndToEndFlowTest().catch(console.error);
+import './helpers/safeTestEnvironment.js';

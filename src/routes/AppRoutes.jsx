@@ -29,6 +29,7 @@ import { LawyerEarningsPage } from '../pages/lawyer/LawyerEarningsPage';
 import { LawyerProfilePage as LawyerChambersProfilePage } from '../pages/lawyer/LawyerProfilePage';
 import { AdminLawyersPage } from '../pages/admin/AdminLawyersPage';
 import { AdminPaymentsPage } from '../pages/admin/AdminPaymentsPage';
+import { AdminSupportPage } from '../pages/admin/AdminSupportPage';
 import { CitizenPaymentsPage } from '../pages/payments/CitizenPaymentsPage';
 
 // Main Dashboard & Legal Chat
@@ -63,27 +64,28 @@ import { EscalationTrackingPage } from '../pages/complaints/EscalationTrackingPa
 // 404
 import { NotFoundPage } from '../pages/notFound/NotFoundPage';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 // Landing & Marketing Page
 import { LandingPage } from '../pages/landing/LandingPage';
+
+import { useAuth } from '../hooks/useAuth';
+
+function CitizenChatRoute() {
+  const { isAdvocate, isVerifiedAdvocate } = useAuth();
+  if (isAdvocate) {
+    if (!isVerifiedAdvocate) {
+      return <Navigate to="/advocate/status" replace />;
+    }
+    return <Navigate to="/lawyer/dashboard" replace />;
+  }
+  return <AIChatPage />;
+}
 
 export function AppRoutes() {
   return (
     <Routes>
       {/* Public Home & Auth Routes */}
       <Route path="/" element={<LandingPage />} />
-<<<<<<< HEAD
-=======
-export function AppRoutes() {
-  return (
-    <Routes>
-      {/* Public Auth Routes */}
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -95,34 +97,40 @@ export function AppRoutes() {
       <Route path="/lawyer/login" element={<LawyerLoginPage />} />
       <Route path="/lawyer/register" element={<LawyerRegisterPage />} />
       <Route path="/lawyer/verification-status" element={<LawyerVerificationStatusPage />} />
+      <Route path="/advocate/status" element={<AdvocateStatusPage />} />
 
-      {/* Protected Lawyer Portal Chambers Routes */}
-      <Route path="/lawyer" element={<LawyerLayout />}>
-        <Route index element={<Navigate to="/lawyer/dashboard" replace />} />
-        <Route path="dashboard" element={<LawyerDashboardPage />} />
-        <Route path="requests" element={<LawyerRequestsPage />} />
-        <Route path="cases" element={<LawyerCasesPage />} />
-        <Route path="cases/:caseId" element={<LawyerCaseWorkspacePage />} />
-        <Route path="calendar" element={<LawyerCalendarPage />} />
-        <Route path="messages" element={<LawyerRequestsPage />} />
-        <Route path="earnings" element={<LawyerEarningsPage />} />
-        <Route path="profile" element={<LawyerChambersProfilePage />} />
-        <Route path="consultations" element={<LawyerCalendarPage />} />
+      {/* Protected Lawyer Portal Chambers Routes (Require verified advocate or admin) */}
+      <Route element={<ProtectedRoute allowedRoles={['lawyer', 'admin']} />}>
+        <Route path="/lawyer" element={<LawyerLayout />}>
+          <Route index element={<Navigate to="/lawyer/dashboard" replace />} />
+          <Route path="dashboard" element={<LawyerDashboardPage />} />
+          <Route path="requests" element={<LawyerRequestsPage />} />
+          <Route path="cases" element={<LawyerCasesPage />} />
+          <Route path="cases/:caseId" element={<LawyerCaseWorkspacePage />} />
+          <Route path="calendar" element={<LawyerCalendarPage />} />
+          <Route path="messages" element={<LawyerRequestsPage />} />
+          <Route path="earnings" element={<LawyerEarningsPage />} />
+          <Route path="profile" element={<LawyerChambersProfilePage />} />
+          <Route path="consultations" element={<LawyerCalendarPage />} />
+        </Route>
+        <Route path="/advocate/dashboard" element={<AdvocateDashboardPage />} />
       </Route>
 
-      {/* Admin Lawyer Verification & Oversight Docket */}
-      <Route path="/admin/lawyers" element={<AdminLawyersPage />} />
-      <Route path="/admin/lawyers/:id" element={<AdminLawyersPage />} />
+      {/* Protected Administrator Oversight Routes (Require admin role only) */}
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route path="/admin/verifications" element={<AdminVerificationPage />} />
+        <Route path="/admin/verification" element={<AdminVerificationPage />} />
+        <Route path="/admin/lawyers" element={<AdminLawyersPage />} />
+        <Route path="/admin/lawyers/:id" element={<AdminLawyersPage />} />
+        <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+        <Route path="/admin/support" element={<AdminSupportPage />} />
+      </Route>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-      {/* Public Legal Agent & Legal Research (Accessible without authentication) */}
+      {/* Public Legal Agent & Legal Research (Accessible without authentication for citizens) */}
       <Route element={<AppLayout />}>
-        {/* AI Legal Assistant - Public Citizen Agent */}
-        <Route path="/chat" element={<AIChatPage />} />
-        <Route path="/chat/:sessionId" element={<AIChatPage />} />
+        {/* AI Legal Assistant - Citizen Chat with unapproved advocate redirect */}
+        <Route path="/chat" element={<CitizenChatRoute />} />
+        <Route path="/chat/:sessionId" element={<CitizenChatRoute />} />
 
         {/* Public Legal Research & Guidance Views */}
         <Route path="/cases/:caseId/guidance" element={<AIGuidanceResultsPage />} />
@@ -134,58 +142,21 @@ export function AppRoutes() {
         <Route path="/lawyers/:lawyerId" element={<LawyerProfilePage />} />
       </Route>
 
-      {/* Protected Routes (Require Verified Login) */}
-<<<<<<< HEAD
-=======
-      {/* Protected Routes */}
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
-      <Route element={<ProtectedRoute />}>
-        {/* Advocate Experience Screens (Unwrapped by standard citizen sidebar) */}
-        <Route path="/advocate/status" element={<AdvocateStatusPage />} />
-        <Route path="/advocate/dashboard" element={<AdvocateDashboardPage />} />
-
-        {/* Administrator Oversight */}
-        <Route path="/admin/verifications" element={<AdminVerificationPage />} />
-        <Route path="/admin/payments" element={<AdminPaymentsPage />} />
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-        {/* Protected Citizen Cases Workspace */}
+      {/* Protected Citizen Cases Workspace */}
+      <Route element={<ProtectedRoute allowedRoles={['user', 'admin']} />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-=======
-        {/* Standard VidhiSetu Legal Assistant & Cases Workspace */}
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<Navigate to="/chat" replace />} />
-          <Route path="/dashboard" element={<Navigate to="/chat" replace />} />
-
-          {/* AI Legal Assistant */}
-          <Route path="/chat" element={<AIChatPage />} />
-          <Route path="/chat/:sessionId" element={<AIChatPage />} />
->>>>>>> origin/main
-=======
-        {/* Protected Citizen Cases Workspace */}
-        <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
->>>>>>> 3aab4be (dhanush commits)
 
           {/* Consultation Payments & Invoices */}
           <Route path="/payments" element={<CitizenPaymentsPage />} />
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
           {/* User-Isolated Cases */}
           <Route path="/cases" element={<CasesListPage />} />
           <Route path="/cases/new" element={<NewCasePage />} />
           <Route path="/cases/:caseId" element={<CaseDetailsPage />} />
 
           {/* Booking Consultations */}
-<<<<<<< HEAD
-=======
           {/* Cases */}
           <Route path="/cases" element={<CasesListPage />} />
           <Route path="/cases/new" element={<NewCasePage />} />
@@ -201,9 +172,6 @@ export function AppRoutes() {
           {/* Lawyers & Booking */}
           <Route path="/cases/:caseId/lawyers" element={<LawyerRecommendationsPage />} />
           <Route path="/lawyers/:lawyerId" element={<LawyerProfilePage />} />
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
           <Route path="/lawyers/:lawyerId/book" element={<BookConsultationPage />} />
           <Route path="/consultation/confirmed/:bookingId" element={<ConsultationConfirmationPage />} />
 

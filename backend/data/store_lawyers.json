@@ -1,0 +1,1764 @@
+[
+  {
+    "id": "law-kar-01",
+    "user_id": "usr_law_01",
+    "name": "Adv. Rajeshwar Rao",
+    "email": "rajeshwar.rao@earnlaw.in",
+    "phone": "+91 98450 11223",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "KAR/2012/5894",
+    "state_bar_council": "Karnataka",
+    "year_of_enrollment": 2012,
+    "years_of_experience": 14,
+    "primary_jurisdiction": "Karnataka",
+    "primary_court": "High Court of Karnataka & Labour Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English",
+      "Kannada",
+      "Hindi"
+    ],
+    "specializations": [
+      "labour_law",
+      "employment_disputes",
+      "consumer_protection",
+      "tenancy_disputes"
+    ],
+    "consultation_fee": 1200,
+    "fee_schedule": {
+      "chat": 600,
+      "voice": 900,
+      "video": 1200,
+      "in_person": 2000,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat",
+      "in_person"
+    ],
+    "verification_status": "VERIFIED",
+    "admin_remarks": "Verified by Bar Council of Karnataka records.",
+    "is_available": true,
+    "rating_avg": 4.9,
+    "profile_bio": "Senior Counsel specializing in wrongful termination, tenancy recovery, and high-stakes contract dispute litigation with 14+ years of bar experience.",
+    "verification_documents": [
+      {
+        "id": "vdoc-01",
+        "title": "Bar Enrollment Certificate",
+        "type": "certificate",
+        "url": "#",
+        "verified": true,
+        "uploadedAt": "2026-01-10"
+      },
+      {
+        "id": "vdoc-02",
+        "title": "Karnataka Bar Council ID",
+        "type": "bar_id",
+        "url": "#",
+        "verified": true,
+        "uploadedAt": "2026-01-10"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:30",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM",
+        "05:30 PM"
+      ]
+    },
+    "created_at": "2026-01-10T09:00:00Z",
+    "updated_at": "2026-09-20T10:00:00Z"
+  },
+  {
+    "id": "law-del-02",
+    "user_id": "usr_law_02",
+    "name": "Adv. Meenakshi Sundaram",
+    "email": "meenakshi.s@earnlaw.in",
+    "phone": "+91 98100 44556",
+    "photoUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "D/2009/4120",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2009,
+    "years_of_experience": 16,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "Delhi High Court & NCDRC",
+    "location_city": "New Delhi",
+    "languages": [
+      "English",
+      "Hindi",
+      "Tamil"
+    ],
+    "specializations": [
+      "consumer_protection",
+      "rera_property",
+      "contract_disputes",
+      "tenancy_disputes"
+    ],
+    "consultation_fee": 1500,
+    "fee_schedule": {
+      "chat": 800,
+      "voice": 1100,
+      "video": 1500,
+      "in_person": 2500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "VERIFIED",
+    "admin_remarks": "Verified by Delhi High Court Bar Association.",
+    "is_available": true,
+    "rating_avg": 4.85,
+    "profile_bio": "Extensive litigation experience before the National Consumer Disputes Redressal Commission and Delhi High Court in real estate, tenancy and commercial recovery.",
+    "verification_documents": [
+      {
+        "id": "vdoc-03",
+        "title": "Bar Enrollment Certificate (Delhi)",
+        "type": "certificate",
+        "url": "#",
+        "verified": true,
+        "uploadedAt": "2026-02-15"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Wednesday",
+        "Friday"
+      ],
+      "startTime": "11:00",
+      "endTime": "17:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "11:00 AM",
+        "02:00 PM",
+        "03:30 PM"
+      ]
+    },
+    "created_at": "2026-02-15T11:00:00Z",
+    "updated_at": "2026-09-18T14:30:00Z"
+  },
+  {
+    "id": "lawyer-pending-01",
+    "user_id": "usr_law_03",
+    "name": "Adv. Vikram Malhotra",
+    "email": "vikram.malhotra@example.com",
+    "phone": "+91 99887 66554",
+    "photoUrl": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "MAH/4590/2018",
+    "state_bar_council": "Maharashtra",
+    "year_of_enrollment": 2018,
+    "years_of_experience": 8,
+    "primary_jurisdiction": "Maharashtra",
+    "primary_court": "Bombay High Court & City Civil Court",
+    "location_city": "Mumbai",
+    "languages": [
+      "English",
+      "Marathi",
+      "Hindi"
+    ],
+    "specializations": [
+      "rera_property",
+      "civil_disputes",
+      "consumer_protection"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 800,
+      "video": 1000,
+      "in_person": 1800,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Practicing Advocate at Bombay High Court focusing on residential tenancy disputes, property acquisition and RERA consumer complaints.",
+    "verification_documents": [
+      {
+        "id": "vdoc-04",
+        "title": "Bar_Certificate_Vikram.pdf",
+        "type": "Bar Enrollment Certificate",
+        "verified": false,
+        "uploadedAt": "2026-08-28"
+      },
+      {
+        "id": "vdoc-05",
+        "title": "Bar_ID_Vikram.pdf",
+        "type": "Bar Council ID",
+        "verified": false,
+        "uploadedAt": "2026-08-28"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Thursday"
+      ],
+      "startTime": "14:00",
+      "endTime": "19:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "02:00 PM",
+        "04:00 PM"
+      ]
+    },
+    "created_at": "2026-08-28T10:00:00Z",
+    "updated_at": "2026-08-28T10:00:00Z"
+  },
+  {
+    "id": "law-uniq-2723",
+    "user_id": "usr_law-uniq-2723",
+    "name": "Adv. Unique Counsel",
+    "email": "advocate.unique.1793018052723@gmail.com",
+    "phone": "+919988776655",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/2021/8877",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 5,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "Delhi High Court",
+    "location_city": "New Delhi",
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "specializations": [
+      "civil_litigation"
+    ],
+    "consultation_fee": 1500,
+    "fee_schedule": {
+      "chat": 750,
+      "voice": 1125,
+      "video": 1500,
+      "in_person": 2250,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Practicing Advocate in Delhi High Court.",
+    "verification_documents": [
+      {
+        "id": "vdoc-1793018052724-0",
+        "title": "Bar_Certificate.pdf",
+        "type": "Bar Certificate",
+        "url": "#",
+        "sizeFormatted": "Uploaded File",
+        "verified": false,
+        "uploadedAt": "2026-10-26"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": false,
+    "notification_status": "failed",
+    "notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "notification_attempted_at": "2026-10-26T12:34:15.067Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:34:12.724Z",
+    "updated_at": "2026-10-26T12:34:12.724Z"
+  },
+  {
+    "id": "law-retry-5080",
+    "user_id": "usr_law-retry-5080",
+    "name": "Adv. Retry Test",
+    "email": "retry.test.1793018055080@gmail.com",
+    "phone": "+919811223344",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "MAH/2022/9900",
+    "state_bar_council": "Maharashtra",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 4,
+    "primary_jurisdiction": "Maharashtra",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": false,
+    "notification_status": "failed",
+    "notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "notification_attempted_at": "2026-10-26T12:34:19.882Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:34:15.080Z",
+    "updated_at": "2026-10-26T12:34:15.080Z"
+  },
+  {
+    "id": "law-kar-9888",
+    "user_id": "usr_law-kar-9888",
+    "name": "Adv. Unapproved",
+    "email": "pending.reg.1793018059888@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "KAR/2023/1122",
+    "state_bar_council": "Karnataka",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Karnataka",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": false,
+    "notification_status": "failed",
+    "notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "notification_attempted_at": "2026-10-26T12:34:22.232Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:34:19.888Z",
+    "updated_at": "2026-10-26T12:34:19.888Z"
+  },
+  {
+    "id": "law-del-2238",
+    "user_id": "usr_law-del-2238",
+    "name": "Adv. Approved One",
+    "email": "adv.toapprove.1793018062238@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "D/2020/5544",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "VERIFIED",
+    "admin_remarks": "Credentials verified by Delhi Bar Council.",
+    "is_available": true,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": false,
+    "notification_status": "failed",
+    "notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "notification_attempted_at": "2026-10-26T12:34:24.680Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T12:34:24.683Z",
+    "created_at": "2026-10-26T12:34:22.238Z",
+    "updated_at": "2026-10-26T12:34:24.683Z",
+    "status_notification_sent": false,
+    "status_notification_status": "failed",
+    "status_notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "status_notification_attempted_at": "2026-10-26T12:34:27.033Z"
+  },
+  {
+    "id": "law-utt-7037",
+    "user_id": "usr_law-utt-7037",
+    "name": "Adv. Rejected Candidate",
+    "email": "adv.toreject.1793018067037@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "UP/2024/0011",
+    "state_bar_council": "Uttar Pradesh",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Uttar Pradesh",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "REJECTED",
+    "admin_remarks": "Bar Council enrollment certificate unreadable.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": false,
+    "notification_status": "failed",
+    "notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "notification_attempted_at": "2026-10-26T12:34:29.360Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T12:34:29.362Z",
+    "created_at": "2026-10-26T12:34:27.037Z",
+    "updated_at": "2026-10-26T12:34:29.363Z",
+    "status_notification_sent": false,
+    "status_notification_status": "failed",
+    "status_notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "status_notification_attempted_at": "2026-10-26T12:34:31.697Z"
+  },
+  {
+    "id": "law-del-4212",
+    "user_id": "usr_law-del-4212",
+    "name": "Adv. Restart Counsel",
+    "email": "restart.adv.1793018074211@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/2024/7788",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": false,
+    "notification_status": "failed",
+    "notification_error": "SMTP transmission failed: getaddrinfo ENOTFOUND mock.local",
+    "notification_attempted_at": "2026-10-26T12:34:36.540Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:34:34.212Z",
+    "updated_at": "2026-10-26T12:34:34.212Z"
+  },
+  {
+    "id": "law-uniq-7403",
+    "user_id": "usr_law-uniq-7403",
+    "name": "Adv. Unique Counsel",
+    "email": "advocate.unique.1793018267403@gmail.com",
+    "phone": "+919988776655",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/2021/8877",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 5,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "Delhi High Court",
+    "location_city": "New Delhi",
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "specializations": [
+      "civil_litigation"
+    ],
+    "consultation_fee": 1500,
+    "fee_schedule": {
+      "chat": 750,
+      "voice": 1125,
+      "video": 1500,
+      "in_person": 2250,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Practicing Advocate in Delhi High Court.",
+    "verification_documents": [
+      {
+        "id": "vdoc-1793018267403-0",
+        "title": "Bar_Certificate.pdf",
+        "type": "Bar Certificate",
+        "url": "#",
+        "sizeFormatted": "Uploaded File",
+        "verified": false,
+        "uploadedAt": "2026-10-26"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:37:47.673Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:37:47.403Z",
+    "updated_at": "2026-10-26T12:37:47.403Z"
+  },
+  {
+    "id": "law-retry-7931",
+    "user_id": "usr_law-retry-7931",
+    "name": "Adv. Retry Test",
+    "email": "retry.test.1793018267931@gmail.com",
+    "phone": "+919811223344",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "MAH/2022/9900",
+    "state_bar_council": "Maharashtra",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 4,
+    "primary_jurisdiction": "Maharashtra",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:37:49.327Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:37:47.932Z",
+    "updated_at": "2026-10-26T12:37:47.932Z"
+  },
+  {
+    "id": "law-kar-9572",
+    "user_id": "usr_law-kar-9572",
+    "name": "Adv. Unapproved",
+    "email": "pending.reg.1793018269572@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "KAR/2023/1122",
+    "state_bar_council": "Karnataka",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Karnataka",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:37:49.826Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:37:49.572Z",
+    "updated_at": "2026-10-26T12:37:49.572Z"
+  },
+  {
+    "id": "law-del-9829",
+    "user_id": "usr_law-del-9829",
+    "name": "Adv. Approved One",
+    "email": "adv.toapprove.1793018269829@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "D/2020/5544",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "VERIFIED",
+    "admin_remarks": "Credentials verified by Delhi Bar Council.",
+    "is_available": true,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:37:50.067Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T12:37:50.071Z",
+    "created_at": "2026-10-26T12:37:49.829Z",
+    "updated_at": "2026-10-26T12:37:50.071Z",
+    "status_notification_sent": true,
+    "status_notification_status": "accepted",
+    "status_notification_error": null,
+    "status_notification_attempted_at": "2026-10-26T12:37:51.022Z"
+  },
+  {
+    "id": "law-utt-1025",
+    "user_id": "usr_law-utt-1025",
+    "name": "Adv. Rejected Candidate",
+    "email": "adv.toreject.1793018271025@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "UP/2024/0011",
+    "state_bar_council": "Uttar Pradesh",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Uttar Pradesh",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "REJECTED",
+    "admin_remarks": "Bar Council enrollment certificate unreadable.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:37:51.293Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T12:37:51.295Z",
+    "created_at": "2026-10-26T12:37:51.026Z",
+    "updated_at": "2026-10-26T12:37:51.295Z",
+    "status_notification_sent": true,
+    "status_notification_status": "accepted",
+    "status_notification_error": null,
+    "status_notification_attempted_at": "2026-10-26T12:37:51.660Z"
+  },
+  {
+    "id": "law-del-2701",
+    "user_id": "usr_law-del-2701",
+    "name": "Adv. Restart Counsel",
+    "email": "restart.adv.1793018272701@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/2024/7788",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:37:52.970Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:37:52.701Z",
+    "updated_at": "2026-10-26T12:37:52.701Z"
+  },
+  {
+    "id": "law-uniq-6386",
+    "user_id": "usr_law-uniq-6386",
+    "name": "Adv. Unique Counsel",
+    "email": "advocate.unique.1793018376386@gmail.com",
+    "phone": "+919988776655",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/2021/8877",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 5,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "Delhi High Court",
+    "location_city": "New Delhi",
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "specializations": [
+      "civil_litigation"
+    ],
+    "consultation_fee": 1500,
+    "fee_schedule": {
+      "chat": 750,
+      "voice": 1125,
+      "video": 1500,
+      "in_person": 2250,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Practicing Advocate in Delhi High Court.",
+    "verification_documents": [
+      {
+        "id": "vdoc-1793018376387-0",
+        "title": "Bar_Certificate.pdf",
+        "type": "Bar Certificate",
+        "url": "#",
+        "sizeFormatted": "Uploaded File",
+        "verified": false,
+        "uploadedAt": "2026-10-26"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:39:36.656Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:39:36.387Z",
+    "updated_at": "2026-10-26T12:39:36.387Z"
+  },
+  {
+    "id": "law-retry-6935",
+    "user_id": "usr_law-retry-6935",
+    "name": "Adv. Retry Test",
+    "email": "retry.test.1793018376935@gmail.com",
+    "phone": "+919811223344",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "MAH/2022/9900",
+    "state_bar_council": "Maharashtra",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 4,
+    "primary_jurisdiction": "Maharashtra",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:39:38.157Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:39:36.935Z",
+    "updated_at": "2026-10-26T12:39:36.935Z"
+  },
+  {
+    "id": "law-kar-8416",
+    "user_id": "usr_law-kar-8416",
+    "name": "Adv. Unapproved",
+    "email": "pending.reg.1793018378416@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "KAR/2023/1122",
+    "state_bar_council": "Karnataka",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Karnataka",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:39:38.671Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:39:38.416Z",
+    "updated_at": "2026-10-26T12:39:38.416Z"
+  },
+  {
+    "id": "law-del-8674",
+    "user_id": "usr_law-del-8674",
+    "name": "Adv. Approved One",
+    "email": "adv.toapprove.1793018378674@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "D/2020/5544",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "VERIFIED",
+    "admin_remarks": "Credentials verified by Delhi Bar Council.",
+    "is_available": true,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:39:39.637Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T12:39:39.642Z",
+    "created_at": "2026-10-26T12:39:38.674Z",
+    "updated_at": "2026-10-26T12:39:39.642Z",
+    "status_notification_sent": true,
+    "status_notification_status": "accepted",
+    "status_notification_error": null,
+    "status_notification_attempted_at": "2026-10-26T12:39:39.892Z"
+  },
+  {
+    "id": "law-utt-9895",
+    "user_id": "usr_law-utt-9895",
+    "name": "Adv. Rejected Candidate",
+    "email": "adv.toreject.1793018379895@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "UP/2024/0011",
+    "state_bar_council": "Uttar Pradesh",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Uttar Pradesh",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "REJECTED",
+    "admin_remarks": "Bar Council enrollment certificate unreadable.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:39:40.169Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T12:39:40.173Z",
+    "created_at": "2026-10-26T12:39:39.895Z",
+    "updated_at": "2026-10-26T12:39:40.173Z",
+    "status_notification_sent": true,
+    "status_notification_status": "accepted",
+    "status_notification_error": null,
+    "status_notification_attempted_at": "2026-10-26T12:39:40.427Z"
+  },
+  {
+    "id": "law-del-1609",
+    "user_id": "usr_law-del-1609",
+    "name": "Adv. Restart Counsel",
+    "email": "restart.adv.1793018381609@gmail.com",
+    "phone": "",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/2024/7788",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Documents awaiting administrative review.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T12:39:41.995Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T12:39:41.609Z",
+    "updated_at": "2026-10-26T12:39:41.609Z"
+  },
+  {
+    "id": "law-mah-3655",
+    "user_id": "usr_4b38cf74d06c005c",
+    "name": "Adv. Ananya Deshmukh",
+    "email": "advocate_test_1793021583473@vidhisetu.in",
+    "phone": "+91 98765 43210",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "MAH/3473/2020",
+    "state_bar_council": "Maharashtra",
+    "year_of_enrollment": 2020,
+    "years_of_experience": 6,
+    "primary_jurisdiction": "Bombay High Court",
+    "primary_court": "Bombay High Court & City Civil Court",
+    "location_city": "Mumbai",
+    "languages": [
+      "English",
+      "Marathi",
+      "Hindi"
+    ],
+    "specializations": [
+      "tenancy_disputes",
+      "consumer_protection"
+    ],
+    "consultation_fee": 1500,
+    "fee_schedule": {
+      "chat": 750,
+      "voice": 1125,
+      "video": 1500,
+      "in_person": 2250,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "VERIFIED",
+    "admin_remarks": "Reinstated verified status.",
+    "is_available": true,
+    "rating_avg": 5,
+    "profile_bio": "High Court advocate practicing civil litigation and real estate disputes.",
+    "verification_documents": [
+      {
+        "id": "vdoc-1793021584179-0",
+        "title": "Bar_Certificate.pdf",
+        "type": "Bar Enrollment Certificate",
+        "url": "#",
+        "sizeFormatted": "Uploaded File",
+        "verified": true,
+        "uploadedAt": "2026-10-26"
+      },
+      {
+        "id": "vdoc-1793021584179-1",
+        "title": "Bar_ID.pdf",
+        "type": "Bar Council Photo ID",
+        "url": "#",
+        "sizeFormatted": "Uploaded File",
+        "verified": true,
+        "uploadedAt": "2026-10-26"
+      }
+    ],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T13:33:16.865Z",
+    "reviewed_by_admin": "adminvidhisetu@gmail.com",
+    "reviewed_at": "2026-10-26T13:33:17.000Z",
+    "created_at": "2026-10-26T13:33:04.179Z",
+    "updated_at": "2026-10-26T13:33:17.000Z",
+    "status_notification_sent": false,
+    "status_notification_status": "failed",
+    "status_notification_error": "Advocate recipient validation failed: Placeholder or unroutable domain (@vidhisetu.in) rejected to prevent delivery failure.",
+    "status_notification_attempted_at": "2026-10-26T13:33:17.004Z"
+  },
+  {
+    "id": "law-del-7087",
+    "user_id": "usr_6405d8c79901a2c8",
+    "name": "Unverified Advocate Candidate",
+    "email": "pending_adv_1793021583473@vidhisetu.in",
+    "phone": "+91 99999 11111",
+    "photoUrl": "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400",
+    "bar_registration_number": "DEL/PENDING/1793021583473",
+    "state_bar_council": "Delhi",
+    "year_of_enrollment": 2026,
+    "years_of_experience": 1,
+    "primary_jurisdiction": "Delhi",
+    "primary_court": "District & Sessions Court",
+    "location_city": "Bengaluru",
+    "languages": [
+      "English"
+    ],
+    "specializations": [
+      "civil_law",
+      "consumer_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [
+      "video",
+      "voice",
+      "chat"
+    ],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application under review by administrative council.",
+    "is_available": false,
+    "rating_avg": 5,
+    "profile_bio": "Advocate practicing at State Bar Council.",
+    "verification_documents": [],
+    "availability": {
+      "workingDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "slotDuration": 30,
+      "bufferMinutes": 15,
+      "slots": [
+        "10:00 AM",
+        "11:30 AM",
+        "02:30 PM",
+        "04:00 PM"
+      ]
+    },
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T13:33:21.469Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T13:33:17.251Z",
+    "updated_at": "2026-10-26T13:33:17.251Z"
+  },
+  {
+    "id": "lawyer_3103f432f387",
+    "user_id": "usr_09055dde16e199c1",
+    "name": "Anushka",
+    "email": "anushkareddy3129@gmail.com",
+    "phone": "+919705937165",
+    "photoUrl": null,
+    "bar_registration_number": "KAR/2012/5894",
+    "state_bar_council": "Bar Council of Delhi",
+    "year_of_enrollment": 2022,
+    "years_of_experience": 4,
+    "primary_jurisdiction": "Telangana",
+    "primary_court": "high court",
+    "location_city": "Hyderabad",
+    "languages": [
+      "telugu",
+      "english"
+    ],
+    "specializations": [
+      "consumer_protection",
+      "tenancy_disputes"
+    ],
+    "consultation_fee": 1000,
+    "fee_schedule": {
+      "chat": 500,
+      "voice": 750,
+      "video": 1000,
+      "in_person": 1500,
+      "durationMinutes": 30,
+      "currency": "INR"
+    },
+    "consultation_modes": [],
+    "verification_status": "PENDING",
+    "admin_remarks": "Application submitted. Verification is pending administrative review.",
+    "is_available": false,
+    "rating_avg": null,
+    "profile_bio": "",
+    "verification_documents": [
+      {
+        "id": "vdoc_cbf7c1fdd3b009355e16eeab",
+        "title": "bar1.png",
+        "type": "Bar Enrollment Certificate",
+        "url": "/api/uploads/verification-docs/bar1_cbf7c1fdd3b009355e16eeab.png",
+        "sizeFormatted": "302 KB",
+        "verified": false,
+        "uploadedAt": "2026-10-26T19:44:56.049Z"
+      },
+      {
+        "id": "vdoc_a04d7284da3f3e676fbd1bab",
+        "title": "bar2.png",
+        "type": "Advocate Identity Card",
+        "url": "/api/uploads/verification-docs/bar2_a04d7284da3f3e676fbd1bab.png",
+        "sizeFormatted": "917 KB",
+        "verified": false,
+        "uploadedAt": "2026-10-26T19:44:56.046Z"
+      }
+    ],
+    "notification_sent": true,
+    "notification_status": "accepted",
+    "notification_error": null,
+    "notification_attempted_at": "2026-10-26T19:45:01.317Z",
+    "reviewed_by_admin": null,
+    "reviewed_at": null,
+    "created_at": "2026-10-26T19:44:56.051Z",
+    "updated_at": "2026-10-26T19:44:56.051Z"
+  }
+]

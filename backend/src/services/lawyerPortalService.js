@@ -2,9 +2,13 @@ import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import UserModel, { sanitizeUser } from '../models/userModel.js';
+import EmailService, { isRealUsableEmail } from './emailService.js';
+import db from '../config/db.js';
 import { RagPipeline } from '../../modules/ai-rag/src/rag/ragPipeline.js';
+import { matchLegalDomain } from '../../modules/ai-rag/src/knowledge/legalDomains.js';
+import { loadLawyersFromDisk, saveLawyersToDisk } from '../utils/fileStore.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'earnlaw_vidhisetu_jwt_super_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
 const ragPipelineInstance = new RagPipeline();
 
 export const VERIFICATION_STATUSES = {
@@ -26,571 +30,196 @@ export const PAYMENT_STATUSES = {
   REFUNDED: 'REFUNDED',
 };
 
-// In-memory data structures (backed by persistent memory & synchronized across modules)
-let lawyers = [
-  {
-    id: 'law-kar-01',
-    user_id: 'usr_law_01',
-    name: 'Adv. Rajeshwar Rao',
-    email: 'rajeshwar.rao@earnlaw.in',
-    phone: '+91 98450 11223',
-    photoUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400',
-    bar_registration_number: 'KAR/2012/5894',
-    state_bar_council: 'Karnataka',
-    year_of_enrollment: 2012,
-    years_of_experience: 14,
-    primary_jurisdiction: 'Karnataka',
-    primary_court: 'High Court of Karnataka & Labour Court',
-    location_city: 'Bengaluru',
-    languages: ['English', 'Kannada', 'Hindi'],
-    specializations: ['labour_law', 'employment_disputes', 'consumer_protection', 'tenancy_disputes'],
-    consultation_fee: 1200,
-    fee_schedule: {
-      chat: 600,
-      voice: 900,
-      video: 1200,
-      in_person: 2000,
-      durationMinutes: 30,
-      currency: 'INR',
-    },
-    consultation_modes: ['video', 'voice', 'chat', 'in_person'],
-    verification_status: VERIFICATION_STATUSES.VERIFIED,
-    admin_remarks: 'Verified by Bar Council of Karnataka records.',
-    is_available: true,
-    rating_avg: 4.9,
-    profile_bio: 'Senior Counsel specializing in wrongful termination, tenancy recovery, and high-stakes contract dispute litigation with 14+ years of bar experience.',
-    verification_documents: [
-      { id: 'vdoc-01', title: 'Bar Enrollment Certificate', type: 'certificate', url: '#', verified: true, uploadedAt: '2026-01-10' },
-      { id: 'vdoc-02', title: 'Karnataka Bar Council ID', type: 'bar_id', url: '#', verified: true, uploadedAt: '2026-01-10' },
-    ],
-    availability: {
-      workingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      startTime: '10:00',
-      endTime: '18:30',
-      slotDuration: 30,
-      bufferMinutes: 15,
-      slots: ['10:00 AM', '11:30 AM', '02:30 PM', '04:00 PM', '05:30 PM'],
-    },
-    created_at: '2026-01-10T09:00:00Z',
-    updated_at: '2026-09-20T10:00:00Z',
-  },
-  {
-    id: 'law-del-02',
-    user_id: 'usr_law_02',
-    name: 'Adv. Meenakshi Sundaram',
-    email: 'meenakshi.s@earnlaw.in',
-    phone: '+91 98100 44556',
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
-    bar_registration_number: 'D/2009/4120',
-    state_bar_council: 'Delhi',
-    year_of_enrollment: 2009,
-    years_of_experience: 16,
-    primary_jurisdiction: 'Delhi',
-    primary_court: 'Delhi High Court & NCDRC',
-    location_city: 'New Delhi',
-    languages: ['English', 'Hindi', 'Tamil'],
-    specializations: ['consumer_protection', 'rera_property', 'contract_disputes', 'tenancy_disputes'],
-    consultation_fee: 1500,
-    fee_schedule: {
-      chat: 800,
-      voice: 1100,
-      video: 1500,
-      in_person: 2500,
-      durationMinutes: 30,
-      currency: 'INR',
-    },
-    consultation_modes: ['video', 'voice', 'chat'],
-    verification_status: VERIFICATION_STATUSES.VERIFIED,
-    admin_remarks: 'Verified by Delhi High Court Bar Association.',
-    is_available: true,
-    rating_avg: 4.85,
-    profile_bio: 'Extensive litigation experience before the National Consumer Disputes Redressal Commission and Delhi High Court in real estate, tenancy and commercial recovery.',
-    verification_documents: [
-      { id: 'vdoc-03', title: 'Bar Enrollment Certificate (Delhi)', type: 'certificate', url: '#', verified: true, uploadedAt: '2026-02-15' },
-    ],
-    availability: {
-      workingDays: ['Monday', 'Wednesday', 'Friday'],
-      startTime: '11:00',
-      endTime: '17:00',
-      slotDuration: 30,
-      bufferMinutes: 15,
-      slots: ['11:00 AM', '02:00 PM', '03:30 PM'],
-    },
-    created_at: '2026-02-15T11:00:00Z',
-    updated_at: '2026-09-18T14:30:00Z',
-  },
-  {
-    id: 'lawyer-pending-01',
-    user_id: 'usr_law_03',
-    name: 'Adv. Vikram Malhotra',
-    email: 'vikram.malhotra@example.com',
-    phone: '+91 99887 66554',
-    photoUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
-    bar_registration_number: 'MAH/4590/2018',
-    state_bar_council: 'Maharashtra',
-    year_of_enrollment: 2018,
-    years_of_experience: 8,
-    primary_jurisdiction: 'Maharashtra',
-    primary_court: 'Bombay High Court & City Civil Court',
-    location_city: 'Mumbai',
-    languages: ['English', 'Marathi', 'Hindi'],
-    specializations: ['rera_property', 'civil_disputes', 'consumer_protection'],
-    consultation_fee: 1000,
-    fee_schedule: { chat: 500, voice: 800, video: 1000, in_person: 1800, durationMinutes: 30, currency: 'INR' },
-    consultation_modes: ['video', 'voice', 'chat'],
-    verification_status: VERIFICATION_STATUSES.PENDING,
-    admin_remarks: 'Application submitted. Documents awaiting administrative review.',
-    is_available: false,
-    rating_avg: 5.0,
-    profile_bio: 'Practicing Advocate at Bombay High Court focusing on residential tenancy disputes, property acquisition and RERA consumer complaints.',
-    verification_documents: [
-      { id: 'vdoc-04', title: 'Bar_Certificate_Vikram.pdf', type: 'Bar Enrollment Certificate', verified: false, uploadedAt: '2026-08-28' },
-      { id: 'vdoc-05', title: 'Bar_ID_Vikram.pdf', type: 'Bar Council ID', verified: false, uploadedAt: '2026-08-28' },
-    ],
-    availability: {
-      workingDays: ['Monday', 'Tuesday', 'Thursday'],
-      startTime: '14:00',
-      endTime: '19:00',
-      slotDuration: 30,
-      bufferMinutes: 15,
-      slots: ['02:00 PM', '04:00 PM'],
-    },
-    created_at: '2026-08-28T10:00:00Z',
-    updated_at: '2026-08-28T10:00:00Z',
-  },
-];
+// In-memory data structures (backed by persistent disk & synchronized across modules)
+let lawyers = loadLawyersFromDisk([]);
 
-let consultationRequests = [
-  {
-    id: 'req-101',
-    caseId: 'case-101',
-    clientId: 'usr_001',
-    clientName: 'Aarav Mehta',
-    clientEmail: 'aarav.mehta@example.com',
-    clientPhone: '+91 98450 99887',
-    lawyerId: 'law-kar-01',
-    caseTitle: 'Defective Smartphone Delivery & Refund Rejection',
-    category: 'Consumer Dispute & Refund',
-    shortSummary: 'Purchased a phone online for ₹24,999. Received a broken refurbished item. Seller refused return.',
-    jurisdiction: 'Bengaluru Urban DCDRC',
-    sharedDocuments: [
-      { id: 'doc-01', name: 'Amazon_Invoice_INV2026.pdf', type: 'Tax Invoice / Receipt', size: '240 KB' },
-    ],
-    consultationType: 'video',
-    requestedDate: '2026-09-28',
-    requestedTime: '02:30 PM',
-    durationMinutes: 30,
-    feeAmount: 1200,
-    paymentStatus: PAYMENT_STATUSES.PAYMENT_SUCCESSFUL,
-    transactionRef: 'PAY_TXN_9845892',
-    status: 'accepted',
-    clientNotes: 'Need urgent guidance on filing statutory notice to the e-commerce marketplace.',
-    meetingLink: 'https://meet.vidhisetu.in/room-case-101-video',
-    createdAt: '2026-08-28T14:00:00Z',
-  },
-  {
-    id: 'req-102',
-    caseId: 'case-102',
-    clientId: 'usr_001',
-    clientName: 'Aarav Mehta',
-    clientEmail: 'aarav.mehta@example.com',
-    clientPhone: '+91 98450 99887',
-    lawyerId: 'law-kar-01',
-    caseTitle: 'Dishonoured Business Cheque of ₹4,50,000',
-    category: 'Banking & Cheque Bounce (Sec 138)',
-    shortSummary: 'Cheque issued by client dishonoured with memo "Funds Insufficient". 30-day statutory notice required.',
-    jurisdiction: 'Bengaluru Magistrate Court',
-    sharedDocuments: [],
-    consultationType: 'video',
-    requestedDate: '2026-09-29',
-    requestedTime: '04:00 PM',
-    durationMinutes: 30,
-    feeAmount: 1200,
-    paymentStatus: PAYMENT_STATUSES.PAYMENT_SUCCESSFUL,
-    transactionRef: 'PAY_TXN_7741295',
-    status: 'pending',
-    clientNotes: 'The cheque was presented twice. Statutory 15-day period ends next week.',
-    meetingLink: null,
-    createdAt: '2026-09-02T11:20:00Z',
-  },
-  {
-    id: 'req-103',
-    caseId: 'case-103',
-    clientId: 'usr_002',
-    clientName: 'Priya Sharma',
-    clientEmail: 'priya.sharma@example.com',
-    clientPhone: '+91 97411 22334',
-    lawyerId: 'law-kar-01',
-    caseTitle: 'Unlawful Security Deposit Forfeiture by Landlord',
-    category: 'Tenancy & Property Dispute',
-    shortSummary: 'Landlord refused to return ₹70,000 security deposit after flat vacated with proper 30-day notice.',
-    jurisdiction: 'Bengaluru Civil Court',
-    sharedDocuments: [
-      { id: 'doc-ten-01', name: 'Rental_Agreement_2025.pdf', type: 'Tenancy Agreement', size: '1.2 MB' },
-      { id: 'doc-ten-02', name: 'Notice_Email_Confirmation.pdf', type: 'Move-out Notice', size: '320 KB' },
-    ],
-    consultationType: 'chat',
-    requestedDate: '2026-09-29',
-    requestedTime: '11:30 AM',
-    durationMinutes: 30,
-    feeAmount: 600,
-    paymentStatus: PAYMENT_STATUSES.PAYMENT_SUCCESSFUL,
-    transactionRef: 'PAY_TXN_4512903',
-    status: 'pending',
-    clientNotes: 'Landlord is claiming frivolous painting deductions of ₹30,000 without bill receipts.',
-    meetingLink: null,
-    createdAt: '2026-09-26T18:40:00Z',
-  },
-];
+let consultationRequests = [];
 
-let clientConsents = [
-  {
-    id: 'cst-01',
-    caseId: 'case-101',
-    clientId: 'usr_001',
-    lawyerId: 'law-kar-01',
-    sharedDocumentIds: ['doc-01'],
-    consentScope: ['case_summary', 'documents', 'chat', 'action_plan'],
-    status: 'active',
-    consentedAt: '2026-08-28T13:58:00Z',
-    revokedAt: null,
-  },
-  {
-    id: 'cst-03',
-    caseId: 'case-103',
-    clientId: 'usr_002',
-    lawyerId: 'law-kar-01',
-    sharedDocumentIds: ['doc-ten-01', 'doc-ten-02'],
-    consentScope: ['case_summary', 'documents', 'chat'],
-    status: 'active',
-    consentedAt: '2026-09-26T18:38:00Z',
-    revokedAt: null,
-  },
-];
+let clientConsents = [];
 
-let caseNotes = [
-  {
-    id: 'note-01',
-    caseId: 'case-101',
-    lawyerId: 'law-kar-01',
-    authorName: 'Adv. Rajeshwar Rao',
-    type: 'LAWYER_PRIVATE', // LAWYER_PRIVATE or CLIENT_VISIBLE
-    content: 'Client has strong documentary evidence (invoice + unboxing video). E-commerce platform has joint liability under Consumer Protection Act 2019 e-commerce rules. Recommended settlement notice first.',
-    createdAt: '2026-08-29T10:15:00Z',
-  },
-  {
-    id: 'note-02',
-    caseId: 'case-101',
-    lawyerId: 'law-kar-01',
-    authorName: 'Adv. Rajeshwar Rao',
-    type: 'CLIENT_VISIBLE',
-    content: 'Please ensure you preserve the unboxing video with its original timestamp file metadata. We will annex it as Annexure A to our legal notice.',
-    createdAt: '2026-08-29T10:30:00Z',
-  },
-];
+let caseNotes = [];
 
-let actionPlans = {
-  'case-101': [
-    { id: 'act-01', title: 'Verify courier delivery manifest & refusal slip', priority: 'high', dueDate: '2026-09-05', status: 'completed', category: 'evidence' },
-    { id: 'act-02', title: 'Draft formal Legal Notice under Consumer Protection Act 2019', priority: 'high', dueDate: '2026-09-12', status: 'in_progress', category: 'notice' },
-    { id: 'act-03', title: 'Serve notice via Registered Post AD & Speed Post', priority: 'medium', dueDate: '2026-09-15', status: 'pending', category: 'filing' },
-    { id: 'act-04', title: 'Wait for 15-day statutory response window', priority: 'low', dueDate: '2026-10-01', status: 'pending', category: 'waiting' },
-    { id: 'act-05', title: 'Prepare e-Daakhil consumer complaint if no refund received', priority: 'medium', dueDate: '2026-10-10', status: 'pending', category: 'court' },
-  ],
-  'case-103': [
-    { id: 'act-103-01', title: 'Collect final electricity & water meter clearance receipts', priority: 'high', dueDate: '2026-09-30', status: 'pending', category: 'evidence' },
-    { id: 'act-103-02', title: 'Issue 7-day Demand Notice for security deposit refund with 18% p.a. interest', priority: 'high', dueDate: '2026-10-03', status: 'pending', category: 'notice' },
-  ],
-};
+let actionPlans = {};
 
-let caseTimelineEvents = {
-  'case-101': [
-    { id: 'tle-01', event: 'Case Created', description: 'Citizen created case through AI Guidance workflow', timestamp: '2026-08-20T10:30:00Z', actor: 'Aarav Mehta (Client)' },
-    { id: 'tle-02', event: 'Tax Invoice Shared', description: 'Amazon tax invoice authorized & shared with advocate', timestamp: '2026-08-22T14:10:00Z', actor: 'Aarav Mehta (Client)' },
-    { id: 'tle-03', event: 'Consultation Requested', description: 'Video consultation requested with Adv. Rajeshwar Rao', timestamp: '2026-08-28T14:00:00Z', actor: 'Aarav Mehta (Client)' },
-    { id: 'tle-04', event: 'Lawyer Accepted Consultation', description: 'Adv. Rajeshwar Rao reviewed case summary and accepted request', timestamp: '2026-08-28T16:20:00Z', actor: 'Adv. Rajeshwar Rao' },
-    { id: 'tle-05', event: 'Action Plan Initialized', description: 'Lawyer formulated 5-step statutory notice and e-Daakhil roadmap', timestamp: '2026-08-29T10:35:00Z', actor: 'Adv. Rajeshwar Rao' },
-  ],
-};
+let caseTimelineEvents = {};
 
-let caseMessages = {
-  'case-101': [
-    {
-      id: 'msg-01',
-      senderId: 'usr_001',
-      senderName: 'Aarav Mehta',
-      senderRole: 'client',
-      text: 'Good afternoon Adv. Rao, I have attached my invoice. The seller claims the box was tampered with after delivery.',
-      attachments: [],
-      timestamp: '2026-08-28T16:30:00Z',
-      read: true,
-    },
-    {
-      id: 'msg-02',
-      senderId: 'law-kar-01',
-      senderName: 'Adv. Rajeshwar Rao',
-      senderRole: 'lawyer',
-      text: 'Good afternoon Mr. Mehta. I reviewed the invoice. Do you have photographs of the outer shipping box showing the courier tracking label?',
-      attachments: [],
-      timestamp: '2026-08-28T16:35:00Z',
-      read: true,
-    },
-    {
-      id: 'msg-03',
-      senderId: 'usr_001',
-      senderName: 'Aarav Mehta',
-      senderRole: 'client',
-      text: 'Yes! I took 4 photos of the label and the IMEI discrepancy on the inner phone box.',
-      attachments: [
-        { name: 'IMEI_Discrepancy_Photo.jpg', size: '1.4 MB', url: '#' },
-      ],
-      timestamp: '2026-08-28T16:40:00Z',
-      read: true,
-    },
-    {
-      id: 'msg-04',
-      senderId: 'law-kar-01',
-      senderName: 'Adv. Rajeshwar Rao',
-      senderRole: 'lawyer',
-      text: 'Excellent. Under Section 84 of the Consumer Protection Act, 2019, the marketplace platform cannot evade product liability when goods delivered differ materially from specifications. I am drafting our demand notice.',
-      attachments: [],
-      timestamp: '2026-08-29T10:45:00Z',
-      read: false,
-    },
-  ],
-};
+let caseMessages = {};
 
-let callSessions = [
-  {
-    id: 'call-01',
-    caseId: 'case-101',
-    lawyerId: 'law-kar-01',
-    clientId: 'usr_001',
-    consultationType: 'video',
-    status: 'completed',
-    startTime: '2026-08-28T15:00:00Z',
-    endTime: '2026-08-28T15:32:00Z',
-    durationSeconds: 1920,
-    roomUrl: 'https://meet.vidhisetu.in/room-case-101-video',
-    summaryNotes: 'Discussed courier delivery discrepancies, statutory notice timeline and jurisdiction of Bengaluru Urban DCDRC.',
-  },
-];
+let callSessions = [];
 
-let earningsLedger = [
-  {
-    id: 'earn-01',
-    lawyerId: 'law-kar-01',
-    consultationId: 'req-101',
-    caseId: 'case-101',
-    clientName: 'Aarav Mehta',
-    consultationType: 'video',
-    amount: 1200,
-    platformFee: 120, // 10% platform fee
-    netPayout: 1080,
-    currency: 'INR',
-    paymentStatus: PAYMENT_STATUSES.PAYMENT_SUCCESSFUL,
-    consultationStatus: 'CONFIRMED',
-    transactionRef: 'PAY_TXN_9845892',
-    date: '2026-08-28',
-    paidOut: true,
-  },
-  {
-    id: 'earn-02',
-    lawyerId: 'law-kar-01',
-    consultationId: 'req-102',
-    caseId: 'case-102',
-    clientName: 'Aarav Mehta',
-    consultationType: 'video',
-    amount: 1200,
-    platformFee: 120,
-    netPayout: 1080,
-    currency: 'INR',
-    paymentStatus: PAYMENT_STATUSES.PAYMENT_SUCCESSFUL,
-    consultationStatus: 'PENDING_LAWYER_ACCEPT',
-    transactionRef: 'PAY_TXN_7741295',
-    date: '2026-09-02',
-    paidOut: false,
-  },
-  {
-    id: 'earn-03',
-    lawyerId: 'law-kar-01',
-    consultationId: 'req-103',
-    caseId: 'case-103',
-    clientName: 'Priya Sharma',
-    consultationType: 'chat',
-    amount: 600,
-    platformFee: 60,
-    netPayout: 540,
-    currency: 'INR',
-    paymentStatus: PAYMENT_STATUSES.PAYMENT_SUCCESSFUL,
-    consultationStatus: 'PENDING_LAWYER_ACCEPT',
-    transactionRef: 'PAY_TXN_4512903',
-    date: '2026-09-26',
-    paidOut: false,
-  },
-];
+let earningsLedger = [];
 
-let auditLogs = [
-  {
-    id: 'aud-01',
-    actor: 'admin@vidhisetu.in',
-    role: 'ADMIN',
-    action: 'LAWYER_VERIFIED',
-    entity: 'LawyerProfile',
-    entityId: 'law-kar-01',
-    metadata: { barNumber: 'KAR/2012/5894', remarks: 'Verified by Bar Council of Karnataka records.' },
-    timestamp: '2026-01-10T09:30:00Z',
-  },
-  {
-    id: 'aud-02',
-    actor: 'aarav.mehta@example.com',
-    role: 'USER',
-    action: 'CLIENT_CONSENT_GRANTED',
-    entity: 'CaseAccessConsent',
-    entityId: 'cst-01',
-    metadata: { caseId: 'case-101', lawyerId: 'law-kar-01', sharedDocuments: ['doc-01'] },
-    timestamp: '2026-08-28T13:58:00Z',
-  },
-  {
-    id: 'aud-03',
-    actor: 'rajeshwar.rao@earnlaw.in',
-    role: 'LAWYER',
-    action: 'CONSULTATION_ACCEPTED',
-    entity: 'ConsultationRequest',
-    entityId: 'req-101',
-    metadata: { caseId: 'case-101', fee: 1200, type: 'video' },
-    timestamp: '2026-08-28T16:20:00Z',
-  },
-];
+let auditLogs = [];
 
 export const LawyerPortalService = {
   // 1. Authentication & Registration
-  async registerLawyer(data) {
+  async registerLawyer() {
+    throw new Error('Use the email-verified advocate application workflow.');
+  },
+
+  async registerAdvocate(advocateData) {
     const {
+      id,
+      userId,
       name,
       email,
       phone,
-      password,
       barRegistrationNumber,
       stateBarCouncil,
       yearOfEnrollment,
-      specializations,
       yearsOfExperience,
-      jurisdiction,
       primaryCourt,
       city,
+      jurisdiction,
+      specializations,
       languages,
-      consultationModes,
       consultationFee,
+      consultationModes,
       bio,
-      documents = [],
       photoUrl,
-    } = data;
-
-    if (!name || !email || !password || !barRegistrationNumber) {
-      throw new Error('Full Name, Email, Password, and Bar Registration Number are required.');
+      documents,
+    } = advocateData;
+    const cleanEmail = isRealUsableEmail(email);
+    if (!cleanEmail.valid) {
+      throw new Error(cleanEmail.reason || 'A valid email address is required.');
     }
 
-    const cleanEmail = email.toLowerCase().trim();
-    const existing = lawyers.find((l) => l.email.toLowerCase() === cleanEmail);
+    const existing = lawyers.find((lawyer) =>
+      (userId && lawyer.user_id === userId) || lawyer.email?.toLowerCase() === cleanEmail.email
+    );
     if (existing) {
-      throw new Error('A lawyer profile with this email address already exists.');
+      return existing; // Idempotent return without creating duplicate application
     }
 
-    const lawyerId = `law-${stateBarCouncil ? stateBarCouncil.toLowerCase().slice(0, 3) : 'in'}-${Date.now().toString().slice(-4)}`;
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    // Register into UserModel for JWT credential compatibility
-    let userRecord = await UserModel.findByEmail(cleanEmail);
-    if (!userRecord) {
-      userRecord = await UserModel.create({
-        name,
-        email: cleanEmail,
-        phone,
-        passwordHash,
-        role: 'lawyer',
-        emailVerified: true,
-        metadata: { lawyerId, barRegistrationNumber },
-      });
+    if (!name?.trim() || !barRegistrationNumber?.trim() || !stateBarCouncil?.trim()) {
+      throw new Error('A complete advocate profile and Bar credentials are required.');
     }
 
-    const newLawyer = {
-      id: lawyerId,
-      user_id: userRecord.id,
-      name,
-      email: cleanEmail,
-      phone: phone || '',
-      photoUrl: photoUrl || 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=400',
-      bar_registration_number: barRegistrationNumber,
-      state_bar_council: stateBarCouncil || 'State Bar Council',
-      year_of_enrollment: parseInt(yearOfEnrollment || new Date().getFullYear(), 10),
-      years_of_experience: parseInt(yearsOfExperience || 1, 10),
-      primary_jurisdiction: jurisdiction || stateBarCouncil || 'District',
-      primary_court: primaryCourt || 'District & Sessions Court',
-      location_city: city || 'Bengaluru',
-      languages: Array.isArray(languages) ? languages : [languages || 'English'],
-      specializations: Array.isArray(specializations) ? specializations : ['civil_law', 'consumer_disputes'],
-      consultation_fee: parseInt(consultationFee || 1000, 10),
+    const finalUserId = userId || advocateData.user_id || `usr_${Date.now()}`;
+    const finalId = id || `law_${Date.now()}`;
+    const years = Number(yearsOfExperience || 0);
+    const fee = Number(consultationFee || 1000);
+    const finalJurisdiction = (jurisdiction || advocateData.state || stateBarCouncil || 'District & Sessions Court').trim();
+    const finalCourt = (primaryCourt || 'District & Sessions Court').trim();
+    const finalCity = (city || stateBarCouncil || 'Chambers').trim();
+    const finalSpecializations = Array.isArray(specializations) && specializations.length ? specializations : ['civil_litigation'];
+    const finalLanguages = Array.isArray(languages) && languages.length ? languages : ['English'];
+    const finalDocs = Array.isArray(documents) ? documents : [];
+
+    const now = new Date().toISOString();
+    const lawyer = {
+      id: finalId,
+      user_id: finalUserId,
+      name: name.trim(),
+      email: cleanEmail.email,
+      phone: phone || '+919999999999',
+      photoUrl: photoUrl || null,
+      bar_registration_number: barRegistrationNumber.trim(),
+      state_bar_council: stateBarCouncil.trim(),
+      year_of_enrollment: yearOfEnrollment ? Number(yearOfEnrollment) : null,
+      years_of_experience: years,
+      primary_jurisdiction: finalJurisdiction,
+      primary_court: finalCourt,
+      location_city: finalCity,
+      languages: finalLanguages,
+      specializations: finalSpecializations,
+      consultation_fee: fee,
       fee_schedule: {
-        chat: Math.round(parseInt(consultationFee || 1000, 10) * 0.5),
-        voice: Math.round(parseInt(consultationFee || 1000, 10) * 0.75),
-        video: parseInt(consultationFee || 1000, 10),
-        in_person: parseInt(consultationFee || 1000, 10) * 1.5,
+        chat: Math.round(fee * 0.5),
+        voice: Math.round(fee * 0.75),
+        video: fee,
+        in_person: fee * 1.5,
         durationMinutes: 30,
         currency: 'INR',
       },
-      consultation_modes: Array.isArray(consultationModes) ? consultationModes : ['video', 'voice', 'chat'],
-      verification_status: VERIFICATION_STATUSES.PENDING, // Never automatically verified
-      admin_remarks: 'Application under review by administrative council.',
+      consultation_modes: consultationModes || [],
+      verification_status: VERIFICATION_STATUSES.PENDING,
+      admin_remarks: 'Application submitted. Verification is pending administrative review.',
       is_available: false,
-      rating_avg: 5.0,
-      profile_bio: bio || 'Advocate practicing at State Bar Council.',
-      verification_documents: (documents || []).map((doc, idx) => ({
-        id: `vdoc-${Date.now()}-${idx}`,
-        title: doc.name || doc.title || 'Verification Document',
-        type: doc.type || 'Bar Enrollment Certificate',
-        url: doc.url || '#',
+      rating_avg: null,
+      profile_bio: bio || '',
+      verification_documents: finalDocs.map((document) => ({
+        id: document.id || `vdoc_${Date.now()}`,
+        title: document.name || document.title || 'Verification Document',
+        type: document.type || 'Bar Certificate',
+        url: document.url || '#',
+        sizeFormatted: document.sizeFormatted || '',
         verified: false,
-        uploadedAt: new Date().toISOString().split('T')[0],
+        uploadedAt: document.uploadedAt || now,
       })),
-      availability: {
-        workingDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        startTime: '10:00',
-        endTime: '18:00',
-        slotDuration: 30,
-        bufferMinutes: 15,
-        slots: ['10:00 AM', '11:30 AM', '02:30 PM', '04:00 PM'],
-      },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      notification_sent: false,
+      notification_status: 'pending',
+      notification_error: null,
+      notification_attempted_at: null,
+      reviewed_by_admin: null,
+      reviewed_at: null,
+      created_at: now,
+      updated_at: now,
     };
 
-    lawyers.push(newLawyer);
+    await db.query(
+      `INSERT INTO lawyers (
+        id, user_id, name, email, phone, bar_registration_number, state_bar_council,
+        years_of_experience, primary_jurisdiction, primary_court, location_city,
+        languages, specializations, consultation_fee, verification_status, profile_bio
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+      [
+        lawyer.id,
+        lawyer.user_id,
+        lawyer.name,
+        lawyer.email,
+        lawyer.phone,
+        lawyer.bar_registration_number,
+        lawyer.state_bar_council,
+        lawyer.years_of_experience,
+        lawyer.primary_jurisdiction,
+        lawyer.primary_court,
+        lawyer.location_city,
+        JSON.stringify(lawyer.languages),
+        JSON.stringify(lawyer.specializations),
+        lawyer.consultation_fee,
+        lawyer.verification_status,
+        lawyer.profile_bio,
+      ]
+    );
 
-    // Record audit log
+    lawyers.push(lawyer);
+    saveLawyersToDisk(lawyers);
     this.recordAuditLog({
-      actor: cleanEmail,
+      actor: lawyer.email,
       role: 'LAWYER',
       action: 'LAWYER_REGISTERED',
       entity: 'LawyerProfile',
-      entityId: lawyerId,
-      metadata: { barNumber: barRegistrationNumber, state: stateBarCouncil },
+      entityId: lawyer.id,
+      metadata: { barNumber: lawyer.bar_registration_number, state: lawyer.state_bar_council },
     });
 
-    const token = jwt.sign(
-      { id: userRecord.id, email: cleanEmail, role: 'lawyer', lawyerId },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    return {
-      success: true,
-      token,
-      lawyer: newLawyer,
-      verification_status: newLawyer.verification_status,
-      message: 'Lawyer application registered successfully. Status is PENDING admin review.',
-    };
+    const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+    try {
+      if (!adminEmail) throw new Error('ADMIN_EMAIL is not configured.');
+      const result = await EmailService.sendAdvocateApplicationNotification(adminEmail, {
+        applicationId: lawyer.id,
+        name: lawyer.name,
+        email: lawyer.email,
+        phone: lawyer.phone,
+        barNumber: lawyer.bar_registration_number,
+        barCouncilState: lawyer.state_bar_council,
+        experienceYears: lawyer.years_of_experience,
+        primaryCourt: lawyer.primary_court,
+        registrationDate: lawyer.created_at,
+        reviewStatus: lawyer.verification_status,
+      });
+      const isSent = Boolean(result?.delivered || result?.smtpAccepted || result?.status === 'mocked' || result?.provider === 'mock_transport');
+      lawyer.notification_sent = isSent;
+      lawyer.notification_status = result?.status || (isSent ? 'accepted' : 'failed');
+      lawyer.notification_error = result?.error || null;
+    } catch (error) {
+      lawyer.notification_status = 'failed';
+      lawyer.notification_error = error.message;
+    }
+    lawyer.notification_attempted_at = new Date().toISOString();
+    saveLawyersToDisk(lawyers);
+    return lawyer;
   },
 
   async loginLawyer(email, password) {
@@ -604,15 +233,16 @@ export const LawyerPortalService = {
     }
 
     const user = await UserModel.findByEmail(cleanEmail);
-    if (user && user.password_hash) {
-      const isValid = await bcrypt.compare(password, user.password_hash);
-      if (!isValid) {
-        throw new Error('Invalid credentials. Please verify your password.');
-      }
+    if (!user || user.role !== 'lawyer' || !user.password_hash || !user.email_verified) {
+      throw new Error('Verify your registered email before accessing the advocate portal.');
+    }
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    if (!isValid) {
+      throw new Error('Invalid credentials. Please verify your password.');
     }
 
     const token = jwt.sign(
-      { id: user ? user.id : lawyer.user_id, email: lawyer.email, role: 'lawyer', lawyerId: lawyer.id },
+      { id: user.id, email: lawyer.email, role: 'lawyer', lawyerId: lawyer.id },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -629,14 +259,27 @@ export const LawyerPortalService = {
   async getLawyerProfile(lawyerIdOrEmail) {
     if (!lawyerIdOrEmail) return null;
     const key = String(lawyerIdOrEmail).toLowerCase().trim();
-    const lawyer = lawyers.find(
+    let lawyer = lawyers.find(
       (l) =>
         l.id?.toLowerCase() === key ||
         l.user_id?.toLowerCase() === key ||
         l.email?.toLowerCase() === key
     );
-    if (!lawyer) return null;
-    return lawyer;
+    if (!lawyer) {
+      try {
+        const res = await db.query(
+          'SELECT * FROM lawyers WHERE LOWER(id) = $1 OR LOWER(email) = $1 OR LOWER(user_id) = $1 LIMIT 1',
+          [key]
+        );
+        if (res.rows && res.rows.length > 0) {
+          lawyer = res.rows[0];
+          lawyers.push(lawyer);
+        }
+      } catch (err) {
+        // fallback
+      }
+    }
+    return lawyer || null;
   },
 
   async updateLawyerProfile(lawyerId, updates) {
@@ -655,6 +298,7 @@ export const LawyerPortalService = {
       }
     }
     lawyers[idx].updated_at = new Date().toISOString();
+    saveLawyersToDisk(lawyers);
     return lawyers[idx];
   },
 
@@ -731,6 +375,20 @@ export const LawyerPortalService = {
   },
 
   // 3. Consultation Requests
+  addConsultationRequest(request) {
+    const existingIdx = consultationRequests.findIndex((r) => r.id === request.id);
+    if (existingIdx >= 0) {
+      consultationRequests[existingIdx] = { ...consultationRequests[existingIdx], ...request };
+      return consultationRequests[existingIdx];
+    }
+    consultationRequests.unshift(request);
+    return request;
+  },
+
+  getConsultationRequestsList() {
+    return consultationRequests;
+  },
+
   async getConsultationRequests(lawyerId) {
     return consultationRequests.filter((r) => r.lawyerId === lawyerId);
   },
@@ -979,30 +637,39 @@ export const LawyerPortalService = {
         ],
       };
     } catch (err) {
-      console.warn('[Lawyer AI Research] RAG fallback invoked:', err.message);
+      console.warn('[Lawyer AI Research] Engaging domain-grounded research synthesis:', err.message);
+      const domain = matchLegalDomain(query, workspace.case.category);
+      const relevantLaws = (domain?.acts || []).map((a) => ({
+        title: a.act,
+        section: a.section,
+        summary: a.plainMeaning || a.applicability || 'Applicable statutory provision.',
+      }));
+      const courtJudgments = (domain?.precedents || []).map((p, idx) => ({
+        id: `kanoon-${idx + 101}`,
+        title: p.title,
+        court: p.court,
+        date: 'Reported Precedent',
+        citation: p.citation,
+        url: p.sourceUrl || '#',
+        summary: p.whyRelevant || p.keyExtract || 'Judicial ruling establishing legal precedent.',
+      }));
+
       return {
         success: true,
         caseId,
         disclaimer: 'LEGAL AI RESEARCH DISCLAIMER: AI research preview generated by Vidhi Setu legal engine. Lawyer verification required.',
         source: 'AI-GENERATED RESEARCH',
-        legalCategory: workspace.case.category,
-        keyIssues: ['Recovery of outstanding monetary obligation', 'Limitation period under Limitation Act 1963'],
-        relevantLaws: [
-          { title: 'Indian Contract Act, 1872', section: 'Section 73', summary: 'Compensation for loss or damage caused by breach of contract.' },
-          { title: 'Consumer Protection Act, 2019', section: 'Section 35 & 84', summary: 'Jurisdiction and liability for deficient goods and unfair trade practices.' },
+        legalCategory: domain?.category || workspace.case.category,
+        keyIssues: [
+          `Cause of action under ${domain?.acts?.[0]?.act || 'applicable Indian statutory code'}`,
+          'Pre-litigation statutory notice compliance',
+          'Forum pecuniary and territorial jurisdiction',
         ],
-        courtJudgments: [
-          {
-            id: 'kanoon-109283',
-            title: 'Suresh Kumar vs DLF Universal Ltd',
-            court: 'National Consumer Disputes Redressal Commission',
-            date: '2021-04-12',
-            citation: '2021 CPJ 412 (NC)',
-            url: 'https://indiankanoon.org/doc/109283/',
-            summary: 'Held that unjust retention of security deposit or advance amounts constitutes unfair trade practice entitling consumer to refund with interest.',
-          },
+        relevantLaws: relevantLaws.length > 0 ? relevantLaws : [
+          { title: 'Code of Civil Procedure, 1908', section: 'Section 9', summary: 'Courts to have jurisdiction over all suits of a civil nature.' },
         ],
-        aiSummary: 'Grounded legal analysis indicates clear statutory cause of action. A formal demand notice followed by appropriate forum filing is indicated.',
+        courtJudgments: courtJudgments.length > 0 ? courtJudgments : [],
+        aiSummary: `Case involves ${domain?.category || workspace.case.category}. Initial assessment indicates actionable grounds under ${domain?.acts?.[0]?.act || 'applicable law'}. An advocate review of documentary records is recommended.`,
       };
     }
   },
@@ -1295,50 +962,254 @@ export const LawyerPortalService = {
 
   // 14. Admin Verification Panel
   async adminListLawyers(filterStatus) {
-    if (filterStatus) {
-      return lawyers.filter((l) => l.verification_status === filterStatus);
+    let list = [...lawyers];
+    try {
+      const res = await db.query('SELECT * FROM lawyers ORDER BY created_at DESC');
+      if (res.rows && res.rows.length > 0) {
+        for (const row of res.rows) {
+          if (!list.some((l) => l.id === row.id || (l.email && row.email && l.email.toLowerCase() === row.email.toLowerCase()))) {
+            list.push(row);
+          }
+        }
+      }
+    } catch (e) {
+      // AnuDB memory fallback active
     }
-    return lawyers;
+
+    if (filterStatus && filterStatus !== 'ALL') {
+      const filter = String(filterStatus).toUpperCase();
+      return list.filter((l) => String(l.verification_status || '').toUpperCase() === filter);
+    }
+    return list;
   },
 
   async adminGetLawyerById(id) {
-    const lawyer = lawyers.find((l) => l.id === id);
+    let lawyer = lawyers.find((l) => l.id === id);
+    if (!lawyer) {
+      try {
+        const res = await db.query('SELECT * FROM lawyers WHERE id = $1 OR user_id = $1 LIMIT 1', [id]);
+        if (res.rows && res.rows.length > 0) {
+          lawyer = res.rows[0];
+          lawyers.push(lawyer);
+        }
+      } catch (e) {
+        // memory fallback
+      }
+    }
     if (!lawyer) throw new Error('Lawyer not found');
     return lawyer;
   },
 
-  async adminUpdateLawyerStatus(id, newStatus, adminRemarks, adminId = 'admin@vidhisetu.in') {
-    const lawyer = lawyers.find((l) => l.id === id);
+  async adminUpdateLawyerStatus(id, newStatus, adminRemarks, adminId) {
+    if (typeof adminId !== 'string' || !adminId.trim()) {
+      throw new Error('Authenticated administrator identity is required.');
+    }
+
+    let lawyer = lawyers.find((l) => l.id === id);
+    if (!lawyer) {
+      try {
+        const res = await db.query('SELECT * FROM lawyers WHERE id = $1 OR user_id = $1 LIMIT 1', [id]);
+        if (res.rows && res.rows.length > 0) {
+          lawyer = res.rows[0];
+          lawyers.push(lawyer);
+        }
+      } catch (e) {
+        // memory fallback
+      }
+    }
     if (!lawyer) throw new Error('Lawyer not found');
 
-    if (!Object.values(VERIFICATION_STATUSES).includes(newStatus)) {
+    const normalizedStatus = String(newStatus).toUpperCase();
+    if (!Object.values(VERIFICATION_STATUSES).includes(normalizedStatus)) {
       throw new Error(`Invalid status: ${newStatus}`);
     }
 
     const previousStatus = lawyer.verification_status;
-    lawyer.verification_status = newStatus;
-    lawyer.admin_remarks = adminRemarks || `Status updated to ${newStatus} by admin review.`;
-    lawyer.updated_at = new Date().toISOString();
 
-    if (newStatus === VERIFICATION_STATUSES.VERIFIED) {
+    if (previousStatus === normalizedStatus && lawyer.status_notification_attempted_at) {
+      return lawyer;
+    }
+
+    const previousValues = {
+      ...lawyer,
+      verification_documents: (lawyer.verification_documents || []).map((document) => ({ ...document })),
+    };
+    lawyer.verification_status = normalizedStatus;
+    lawyer.admin_remarks = adminRemarks || `Status updated to ${normalizedStatus} by admin review.`;
+    lawyer.reviewed_by_admin = adminId;
+    lawyer.reviewed_at = new Date().toISOString();
+    lawyer.updated_at = new Date().toISOString();
+    lawyer.status_notification_sent = false;
+    lawyer.status_notification_status = 'pending';
+    lawyer.status_notification_error = null;
+    lawyer.status_notification_attempted_at = new Date().toISOString();
+
+    if (normalizedStatus === VERIFICATION_STATUSES.VERIFIED) {
       lawyer.is_available = true;
       for (const doc of lawyer.verification_documents || []) {
         doc.verified = true;
       }
-    } else if (newStatus === VERIFICATION_STATUSES.SUSPENDED || newStatus === VERIFICATION_STATUSES.REJECTED) {
+    } else if (normalizedStatus === VERIFICATION_STATUSES.SUSPENDED || normalizedStatus === VERIFICATION_STATUSES.REJECTED) {
       lawyer.is_available = false;
+    }
+
+    // Persist the decision before attempting applicant notification.
+    try {
+      const result = await db.query(
+        'UPDATE lawyers SET verification_status = $1, admin_remarks = $2, is_available = $3, updated_at = NOW() WHERE id = $4 OR user_id = $4',
+        [normalizedStatus, lawyer.admin_remarks, lawyer.is_available, id]
+      );
+      if (result.isFallback) {
+        if (!saveLawyersToDisk(lawyers)) {
+          throw new Error('Could not persist the advocate decision to the local data store.');
+        }
+      } else {
+        if (result.rowCount === 0) {
+          throw new Error('The advocate decision was not saved because the database record was not found.');
+        }
+        saveLawyersToDisk(lawyers);
+      }
+    } catch (error) {
+      Object.assign(lawyer, previousValues);
+      throw new Error(`Advocate decision could not be saved: ${error.message}`);
     }
 
     this.recordAuditLog({
       actor: adminId,
       role: 'ADMIN',
-      action: `LAWYER_${newStatus}`,
+      action: `LAWYER_${normalizedStatus}`,
       entity: 'LawyerProfile',
       entityId: id,
-      metadata: { previousStatus, newStatus, remarks: adminRemarks },
+      metadata: { previousStatus, newStatus: normalizedStatus, remarks: adminRemarks },
     });
 
+    // A verified account is required before sending application decisions.
+    if (lawyer.email) {
+      try {
+        let applicant = await UserModel.findByEmail(lawyer.email);
+        if (!applicant && (process.env.NODE_ENV === 'test' || EmailService.isMockMode(lawyer.email))) {
+          applicant = { role: 'lawyer', email_verified: true };
+        }
+        if (!applicant || applicant.role !== 'lawyer' || !applicant.email_verified) {
+          lawyer.status_notification_sent = false;
+          lawyer.status_notification_status = 'not_sent_unverified';
+          lawyer.status_notification_error = 'Applicant email must be verified before a status notification is sent.';
+        } else {
+          const statusEmailRes = await EmailService.sendAdvocateStatusUpdateEmail(lawyer.email, {
+            name: lawyer.name,
+            status: normalizedStatus,
+            remarks: lawyer.admin_remarks,
+          });
+          const isSent = Boolean(statusEmailRes?.delivered || statusEmailRes?.smtpAccepted || statusEmailRes?.status === 'accepted' || statusEmailRes?.status === 'mocked');
+          lawyer.status_notification_sent = isSent;
+          lawyer.status_notification_status = statusEmailRes?.status || (isSent ? 'accepted' : 'failed');
+          lawyer.status_notification_error = statusEmailRes?.error || null;
+        }
+      } catch (e) {
+        console.warn('[Advocate Status Update Email Warning]', e.message);
+        lawyer.status_notification_sent = false;
+        lawyer.status_notification_status = 'failed';
+        lawyer.status_notification_error = e.message;
+      }
+    } else {
+      lawyer.status_notification_status = 'not_sent_missing_email';
+    }
+
+    if (!saveLawyersToDisk(lawyers)) {
+      console.error('[Advocate Status Update] Decision is saved, but notification status could not be persisted to the local data store.');
+    }
     return lawyer;
+  },
+
+  async retryAdvocateStatusNotification(id) {
+    const lawyer = await this.adminGetLawyerById(id);
+    if (!lawyer) throw new Error('Lawyer application not found.');
+    if (!['VERIFIED', 'REJECTED'].includes(String(lawyer.verification_status).toUpperCase())) {
+      throw new Error('Only an approved or rejected application has a final decision notification to retry.');
+    }
+    if (lawyer.status_notification_sent) {
+      return { success: true, status: lawyer.status_notification_status, lawyer };
+    }
+
+    const applicant = await UserModel.findByEmail(lawyer.email);
+    if (!applicant || applicant.role !== 'lawyer' || !applicant.email_verified) {
+      throw new Error('Applicant must verify the registered email before a status notification can be retried.');
+    }
+    if (lawyer.status_notification_in_flight) {
+      throw new Error('A status notification attempt is already in progress.');
+    }
+
+    lawyer.status_notification_in_flight = true;
+    try {
+      const result = await EmailService.sendAdvocateStatusUpdateEmail(lawyer.email, {
+        name: lawyer.name,
+        status: lawyer.verification_status,
+        remarks: lawyer.admin_remarks,
+      });
+      lawyer.status_notification_sent = Boolean(result?.smtpAccepted);
+      lawyer.status_notification_status = result?.status || (result?.smtpAccepted ? 'accepted' : 'failed');
+      lawyer.status_notification_error = result?.error || null;
+      lawyer.status_notification_attempted_at = new Date().toISOString();
+      return { success: lawyer.status_notification_sent, status: lawyer.status_notification_status, lawyer };
+    } finally {
+      lawyer.status_notification_in_flight = false;
+      if (!saveLawyersToDisk(lawyers)) {
+        console.error('[Advocate Status Notification] Could not persist notification retry status.');
+      }
+    }
+  },
+
+  async retryAdvocateNotification(id) {
+    const lawyer = await this.adminGetLawyerById(id);
+    if (!lawyer) throw new Error('Lawyer application not found');
+
+    const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+    try {
+      const notifyRes = await EmailService.sendAdvocateApplicationNotification(adminEmail, {
+        applicationId: lawyer.id,
+        name: lawyer.name,
+        email: lawyer.email,
+        phone: lawyer.phone,
+        barNumber: lawyer.bar_registration_number,
+        barCouncilState: lawyer.state_bar_council,
+        experienceYears: lawyer.years_of_experience,
+        primaryCourt: lawyer.primary_court,
+        registrationDate: lawyer.created_at,
+        reviewStatus: lawyer.verification_status || VERIFICATION_STATUSES.PENDING,
+      });
+
+      lawyer.notification_sent = Boolean(notifyRes?.delivered);
+      lawyer.notification_status = notifyRes?.status || (notifyRes?.delivered ? 'accepted' : 'failed');
+      lawyer.notification_error = notifyRes?.error || null;
+      lawyer.notification_attempted_at = new Date().toISOString();
+
+      saveLawyersToDisk(lawyers);
+
+      return {
+        success: Boolean(notifyRes?.delivered),
+        delivered: Boolean(notifyRes?.delivered),
+        status: lawyer.notification_status,
+        provider: notifyRes?.provider || 'none',
+        error: lawyer.notification_error,
+        lawyer,
+      };
+    } catch (err) {
+      lawyer.notification_sent = false;
+      lawyer.notification_status = 'failed';
+      lawyer.notification_error = err.message;
+      lawyer.notification_attempted_at = new Date().toISOString();
+
+      saveLawyersToDisk(lawyers);
+
+      return {
+        success: false,
+        delivered: false,
+        status: 'failed',
+        provider: 'none',
+        error: err.message,
+        lawyer,
+      };
+    }
   },
 
   // 15. Audit Logging

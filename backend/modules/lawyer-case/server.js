@@ -138,7 +138,7 @@ let usersStore = [
   {
     id: 'usr_admin',
     name: 'VidhiSetu Compliance Officer',
-    email: 'admin@vidhisetu.in',
+    email: process.env.ADMIN_EMAIL || 'adminvidhisetu@gmail.com',
     phone: '+91 80000 11111',
     passwordHash: hashPassword('admin123'),
     accountType: 'admin',

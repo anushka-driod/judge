@@ -1,13 +1,32 @@
 import LawyerPortalService, { VERIFICATION_STATUSES } from '../services/lawyerPortalService.js';
+import AuthService from '../services/authService.js';
 
 export const LawyerPortalController = {
   // 1. Lawyer Auth & Profile
   async register(req, res) {
     try {
-      const result = await LawyerPortalService.registerLawyer(req.body);
+      const result = await AuthService.register({
+        ...req.body,
+        accountType: 'advocate',
+        barNumber: req.body.barRegistrationNumber,
+        barCouncilState: req.body.stateBarCouncil,
+        experienceYears: Number(req.body.yearsOfExperience),
+        practiceAreas: req.body.specializations,
+        languages: req.body.languages,
+        consultationFee: Number(req.body.consultationFee),
+        profileBio: req.body.bio,
+        advocateDetails: {
+          enrollmentNumber: req.body.barRegistrationNumber,
+          enrollmentYear: req.body.yearOfEnrollment,
+          barCouncil: req.body.stateBarCouncil,
+          experienceYears: Number(req.body.yearsOfExperience),
+          practiceAreas: req.body.specializations,
+          documents: req.body.documents,
+        },
+      });
       res.status(201).json(result);
     } catch (err) {
-      res.status(400).json({ success: false, error: err.message });
+      res.status(err.status || 400).json({ success: false, error: err.message });
     }
   },
 
@@ -56,10 +75,12 @@ export const LawyerPortalController = {
       res.status(404).json({ success: false, error: 'Lawyer profile not found.' });
       return null;
     }
-    if (lawyer.verification_status !== VERIFICATION_STATUSES.VERIFIED) {
+    const status = String(lawyer.verification_status || '').toUpperCase();
+    if (status !== VERIFICATION_STATUSES.VERIFIED && status !== 'ACTIVE') {
       res.status(403).json({
         success: false,
-        error: `Lawyer portal access restricted. Current verification status is '${lawyer.verification_status}'.`,
+        code: 'ADVOCATE_NOT_VERIFIED',
+        error: `Advocate chambers access restricted. Current verification status is '${lawyer.verification_status}'.`,
         verification_status: lawyer.verification_status,
         remarks: lawyer.admin_remarks,
       });
@@ -439,7 +460,7 @@ export const LawyerPortalController = {
         req.params.id,
         VERIFICATION_STATUSES.UNDER_REVIEW,
         req.body.remarks || 'Application placed under formal administrative review.',
-        req.user?.email || 'admin@vidhisetu.in'
+        req.user.email
       );
       res.json({ success: true, message: 'Status updated to UNDER_REVIEW.', lawyer: updated });
     } catch (err) {
@@ -453,7 +474,7 @@ export const LawyerPortalController = {
         req.params.id,
         VERIFICATION_STATUSES.VERIFIED,
         req.body.remarks || 'Bar Council registration & credentials verified.',
-        req.user?.email || 'admin@vidhisetu.in'
+        req.user.email
       );
       res.json({ success: true, message: 'Lawyer verified successfully.', lawyer: updated });
     } catch (err) {
@@ -467,7 +488,7 @@ export const LawyerPortalController = {
         req.params.id,
         VERIFICATION_STATUSES.REJECTED,
         req.body.reason || 'Verification criteria not satisfied.',
-        req.user?.email || 'admin@vidhisetu.in'
+        req.user.email
       );
       res.json({ success: true, message: 'Lawyer application rejected.', lawyer: updated });
     } catch (err) {
@@ -481,7 +502,7 @@ export const LawyerPortalController = {
         req.params.id,
         VERIFICATION_STATUSES.PENDING,
         req.body.remarks || 'Additional documentation required from applicant.',
-        req.user?.email || 'admin@vidhisetu.in'
+        req.user.email
       );
       res.json({ success: true, message: 'Additional info requested.', lawyer: updated });
     } catch (err) {
@@ -495,9 +516,27 @@ export const LawyerPortalController = {
         req.params.id,
         VERIFICATION_STATUSES.SUSPENDED,
         req.body.reason || 'Practice access suspended pending inquiry.',
-        req.user?.email || 'admin@vidhisetu.in'
+        req.user.email
       );
       res.json({ success: true, message: 'Lawyer account suspended.', lawyer: updated });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  },
+
+  async adminRetryNotification(req, res) {
+    try {
+      const result = await LawyerPortalService.retryAdvocateNotification(req.params.id);
+      res.json(result);
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  },
+
+  async adminRetryStatusNotification(req, res) {
+    try {
+      const result = await LawyerPortalService.retryAdvocateStatusNotification(req.params.id);
+      res.json(result);
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });
     }

@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert';
 import IndianKanoonService from '../src/services/indianKanoonService.js';
@@ -147,3 +148,4 @@ describe('Indian Kanoon API Service Tests', () => {
     assert.match(normalized.fullText, /Section 79 of RERA/);
   });
 });
+import './helpers/safeTestEnvironment.js';

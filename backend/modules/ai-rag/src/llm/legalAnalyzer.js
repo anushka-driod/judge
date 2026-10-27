@@ -9,20 +9,13 @@
 
 import { LEGAL_SYSTEM_PROMPT } from '../prompts/legalPrompts.js';
 import { geminiClient } from './geminiClient.js';
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 import { matchLegalDomain } from '../knowledge/legalDomains.js';
 
 const HARASSMENT_REPORT_PATTERN = /\b(?:sexual\s+)?(?:harassment|harrasment|harrassment|harassing|harrasing|harrassing|harassed|harrased|molestation|molest|abuse|abusive|threatened|threatening|domestic violence)\b/i;
 const FAMILY_RELATIONSHIP_PATTERN = /\b(husband|wife|spouse|partner|father|mother|family member)\b/i;
 const BANK_TRANSACTION_CONTEXT_PATTERN = /\b(bank|account|upi|atm|card|payment|transaction|money|amount|debit|transfer)\b/i;
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 
 export class LegalAnalyzer {
   /**
@@ -33,10 +26,7 @@ export class LegalAnalyzer {
    * @returns {Promise<Object>} Structured analysis
    */
   static async analyzeQuery(query, declaredJurisdiction = '', contextOptions = {}) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     if (!query || !query.trim()) {
       throw new Error('Please provide your legal question or details of your issue.');
     }
@@ -91,30 +81,16 @@ export class LegalAnalyzer {
         executionMode: 'clarification_required',
       };
     }
-<<<<<<< HEAD
-=======
-    if (!query || query.trim().length < 3) {
+
+    if (trimmedQuery.length < 3) {
       throw new Error('Please provide more detail about your legal problem.');
     }
-
-    const trimmedQuery = query.trim();
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 
     // 1. Attempt Centralized Gemini LLM Analysis if configured
     if (geminiClient.isConfigured()) {
       try {
         const historyText = contextOptions.history && Array.isArray(contextOptions.history) && contextOptions.history.length > 0
-<<<<<<< HEAD
-<<<<<<< HEAD
           ? `\n\nPrevious Case Conversation History (Maintain context and remember these facts):\n${contextOptions.history.slice(-8).map((m) => `${m.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${m.text}`).join('\n')}`
-=======
-          ? `\n\nPrevious Case Context:\n${contextOptions.history.slice(-3).map((m) => `${m.sender}: ${m.text}`).join('\n')}`
->>>>>>> origin/main
-=======
-          ? `\n\nPrevious Case Conversation History (Maintain context and remember these facts):\n${contextOptions.history.slice(-8).map((m) => `${m.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${m.text}`).join('\n')}`
->>>>>>> 3aab4be (dhanush commits)
           : '';
 
         const prompt = `User Legal Query: "${trimmedQuery}"\nDeclared Jurisdiction: "${declaredJurisdiction || 'Auto-detect'}"${historyText}\n\nAnalyze this legal problem according to Indian jurisprudence and output the structured JSON.`;
@@ -127,17 +103,19 @@ export class LegalAnalyzer {
         });
 
         if (result && result.data && Array.isArray(result.data.kanoon_search_queries) && result.data.kanoon_search_queries.length > 0) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           const guarded = this.validateAndGuardAnalysis(result.data, trimmedQuery, declaredJurisdiction, contextOptions);
-=======
-          const guarded = this.validateAndGuardAnalysis(result.data, trimmedQuery, declaredJurisdiction);
->>>>>>> origin/main
-=======
-          const guarded = this.validateAndGuardAnalysis(result.data, trimmedQuery, declaredJurisdiction, contextOptions);
->>>>>>> 3aab4be (dhanush commits)
+          const emotionData = this.detectEmotion(trimmedQuery);
+          const factQuestions = this.generateFactGatheringQuestions(guarded.category || '', trimmedQuery);
           return {
             ...guarded,
+            detected_emotion: emotionData.emotion,
+            detectedEmotion: emotionData.emotion,
+            emotional_tone: emotionData.tone,
+            emotionalTone: emotionData.tone,
+            emotional_acknowledgment: emotionData.acknowledgment,
+            emotionalAcknowledgment: emotionData.acknowledgment,
+            fact_gathering_questions: factQuestions,
+            factGatheringQuestions: factQuestions,
             modelUsed: result.modelUsed,
             executionMode: 'gemini_llm',
           };
@@ -148,10 +126,7 @@ export class LegalAnalyzer {
     }
 
     // 2. High-fidelity domain expert rule engine for offline development, tests, and resilience
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     const fallbackResult = this.analyzeWithExpertEngine(trimmedQuery, declaredJurisdiction, contextOptions);
     const guardedFallback = this.validateAndGuardAnalysis(fallbackResult, trimmedQuery, declaredJurisdiction, contextOptions);
     
@@ -180,15 +155,21 @@ export class LegalAnalyzer {
     } else {
       guardedFallback.executionMode = guardedFallback.executionMode || 'deterministic_fallback';
     }
-<<<<<<< HEAD
-=======
-    const fallbackResult = this.analyzeWithExpertEngine(trimmedQuery, declaredJurisdiction);
-    const guardedFallback = this.validateAndGuardAnalysis(fallbackResult, trimmedQuery, declaredJurisdiction);
-    guardedFallback.executionMode = 'deterministic_fallback';
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
-    return guardedFallback;
+
+    const emotionData = this.detectEmotion(trimmedQuery);
+    const factQuestions = this.generateFactGatheringQuestions(guardedFallback.category || '', trimmedQuery);
+
+    return {
+      ...guardedFallback,
+      detected_emotion: emotionData.emotion,
+      detectedEmotion: emotionData.emotion,
+      emotional_tone: emotionData.tone,
+      emotionalTone: emotionData.tone,
+      emotional_acknowledgment: emotionData.acknowledgment,
+      emotionalAcknowledgment: emotionData.acknowledgment,
+      fact_gathering_questions: factQuestions,
+      factGatheringQuestions: factQuestions,
+    };
   }
 
   /**
@@ -196,10 +177,7 @@ export class LegalAnalyzer {
    * Ensures the legal intent classification stays tightly anchored to the original facts
    * and prevents hallucinations or category drift.
    */
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   static validateAndGuardAnalysis(analysis, query, declaredJurisdiction = '', contextOptions = {}) {
     if (!analysis) return this.analyzeWithExpertEngine(query, declaredJurisdiction, contextOptions);
     const q = query.toLowerCase();
@@ -364,15 +342,6 @@ export class LegalAnalyzer {
       return analysis;
     }
 
-<<<<<<< HEAD
-=======
-  static validateAndGuardAnalysis(analysis, query, declaredJurisdiction = '') {
-    if (!analysis) return this.analyzeWithExpertEngine(query, declaredJurisdiction);
-    const q = query.toLowerCase();
-
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     const isTenancyGrievance =
       q.includes('landlord') ||
       q.includes('tenant') ||
@@ -462,10 +431,7 @@ export class LegalAnalyzer {
    * Grounded in Indian statutory jurisprudence (Labour, Consumer, Property, Tenancy, RERA, NI Act).
    * Supports English, Telugu, and Telugu-English mixed vernacular (Tanglish).
    */
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   static analyzeWithExpertEngine(query, declaredJurisdiction = '', contextOptions = {}) {
     const q = query.toLowerCase();
     const historyCombined = this.isContextualFollowUp(query, contextOptions)
@@ -499,15 +465,6 @@ export class LegalAnalyzer {
           : [],
       };
     }
-<<<<<<< HEAD
-=======
-  static analyzeWithExpertEngine(query, declaredJurisdiction = '') {
-    const q = query.toLowerCase();
-    const jurisdiction = declaredJurisdiction || this.detectJurisdiction(q) || 'Central / All India';
-    const isTeluguMixed = this.detectTeluguMixed(q);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 
     // 1. Tenancy, Landlord & Security Deposit Disputes
     if (
@@ -516,17 +473,8 @@ export class LegalAnalyzer {
       q.includes('tenancy') ||
       q.includes('security deposit') ||
       (q.includes('deposit') && (q.includes('flat') || q.includes('rent') || q.includes('vacat') || q.includes('house'))) ||
-<<<<<<< HEAD
-<<<<<<< HEAD
       (q.includes('rent') && (q.includes('ivvatledu') || q.includes('return') || q.includes('refund'))) ||
       ((q.includes('deposit') || q.includes('notice') || q.includes('painting') || q.includes('deduct')) && (historyCombined.includes('tenant') || historyCombined.includes('landlord')))
-=======
-      (q.includes('rent') && (q.includes('ivvatledu') || q.includes('return') || q.includes('refund')))
->>>>>>> origin/main
-=======
-      (q.includes('rent') && (q.includes('ivvatledu') || q.includes('return') || q.includes('refund'))) ||
-      ((q.includes('deposit') || q.includes('notice') || q.includes('painting') || q.includes('deduct')) && (historyCombined.includes('tenant') || historyCombined.includes('landlord')))
->>>>>>> 3aab4be (dhanush commits)
     ) {
       return {
         summary: 'Tenancy dispute concerning refusal or arbitrary retention of security deposit following vacation of rented premises with due notice.',
@@ -728,10 +676,7 @@ export class LegalAnalyzer {
       };
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     // Without a model or recognizable legal domain, ask for facts instead of guessing.
     return {
       summary: 'The legal issue cannot be classified from the information provided so far.',
@@ -750,29 +695,285 @@ export class LegalAnalyzer {
       kanoon_search_queries: [],
       relevant_acts_anticipated: [],
       executionMode: 'clarification_required',
-<<<<<<< HEAD
-=======
-    // General Fallback
-    return {
-      summary: 'General civil or statutory dispute requiring preliminary legal evaluation.',
-      category: 'Civil & Commercial Law',
-      jurisdiction,
-      detected_language: isTeluguMixed ? 'Telugu-English' : 'English',
-      legal_issues: ['Breach of legal duty or obligation', 'Evaluation of legal remedies and forum'],
-      extracted_facts: [query],
-      missing_information: [
-        'Detailed timeline of events leading to dispute',
-        'Specific damages or loss suffered',
-        'Existence of written contracts or receipts',
-      ],
-      kanoon_search_queries: [
-        query.replace(/[^\w\s]/g, '').slice(0, 45).trim(),
-      ],
-      relevant_acts_anticipated: ['Code of Civil Procedure, 1908', 'Specific Relief Act, 1963'],
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     };
+  }
+
+  /**
+   * Emotion Detection & Psychological Framing
+   * Classifies user emotional state: Sad, Angry, Confused, Happy, Normal
+   */
+  static detectEmotion(text = '') {
+    const q = text.toLowerCase();
+
+    // 1. Sad / Distressed
+    const sadPattern = /\b(sad|crying|depressed|grief|lost everything|hopeless|helpless|pain|suffering|terrible|heartbroken|passed away|died|death|homeless|no shelter|kicked out|begging|desperate|broken|traumatized|depressing|ruined|suicide|miserable)\b/i;
+    if (sadPattern.test(q)) {
+      return {
+        emotion: 'Sad',
+        tone: 'Empathetic & Supportive',
+        acknowledgment: 'I understand how painful and stressful this situation is for you. Please be assured that Indian law provides structured remedies and safeguards to protect your rights, and we will guide you through this step-by-step.',
+      };
+    }
+
+    // 2. Angry / Frustrated / Cheated
+    const angryPattern = /\b(angry|furious|scam|cheated|fraud|loot|harass|corrupt|bribe|threatened|abused|unacceptable|thief|police refused|outrageous|sue them|destroy|fight back|liar|robbed|scammed|ripped off|looting|extortion|cheat|fraudster|unjust)\b/i;
+    if (angryPattern.test(q)) {
+      return {
+        emotion: 'Angry',
+        tone: 'Calm, Assertive & De-escalating',
+        acknowledgment: 'I hear your frustration regarding this unfair situation. Let us address this systematically by focusing on your statutory legal remedies and immediate actionable steps under Indian law.',
+      };
+    }
+
+    // 3. Confused / Overwhelmed
+    const confusedPattern = /\b(confused|don't understand|dont understand|no idea|complicated|jargon|what does this mean|what should i do|lost|not sure|where do i begin|overwhelmed|help me understand|explain simply|clarify|what is this|unclear|clueless)\b/i;
+    if (confusedPattern.test(q)) {
+      return {
+        emotion: 'Confused',
+        tone: 'Plain-Language & Demystifying',
+        acknowledgment: 'Legal procedures and terminology can often feel overwhelming, but we will break this down into clear, plain-language points so you know exactly what your options are.',
+      };
+    }
+
+    // 4. Happy / Relieved
+    const happyPattern = /\b(thank you|thanks|resolved|won|settled|relieved|grateful|happy|worked out|got my money back|agreed|compromise reached|peaceful|succeeded|excellent|great help|awesome|glad)\b/i;
+    if (happyPattern.test(q)) {
+      return {
+        emotion: 'Happy',
+        tone: 'Warm & Encouraging',
+        acknowledgment: 'That is positive and encouraging news! Let us ensure your interests and agreements remain legally protected and properly documented as you move forward.',
+      };
+    }
+
+    // 5. Default Normal
+    return {
+      emotion: 'Normal',
+      tone: 'Professional & Objective',
+      acknowledgment: 'Here is an objective statutory assessment and procedural legal guidance under Indian law based on your situation.',
+    };
+  }
+
+  /**
+   * Targeted Fact-Gathering Question & Option Generator
+   * Provides structured, clickable follow-up options for active legal agent assistance.
+   */
+  static generateFactGatheringQuestions(category = '', query = '') {
+    const cat = category.toLowerCase();
+    const q = query.toLowerCase();
+
+    if (cat.includes('tenan') || cat.includes('rent') || cat.includes('deposit') || q.includes('landlord') || q.includes('tenant')) {
+      return [
+        {
+          id: 'agreement_type',
+          question: 'What kind of rental agreement was executed?',
+          options: [
+            'Registered Tenancy Agreement',
+            'Unregistered / 11-Month Notarized Agreement',
+            'Oral Tenancy (No written document)',
+            'Expired Tenancy Agreement',
+          ],
+        },
+        {
+          id: 'notice_status',
+          question: 'Was a formal move-out notice served?',
+          options: [
+            'Yes, 30-day written notice via WhatsApp / Email',
+            'Yes, verbal / telephone notice given',
+            'No notice served prior to vacating',
+            'Landlord abruptly asked to vacate',
+          ],
+        },
+        {
+          id: 'deduction_proof',
+          question: 'Did the landlord provide repair / painting bills?',
+          options: [
+            'No bills or receipts provided',
+            'Arbitrary deductions without actual proof',
+            'Landlord has stopped responding entirely',
+            'Partial deposit refunded',
+          ],
+        },
+      ];
+    }
+
+    if (cat.includes('consumer') || cat.includes('refund') || cat.includes('product') || q.includes('flipkart') || q.includes('amazon') || q.includes('defect')) {
+      return [
+        {
+          id: 'proof_of_purchase',
+          question: 'Do you have documentary proof of purchase?',
+          options: [
+            'Tax Invoice and Payment Receipt',
+            'Order confirmation email / SMS only',
+            'Unboxing video or defect photographs',
+            'Lost receipt / Cash purchase',
+          ],
+        },
+        {
+          id: 'seller_response',
+          question: 'What was the seller / platform’s formal response?',
+          options: [
+            'Direct written refusal to refund or replace',
+            'Return window expired according to seller',
+            'Customer support tickets closed without resolution',
+            'Replacement delivered with same defect',
+          ],
+        },
+        {
+          id: 'dispute_value',
+          question: 'What is the total monetary value involved?',
+          options: [
+            'Below ₹10,000',
+            '₹10,000 – ₹50,000',
+            '₹50,000 – ₹5 Lakhs',
+            'Above ₹5 Lakhs',
+          ],
+        },
+      ];
+    }
+
+    if (cat.includes('cheque') || cat.includes('138') || cat.includes('dishonour') || q.includes('cheque')) {
+      return [
+        {
+          id: 'memo_status',
+          question: 'What is the official bank return reason on the memo?',
+          options: [
+            'Funds Insufficient',
+            'Account Closed',
+            'Payment Stopped by Drawer',
+            'Signature Differs / Technical defect',
+          ],
+        },
+        {
+          id: 'memo_timeline',
+          question: 'When did you receive the Bank Return Memo?',
+          options: [
+            'Within the last 15 days',
+            'Between 15 and 30 days ago',
+            'More than 30 days ago',
+            'Cheque returned today',
+          ],
+        },
+        {
+          id: 'statutory_notice',
+          question: 'Have you issued a 15-day statutory Demand Notice?',
+          options: [
+            'No, not yet dispatched',
+            'Yes, sent via Speed Post with AD tracking',
+            'Sent via WhatsApp / Email only',
+            '15-day notice period already elapsed',
+          ],
+        },
+      ];
+    }
+
+    if (cat.includes('bank') || cat.includes('cyber') || cat.includes('fraud') || cat.includes('upi') || q.includes('scam')) {
+      return [
+        {
+          id: 'payment_channel',
+          question: 'Which payment mechanism was used?',
+          options: [
+            'UPI (Google Pay, PhonePe, Paytm)',
+            'Netbanking / IMPS / NEFT transfer',
+            'Debit / Credit card online transaction',
+            'ATM physical withdrawal',
+          ],
+        },
+        {
+          id: 'reporting_time',
+          question: 'How quickly did you report it to the bank?',
+          options: [
+            'Within 3 days (Zero Customer Liability window)',
+            'Within 4–7 days',
+            'Beyond 7 days after incident',
+            'Not yet reported to bank',
+          ],
+        },
+        {
+          id: 'cyber_complaint',
+          question: 'Have you dialed 1930 or filed at cybercrime.gov.in?',
+          options: [
+            'Yes, filed complaint with Acknowledgement Number',
+            'Dialed 1930 and transaction was frozen',
+            'No, seeking guidance first',
+            'Police station refused to register FIR',
+          ],
+        },
+      ];
+    }
+
+    if (cat.includes('employment') || cat.includes('labour') || cat.includes('salary') || q.includes('job') || q.includes('wages')) {
+      return [
+        {
+          id: 'employment_contract',
+          question: 'What documentation proves your employment?',
+          options: [
+            'Signed Employment Contract & Offer Letter',
+            'Monthly Salary Slips & Bank Statements',
+            'Work Email ID & Official ID Card',
+            'No formal written contract',
+          ],
+        },
+        {
+          id: 'grievance_type',
+          question: 'What is the primary nature of the dispute?',
+          options: [
+            'Withholding of earned salary or FNF dues',
+            'Unlawful immediate termination without notice period',
+            'Non-deposit of PF (Provident Fund) / Gratuity',
+            'Breach of non-compete / bond penalty',
+          ],
+        },
+      ];
+    }
+
+    if (cat.includes('family') || cat.includes('divorce') || cat.includes('matrimonial')) {
+      return [
+        {
+          id: 'divorce_type',
+          question: 'Is the matrimonial resolution mutual or contested?',
+          options: [
+            'Mutual consent (Both spouses agree)',
+            'Contested (One spouse opposing)',
+            'Exploring legal separation options',
+            'Seeking maintenance / child custody only',
+          ],
+        },
+        {
+          id: 'marriage_duration',
+          question: 'How long have you been married?',
+          options: [
+            'Less than 1 year (Bar under Sec 14 unless hardship)',
+            '1 to 5 years',
+            '5 to 10 years',
+            'More than 10 years',
+          ],
+        },
+      ];
+    }
+
+    // Default General Legal Dispute
+    return [
+      {
+        id: 'written_evidence',
+        question: 'Do you have written proof of your agreement or transactions?',
+        options: [
+          'Yes, signed physical documents',
+          'Yes, digital communications (WhatsApp/Email/SMS)',
+          'Bank transaction statements only',
+          'No written proof (oral agreement only)',
+        ],
+      },
+      {
+        id: 'desired_remedy',
+        question: 'What specific outcome are you seeking?',
+        options: [
+          'Full financial refund and interest compensation',
+          'Specific performance or delivery of agreed obligation',
+          'Mediation or amicable settlement',
+          'Formal legal demand notice to prompt compliance',
+        ],
+      },
+    ];
   }
 
   static detectJurisdiction(text) {
@@ -789,10 +990,7 @@ export class LegalAnalyzer {
     return '';
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   static isContextualFollowUp(query, contextOptions = {}) {
     const q = (query || '').toLowerCase();
     const history = Array.isArray(contextOptions.history) ? contextOptions.history : [];
@@ -826,11 +1024,7 @@ export class LegalAnalyzer {
     return (bareProblem && !namesLegalDomain) || /^(?:i need help|help me|please help)[.!?]*$/i.test(text);
   }
 
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   static detectTeluguMixed(text) {
     const teluguMarkers = [
       'naa', 'chesadu', 'ivvatledu', 'adugutunnadu', 'cheppadu', 'undhi', 'kadu',

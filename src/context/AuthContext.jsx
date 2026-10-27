@@ -1,32 +1,83 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { Alert } from '../components/common/Alert';
 
 const AuthContext = createContext(null);
+
+function normalizeUser(user) {
+  if (!user) return null;
+  const rawRole = (user.role || '').toLowerCase();
+  const rawAccountType = (user.accountType || '').toLowerCase();
+  const rawStatus = String(user.verification_status || user.verificationStatus || '').toUpperCase();
+
+  const isAdvocateRole = rawRole === 'lawyer' || rawRole === 'advocate' || rawAccountType === 'advocate';
+  const isAdminRole = rawRole === 'admin';
+
+  let role = 'user';
+  let accountType = 'candidate';
+  if (isAdminRole) {
+    role = 'admin';
+    accountType = 'admin';
+  } else if (isAdvocateRole) {
+    role = 'lawyer';
+    accountType = 'advocate';
+  }
+
+  let verificationStatus = 'verified';
+  if (isAdvocateRole) {
+    if (rawStatus === 'VERIFIED' || rawStatus === 'ACTIVE') {
+      verificationStatus = 'verified';
+    } else if (rawStatus === 'REJECTED') {
+      verificationStatus = 'rejected';
+    } else if (rawStatus === 'SUSPENDED') {
+      verificationStatus = 'suspended';
+    } else {
+      verificationStatus = 'pending';
+    }
+  }
+
+  return {
+    ...user,
+    role,
+    accountType,
+    verificationStatus,
+    verification_status: verificationStatus.toUpperCase(),
+  };
+}
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState('');
+
+  const setUser = (user) => {
+    setCurrentUser(normalizeUser(user));
+    if (user) setAuthError('');
+  };
 
   const refreshUser = async () => {
+    const storedToken = localStorage.getItem('vidhisetu_auth_token') || localStorage.getItem('earnlaw_auth_token');
+    if (!storedToken) {
+      setUser(null);
+      setAuthError('');
+      return null;
+    }
+
     try {
       const user = await authService.getCurrentUser();
-      setCurrentUser(user);
+      setUser(user);
+      setAuthError('');
       return user;
     } catch (err) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      // Clear stale token so browser does not repeatedly error
-      localStorage.removeItem('vidhisetu_auth_token');
-      localStorage.removeItem('earnlaw_auth_token');
-=======
-      console.error('Failed to load user session', err);
->>>>>>> origin/main
-=======
-      // Clear stale token so browser does not repeatedly error
-      localStorage.removeItem('vidhisetu_auth_token');
-      localStorage.removeItem('earnlaw_auth_token');
->>>>>>> 3aab4be (dhanush commits)
-      setCurrentUser(null);
+      if (err.status === 401 || err.status === 403) {
+        localStorage.removeItem('vidhisetu_auth_token');
+        localStorage.removeItem('earnlaw_auth_token');
+        localStorage.removeItem('vidhisetu_user_profile');
+        setUser(null);
+        setAuthError('');
+      } else {
+        setAuthError(err.message || 'Unable to restore your session because the backend is unavailable.');
+      }
       return null;
     }
   };
@@ -45,7 +96,7 @@ export function AuthProvider({ children }) {
   const login = async (emailOrPhone, password) => {
     const res = await authService.login(emailOrPhone, password);
     if (res?.user) {
-      setCurrentUser(res.user);
+      setUser(res.user);
     }
     return res;
   };
@@ -58,31 +109,19 @@ export function AuthProvider({ children }) {
   const verifyEmail = async (email, otp) => {
     const res = await authService.verifyEmail(email, otp);
     if (res?.user) {
-      setCurrentUser(res.user);
+      setUser(res.user);
     }
     return res;
   };
 
-  const sendOtp = async (phoneOrData) => {
-    return authService.sendOtp(phoneOrData);
-  };
-
-  const verifyOtp = async (verifyData) => {
-    const res = await authService.verifyOtp(verifyData);
-    if (res?.user) {
-      setCurrentUser(res.user);
-    }
-    return res;
-  };
-
-  const resendOtp = async (emailOrPhone) => {
-    return authService.resendOtp(emailOrPhone);
+  const resendOtp = async (email, channel) => {
+    return authService.resendOtp(email, channel);
   };
 
   const googleAuth = async (googleProfile) => {
     const res = await authService.googleAuth(googleProfile);
-    if (!res.isNewUser && res.user) {
-      setCurrentUser(res.user);
+    if (res.user) {
+      setUser(res.user);
     }
     return res;
   };
@@ -90,7 +129,7 @@ export function AuthProvider({ children }) {
   const completeGoogleProfile = async (profileData) => {
     const res = await authService.completeGoogleProfile(profileData);
     if (res?.user) {
-      setCurrentUser(res.user);
+      setUser(res.user);
     }
     return res;
   };
@@ -106,7 +145,7 @@ export function AuthProvider({ children }) {
   const updateProfile = async (profileData) => {
     const res = await authService.updateProfile(profileData);
     if (res?.user) {
-      setCurrentUser(res.user);
+      setUser(res.user);
     }
     return res;
   };
@@ -116,22 +155,26 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await authService.logout();
-    setCurrentUser(null);
+    try {
+      await authService.logout();
+    } finally {
+      setUser(null);
+      setAuthError('');
+    }
   };
 
   // Helper flags
   const isAuthenticated = !!currentUser;
   const isEmailVerified = currentUser ? currentUser.emailVerified !== false : false;
-  const isCandidate = currentUser?.accountType === 'candidate';
-  const isAdvocate = currentUser?.accountType === 'advocate';
-  const isVerifiedAdvocate = isAdvocate && currentUser?.verificationStatus === 'verified';
-  const isAdmin = currentUser?.accountType === 'admin' || currentUser?.role === 'admin';
-  const advocateStatus = currentUser?.verificationStatus || 'pending';
+  const isCandidate = currentUser?.role === 'user' || currentUser?.accountType === 'candidate';
+  const isAdvocate = currentUser?.role === 'lawyer' || currentUser?.role === 'advocate' || currentUser?.accountType === 'advocate';
+  const isVerifiedAdvocate = isAdvocate && (currentUser?.verificationStatus === 'verified' || currentUser?.verification_status === 'VERIFIED');
+  const isAdmin = currentUser?.role === 'admin';
+  const advocateStatus = currentUser?.verificationStatus || (currentUser?.verification_status ? currentUser.verification_status.toLowerCase() : 'pending');
 
   const value = {
     currentUser,
-    setCurrentUser,
+    setCurrentUser: setUser,
     isAuthenticated,
     isEmailVerified,
     isCandidate,
@@ -140,10 +183,9 @@ export function AuthProvider({ children }) {
     isAdmin,
     advocateStatus,
     loading,
+    authError,
     login,
     register,
-    sendOtp,
-    verifyOtp,
     verifyEmail,
     resendOtp,
     googleAuth,
@@ -156,7 +198,17 @@ export function AuthProvider({ children }) {
     refreshUser,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {authError && (
+        <Alert type="danger" title="Authentication service unavailable" onClose={() => setAuthError('')}>
+          {authError}{' '}
+          <button type="button" onClick={refreshUser}>Retry</button>
+        </Alert>
+      )}
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

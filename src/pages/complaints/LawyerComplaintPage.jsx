@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { mockLawyers } from '../../data/mockData';
 import { complaintService } from '../../services/complaintService';
+import { lawyerService } from '../../services/lawyerService';
 import { useUI } from '../../hooks/useUI';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Select } from '../../components/common/Select';
 import { TextArea } from '../../components/common/TextArea';
-import { FileUpload } from '../../components/common/FileUpload';
 import { Alert } from '../../components/common/Alert';
 import {
   AlertOctagon,
@@ -24,15 +23,34 @@ export function LawyerComplaintPage() {
   const navigate = useNavigate();
   const { showToast } = useUI();
 
-  const [selectedLawyerId, setSelectedLawyerId] = useState(mockLawyers[1].id);
+  const [selectedLawyerId, setSelectedLawyerId] = useState('');
+  const [lawyers, setLawyers] = useState([]);
+  const [lawyerLoadError, setLawyerLoadError] = useState('');
+  const [lawyersLoading, setLawyersLoading] = useState(true);
   const [issueCategory, setIssueCategory] = useState('Unreasonable Delay & Non-Communication');
   const [narrative, setNarrative] = useState('');
-  const [evidenceFiles, setEvidenceFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
-  const lawyerOptions = mockLawyers.map((l) => ({
+  useEffect(() => {
+    let isCurrent = true;
+    lawyerService.getAllLawyers()
+      .then((results) => {
+        if (isCurrent) setLawyers(Array.isArray(results) ? results : []);
+      })
+      .catch((err) => {
+        if (isCurrent) setLawyerLoadError(err.message || 'Unable to load verified advocates.');
+      })
+      .finally(() => {
+        if (isCurrent) setLawyersLoading(false);
+      });
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
+  const lawyerOptions = lawyers.map((l) => ({
     value: l.id,
-    label: `${l.name} (${l.court})`,
+    label: `${l.name}${l.court ? ` (${l.court})` : ''}`,
   }));
 
   const issueCategories = [
@@ -46,21 +64,20 @@ export function LawyerComplaintPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!narrative) {
-      alert('Please describe what happened objectively.');
+    if (!narrative || !selectedLawyerId) {
+      alert('Select a verified advocate and describe what happened objectively.');
       return;
     }
 
     setSubmitting(true);
     try {
-      const selectedLawyer = mockLawyers.find((l) => l.id === selectedLawyerId);
+      const selectedLawyer = lawyers.find((l) => l.id === selectedLawyerId);
       const newComplaint = await complaintService.submitComplaint({
         lawyerId: selectedLawyerId,
-        lawyerName: selectedLawyer?.name || 'Advocate',
-        caseId: caseId || 'case-102',
+        lawyerName: selectedLawyer.name,
+        caseId: caseId || null,
         issueCategory,
         description: narrative,
-        evidenceDocument: evidenceFiles[0]?.name || 'Evidence_Log.pdf',
       });
 
       showToast('Issue reported. Escalation tracking initialized.', 'info');
@@ -109,7 +126,13 @@ export function LawyerComplaintPage() {
                 value={selectedLawyerId}
                 onChange={(e) => setSelectedLawyerId(e.target.value)}
                 required
+                disabled={lawyersLoading || Boolean(lawyerLoadError) || lawyers.length === 0}
               />
+              {lawyersLoading && <p role="status">Loading verified advocates…</p>}
+              {lawyerLoadError && <Alert type="danger">{lawyerLoadError}</Alert>}
+              {!lawyersLoading && !lawyerLoadError && lawyers.length === 0 && (
+                <Alert type="info">No verified advocates are available to report right now.</Alert>
+              )}
 
               <Select
                 label="Nature of Reported Issue"
@@ -129,12 +152,9 @@ export function LawyerComplaintPage() {
                 required
               />
 
-              <FileUpload
-                multiple
-                label="Attach Supporting Evidence (WhatsApp Chats, Receipts, Emails)"
-                helperText="Concrete written logs help resolve disputes 3x faster"
-                onFilesSelected={(files) => setEvidenceFiles(files)}
-              />
+              <Alert type="info">
+                Evidence-file uploads are not enabled for this report. Do not attach or share sensitive documents here.
+              </Alert>
 
               <div className="complaint-submit-row">
                 <Button
@@ -142,6 +162,7 @@ export function LawyerComplaintPage() {
                   variant="danger"
                   size="lg"
                   loading={submitting}
+                  disabled={submitting || lawyersLoading || Boolean(lawyerLoadError) || lawyers.length === 0}
                   icon={ArrowRight}
                   iconPosition="right"
                 >

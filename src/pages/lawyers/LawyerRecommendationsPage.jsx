@@ -113,74 +113,113 @@ export function LawyerRecommendationsPage() {
       </div>
 
       {/* Lawyer Cards Grid */}
-      <div className="lawyers-grid">
-        {filteredLawyers.map((lawyer) => (
-          <Card key={lawyer.id} hoverable className="lawyer-card-full">
-            <div className="lawyer-card-top-row">
-              <img
-                src={lawyer.photoUrl}
-                alt={lawyer.name}
-                className="lawyer-avatar-img"
-              />
-              <div className="lawyer-basic-info">
-                <div className="lawyer-name-verified">
-                  <h3 className="lawyer-name">{lawyer.name}</h3>
-                  <span className="bar-verified-badge" title="Bar Council Enrollment Verified">
-                    <ShieldCheck size={14} /> {lawyer.barCouncilId}
-                  </span>
-                </div>
-                <div className="lawyer-court-info">
-                  <MapPin size={14} />
-                  <span>{lawyer.location} • {lawyer.court}</span>
-                </div>
-                <div className="lawyer-rating-line">
-                  <div className="stars-pill">
-                    <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                    <strong>{lawyer.rating}</strong>
-                    <span>({lawyer.reviewCount} client reviews)</span>
+      {filteredLawyers.length === 0 ? (
+        <div
+          className="empty-lawyers-state"
+          style={{
+            textAlign: 'center',
+            padding: '48px 24px',
+            background: 'var(--bg-surface-elevated, #181920)',
+            border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.1))',
+            borderRadius: '12px',
+            margin: '24px 0',
+          }}
+        >
+          <ShieldCheck size={48} color="var(--accent-400, #e5c07b)" style={{ margin: '0 auto 16px' }} />
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary, #f8fafc)', marginBottom: '8px' }}>
+            No Verified Advocates Found Matching Your Query
+          </h3>
+          <p style={{ color: 'var(--text-secondary, #cbd5e1)', maxWidth: '480px', margin: '0 auto 20px', fontSize: '0.925rem' }}>
+            We only display real advocates whose Bar Council credentials have been verified by the administrator. Try adjusting your practice area or search query.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedPracticeArea('');
+            }}
+          >
+            Clear Search Filters
+          </Button>
+        </div>
+      ) : (
+        <div className="lawyers-grid">
+          {filteredLawyers.map((lawyer) => (
+            <Card key={lawyer.id} hoverable className="lawyer-card-full">
+              <div className="lawyer-card-top-row">
+                <img
+                  src={lawyer.photoUrl}
+                  alt={lawyer.name}
+                  className="lawyer-avatar-img"
+                />
+                <div className="lawyer-basic-info">
+                  <div className="lawyer-name-verified">
+                    <h3 className="lawyer-name">{lawyer.name}</h3>
+                    <span className="bar-verified-badge" title="Bar Council Enrollment Verified">
+                      <ShieldCheck size={14} /> {lawyer.barCouncilId}
+                    </span>
                   </div>
-                  <span className="exp-pill">
-                    <Briefcase size={14} /> {lawyer.experienceYears} Years Exp
-                  </span>
+                  <div className="lawyer-court-info">
+                    <MapPin size={14} />
+                    <span>{lawyer.location} • {lawyer.court}</span>
+                  </div>
+                  <div className="lawyer-rating-line">
+                    {lawyer.rating && lawyer.reviewCount > 0 ? (
+                      <div className="stars-pill">
+                        <Star size={14} fill="#f59e0b" color="#f59e0b" />
+                        <strong>{lawyer.rating}</strong>
+                        <span>({lawyer.reviewCount} verified reviews)</span>
+                      </div>
+                    ) : (
+                      <div className="stars-pill" style={{ background: 'rgba(212, 175, 55, 0.12)', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
+                        <ShieldCheck size={14} color="#e5c07b" />
+                        <span style={{ color: '#e5c07b', fontWeight: 600 }}>Verified VidhiSetu Advocate</span>
+                      </div>
+                    )}
+                    <span className="exp-pill">
+                      <Briefcase size={14} /> {lawyer.experienceYears} Years Exp
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <p className="lawyer-bio-snippet">{lawyer.bio}</p>
+              <p className="lawyer-bio-snippet">{lawyer.bio}</p>
 
-            <div className="lawyer-practice-tags">
-              {lawyer.practiceAreas.map((area, idx) => (
-                <span key={idx} className="practice-tag">{area}</span>
-              ))}
-            </div>
-
-            <div className="lawyer-languages-row">
-              <Languages size={14} className="lang-icon" />
-              <span>Languages: {lawyer.languages.join(', ')}</span>
-            </div>
-
-            <div className="lawyer-card-action-bar">
-              <div className="fee-box">
-                <span className="fee-label">Consultation Fee</span>
-                <span className="fee-amount">₹{lawyer.consultationFee} <small>/ session</small></span>
+              <div className="lawyer-practice-tags">
+                {(lawyer.practiceAreas || []).map((area, idx) => (
+                  <span key={idx} className="practice-tag">{area}</span>
+                ))}
               </div>
 
-              <div className="action-buttons-group">
-                <Link to={`/lawyers/${lawyer.id}${caseId ? `?caseId=${caseId}` : ''}`}>
-                  <Button variant="outline" size="sm">
-                    View Profile
-                  </Button>
-                </Link>
-                <Link to={`/lawyers/${lawyer.id}/book${caseId ? `?caseId=${caseId}` : ''}`}>
-                  <Button variant="primary" size="sm" icon={ArrowRight} iconPosition="right">
-                    Book Slot
-                  </Button>
-                </Link>
+              <div className="lawyer-languages-row">
+                <Languages size={14} className="lang-icon" />
+                <span>Languages: {(lawyer.languages || ['English']).join(', ')}</span>
               </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+
+              <div className="lawyer-card-action-bar">
+                <div className="fee-box">
+                  <span className="fee-label">Consultation Fee</span>
+                  <span className="fee-amount">₹{lawyer.consultationFee} <small>/ session</small></span>
+                </div>
+
+                <div className="action-buttons-group">
+                  <Link to={`/lawyers/${lawyer.id}${caseId ? `?caseId=${caseId}` : ''}`}>
+                    <Button variant="outline" size="sm">
+                      View Profile
+                    </Button>
+                  </Link>
+                  <Link to={`/lawyers/${lawyer.id}/book${caseId ? `?caseId=${caseId}` : ''}`}>
+                    <Button variant="primary" size="sm" icon={ArrowRight} iconPosition="right">
+                      Book Slot
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -68,14 +68,30 @@ export const legalService = {
   },
 
   /**
-   * Fetch document metadata (citations list, cited-by list, publish date).
+   * Fetch case-specific AI analysis (facts, legal issues, reasoning, holding, outcome, citations).
    * @param {string|number} docId
+   * @param {Object} [options]
+   * @param {string} [options.language]
    * @returns {Promise<Object>}
    */
-  async getJudgmentMetadata(docId) {
+  async analyzeJudgment(docId, options = {}) {
     if (!docId) throw new Error('Document ID is required');
-    const data = await request(`/legal/document/${encodeURIComponent(docId)}/metadata`);
-    return data?.metadata || data;
+    const params = new URLSearchParams();
+    if (options.language) params.set('lang', options.language);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const data = await request(`/legal/document/${encodeURIComponent(docId)}/analysis${qs}`);
+    return data?.analysis || data;
+  },
+
+  /**
+   * Return the URL to stream or download printable official Judgment Analysis PDF / Dossier.
+   * @param {string|number} docId
+   * @param {string} [language]
+   * @returns {string}
+   */
+  getJudgmentPdfUrl(docId, language = 'en') {
+    const base = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api';
+    return `${base}/legal/document/${encodeURIComponent(docId)}/pdf?lang=${encodeURIComponent(language)}`;
   },
 };
 

@@ -15,25 +15,12 @@
 
 import { LegalAnalyzer } from '../llm/legalAnalyzer.js';
 import { KanoonClient } from '../kanoon/kanoonClient.js';
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-import { getCuratedJudgments } from '../kanoon/curatedJudgments.js';
-import { matchLegalDomain } from '../knowledge/legalDomains.js';
+
 import { JudgmentProcessor } from '../processing/judgmentProcessor.js';
 import { VectorEngine } from '../embeddings/vectorEngine.js';
 import { legalCorpusRepository } from '../storage/legalCorpusRepository.js';
 import { geminiClient } from '../llm/geminiClient.js';
 import { networkManager } from '../../../../src/services/networkManager.js';
-<<<<<<< HEAD
-=======
-import { JudgmentProcessor } from '../processing/judgmentProcessor.js';
-import { VectorEngine } from '../embeddings/vectorEngine.js';
-import { geminiClient } from '../llm/geminiClient.js';
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 import {
   RAG_GUIDANCE_SYSTEM_PROMPT,
   RAG_STRUCTURED_GUIDANCE_PROMPT,
@@ -57,10 +44,7 @@ export class RagPipeline {
     // Stage 1: Legal Problem Understanding & Entity Extraction
     const analysis = await LegalAnalyzer.analyzeQuery(userQuery, jurisdiction, options);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     // If query is an introductory greeting, respond conversationally with domain overview
     if (analysis.isGreeting) {
       return this.buildGreetingResponse(analysis, options);
@@ -118,11 +102,6 @@ export class RagPipeline {
 
       if (rawJudgments.length === 0 && analysis.kanoon_search_queries && analysis.kanoon_search_queries[1]) {
         rawJudgments = await this.kanoonClient.searchJudgments(analysis.kanoon_search_queries[1]);
-      }
-
-      // If remote API returns 0 or fails, load curated authentic Kanoon judgments
-      if (!rawJudgments || rawJudgments.length === 0) {
-        rawJudgments = getCuratedJudgments(analysis.category, userQuery);
       }
 
       // Stage 3: Retrieve full document context and chunk the judgments safely.
@@ -210,119 +189,8 @@ export class RagPipeline {
       if (filtered.length > 0) topChunks = filtered;
     }
 
-    // Insufficient evidence check: only if completely empty after all fallbacks
-    if (topChunks.length === 0) {
-      const domainFallback = matchLegalDomain(userQuery, analysis.category);
-      if (domainFallback.precedents && domainFallback.precedents.length > 0) {
-        topChunks = domainFallback.precedents.map((doc, index) => ({
-          chunkId: `${doc.kanoonId}_chk_${index}`,
-          kanoonId: doc.kanoonId,
-          caseTitle: doc.title,
-          court: doc.court,
-          citation: doc.citation,
-          sourceUrl: doc.sourceUrl,
-          publishDate: doc.publishDate,
-          chunkIndex: index,
-          chunkType: 'statutory_analysis',
-          chunkText: doc.keyExtract || doc.title,
-          similarityScore: 0.9,
-        }));
-      }
-<<<<<<< HEAD
-=======
-    // Stage 2: Retrieve Relevant Judgments from Indian Kanoon API
-    const primaryQuery = (analysis.kanoon_search_queries && analysis.kanoon_search_queries[0]) || userQuery;
-    let rawJudgments = await this.kanoonClient.searchJudgments(primaryQuery);
-
-    // Fallback search if primary query yielded 0 results
-    if (rawJudgments.length === 0 && analysis.kanoon_search_queries && analysis.kanoon_search_queries[1]) {
-      rawJudgments = await this.kanoonClient.searchJudgments(analysis.kanoon_search_queries[1]);
-    }
-
-    if (rawJudgments.length === 0) {
-      return this.buildInsufficientEvidenceResponse(analysis, userQuery, options);
-    }
-
-    // Stage 3: Retrieve Document Context & Chunk Safely (Handling large judgments)
-    const topDocsToHydrate = rawJudgments.slice(0, 3);
-    const hydratedJudgments = await Promise.all(
-      topDocsToHydrate.map(async (j) => {
-        try {
-          const detailedDoc = await this.kanoonClient.getJudgmentDetails(j.kanoonId);
-          if (detailedDoc && detailedDoc.fullText && detailedDoc.fullText.length > 50) {
-            // Cap at 25,000 characters to prevent memory/token overflows
-            const safeText = detailedDoc.fullText.slice(0, 25000);
-            return {
-              ...j,
-              fullText: safeText,
-              citation: detailedDoc.citation || j.citation,
-              court: detailedDoc.court || j.court,
-              publishDate: detailedDoc.publishDate || j.publishDate,
-            };
-          }
-        } catch (err) {
-          console.warn(`[RagPipeline] Doc hydration for ${j.kanoonId} fell back to search snippet:`, err.message);
-        }
-        return j;
-      })
-    );
-
-    const docsForProcessing = [...hydratedJudgments, ...rawJudgments.slice(3)];
-
-    let allChunks = [];
-    for (const judgment of docsForProcessing) {
-      const chunks = JudgmentProcessor.chunkJudgment(judgment);
-      allChunks.push(...chunks);
-    }
-
-    if (allChunks.length === 0) {
-      // Fallback: create chunk records directly from snippets if text chunking was empty
-      allChunks = docsForProcessing.map((doc, idx) => ({
-        chunkId: `${doc.kanoonId}_chk_${idx}`,
-        kanoonId: doc.kanoonId,
-        caseTitle: doc.title,
-        court: doc.court,
-        citation: doc.citation,
-        sourceUrl: doc.sourceUrl,
-        publishDate: doc.publishDate,
-        chunkIndex: idx,
-        chunkType: 'statutory_analysis',
-        chunkText: doc.fullText || doc.snippet || doc.title,
-      }));
-    }
-
-    // Stage 4: Embed Query and Chunks (pgvector / vectorEngine simulation)
-    const queryVector = await VectorEngine.generateEmbedding(userQuery);
-    const embeddedChunks = await Promise.all(
-      allChunks.map(async (chunk) => ({
-        ...chunk,
-        embedding: await VectorEngine.generateEmbedding(chunk.chunkText),
-      }))
-    );
-
-    // Stage 5 & 6: Hybrid Retrieval (Semantic Vector Search + Top-K Ranking)
-    let topChunks = VectorEngine.searchSimilarChunks(queryVector, embeddedChunks, {
-      topK: 3,
-      minSimilarity: 0.35,
-    });
-
-    // Graceful fallback to highest scored chunks if threshold was strict
-    if (topChunks.length === 0 && embeddedChunks.length > 0) {
-      topChunks = embeddedChunks
-        .map((chunk) => ({
-          ...chunk,
-          similarityScore: Number(VectorEngine.cosineSimilarity(queryVector, chunk.embedding).toFixed(4)),
-        }))
-        .sort((a, b) => b.similarityScore - a.similarityScore)
-        .slice(0, 3);
-    }
-
-    // Insufficient evidence check
     if (topChunks.length === 0) {
       return this.buildInsufficientEvidenceResponse(analysis, userQuery, options);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     }
 
     // Stage 7: Evidence-Grounded Guidance Generation (Gemini LLM or Grounded Fallback Engine)
@@ -332,18 +200,14 @@ export class RagPipeline {
     const verifiedSources = this.verifyAndFormatSources(topChunks, rawJudgments);
 
     // Align laws representation
-    const relevantLaws = (generationResult.relevantLaws && generationResult.relevantLaws.length > 0)
+    const relevantLaws = Array.isArray(generationResult.relevantLaws)
       ? generationResult.relevantLaws.map((l) => ({
           act: l.name || l.act || 'Governing Statute',
           section: l.section || '',
-          plainMeaning: l.explanation || l.plainMeaning || 'Applicable statutory provision under Indian law',
-          applicability: l.explanation || 'Identified as governing statute for the dispute',
+          plainMeaning: l.explanation || l.plainMeaning || '',
+          applicability: l.explanation || '',
         }))
-      : (analysis.relevant_acts_anticipated || []).map((act) => ({
-          act,
-          plainMeaning: 'Identified as governing statute for the dispute under Indian law',
-          applicability: 'Identified as governing statute for the dispute',
-        }));
+      : [];
 
     // Align precedents representation
     const similarCases = verifiedSources.map((s, idx) => {
@@ -362,15 +226,18 @@ export class RagPipeline {
         similarityScore: s.similarityScore,
         sourceUrl: s.sourceUrl,
         keyExtract: s.chunkText,
-        whyRelevant: match?.whyRelevant || `Relevant judicial context on ${analysis.category} regarding ${s.title}`,
-        keyTakeaway: match?.whyRelevant || `Relevant judicial context on ${analysis.category} regarding ${s.title}`,
+        whyRelevant: match?.whyRelevant || 'Retrieved record; relevance to the facts has not been assessed.',
+        keyTakeaway: match?.whyRelevant || 'Retrieved record; relevance to the facts has not been assessed.',
       };
     });
 
     const rawGuidance = generationResult.guidance || '';
-    const finalGuidance = rawGuidance.toLowerCase().includes('applicability depends')
-      ? rawGuidance
-      : `${rawGuidance}\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*`;
+    const emotionalPrefix = (analysis.emotional_acknowledgment && !rawGuidance.includes(analysis.emotional_acknowledgment))
+      ? `${analysis.emotional_acknowledgment}\n\n`
+      : '';
+    const finalGuidance = `${emotionalPrefix}${rawGuidance}`.toLowerCase().includes('applicability depends')
+      ? `${emotionalPrefix}${rawGuidance}`
+      : `${emotionalPrefix}${rawGuidance}\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*`;
 
     return {
       summary: generationResult.problemSummary || analysis.summary,
@@ -378,19 +245,21 @@ export class RagPipeline {
       category: analysis.category,
       jurisdiction: analysis.jurisdiction,
       detected_language: analysis.detected_language || 'English',
+      detected_emotion: analysis.detected_emotion || analysis.detectedEmotion || 'Normal',
+      detectedEmotion: analysis.detected_emotion || analysis.detectedEmotion || 'Normal',
+      emotional_tone: analysis.emotional_tone || analysis.emotionalTone || 'Professional & Objective',
+      emotionalTone: analysis.emotional_tone || analysis.emotionalTone || 'Professional & Objective',
+      emotional_acknowledgment: analysis.emotional_acknowledgment || analysis.emotionalAcknowledgment || '',
+      emotionalAcknowledgment: analysis.emotional_acknowledgment || analysis.emotionalAcknowledgment || '',
+      fact_gathering_questions: analysis.fact_gathering_questions || analysis.factGatheringQuestions || [],
+      factGatheringQuestions: analysis.fact_gathering_questions || analysis.factGatheringQuestions || [],
       kanoonQuery: primaryQuery,
       primaryKanoonQuery: primaryQuery,
       kanoon_search_queries: analysis.kanoon_search_queries || [],
       legal_issues: generationResult.legalIssues || analysis.legal_issues,
       legalIssues: generationResult.legalIssues || analysis.legal_issues,
-      possible_rights: generationResult.possibleRights || [
-        'Right to fair hearing and pre-litigation resolution',
-        'Statutory remedy under Indian civil/consumer jurisdiction',
-      ],
-      possibleRights: generationResult.possibleRights || [
-        'Right to fair hearing and pre-litigation resolution',
-        'Statutory remedy under Indian civil/consumer jurisdiction',
-      ],
+      possible_rights: generationResult.possibleRights || [],
+      possibleRights: generationResult.possibleRights || [],
       relevant_laws: relevantLaws,
       relevantLaws: relevantLaws,
       similar_cases: similarCases,
@@ -411,43 +280,20 @@ export class RagPipeline {
       missingInformation: generationResult.missingEvidence || analysis.missing_information,
       suggestedNextSteps: generationResult.nextActions || (analysis.missing_information || []).map((m) => `Clarify: ${m}`),
       nextActions: generationResult.nextActions || [],
-      evidence_suggestions: generationResult.evidenceSuggestions || [
-        'Written contracts or agreements',
-        'Bank statements and transaction receipts',
-        'Written notices and correspondence',
-      ],
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-      selfHelp: generationResult.selfHelp || matchLegalDomain(userQuery, analysis.category).selfHelp,
+      evidence_suggestions: generationResult.evidenceSuggestions || [],
+
+      selfHelp: generationResult.selfHelp || null,
       confidence: topChunks[0]?.similarityScore > 0.65 ? 'high' : 'medium',
-      modelUsed: generationResult.modelUsed || (networkManager.isOnline() ? 'Gemini 2.5 Flash' : 'VidhiSetu Indian Legal Engine (Local RAG)'),
-      executionMode: !geminiClient.isConfigured() ? 'llm_unavailable' : (generationResult.executionMode || (networkManager.isOnline() ? 'gemini_llm' : 'offline_local_rag')),
+      modelUsed: generationResult.modelUsed || 'none',
+      executionMode: generationResult.executionMode || 'llm_unavailable',
       isOffline: !networkManager.isOnline(),
-<<<<<<< HEAD
-=======
-      confidence: topChunks[0]?.similarityScore > 0.65 ? 'high' : 'medium',
-      modelUsed: generationResult.modelUsed || 'deterministic_expert_engine',
-      executionMode: generationResult.executionMode || 'deterministic_fallback',
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       disclaimer: STANDARD_DISCLAIMER,
     };
   }
 
   /**
    * Generates evidence-grounded guidance using retrieved case chunks.
-<<<<<<< HEAD
-<<<<<<< HEAD
    * Uses Gemini with retrieved evidence and falls back to comprehensive domain expert analysis when unavailable.
-=======
-   * Dispatches to real Gemini LLM if configured; otherwise utilizes deterministic template engine.
->>>>>>> origin/main
-=======
-   * Uses Gemini with retrieved evidence and falls back to comprehensive domain expert analysis when unavailable.
->>>>>>> 3aab4be (dhanush commits)
    */
   async generateGroundedGuidance(query, analysis, chunks, options = {}) {
     const evidenceContext = chunks
@@ -463,25 +309,12 @@ Relevant Extract:
       )
       .join('\n\n');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     // Chat context & case continuity formatting (Multi-turn memory)
     let chatContextSection = '';
     if (options.history && Array.isArray(options.history) && options.history.length > 0) {
       const recentHistory = options.history.slice(-8);
       chatContextSection = `\nPREVIOUS CASE CONVERSATION HISTORY (REMEMBER THIS CONTEXT AND PRIOR FACTS):\n${recentHistory.map((h) => `${h.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${h.text}`).join('\n')}\n`;
-<<<<<<< HEAD
-=======
-    // Chat context & case continuity formatting
-    let chatContextSection = '';
-    if (options.history && Array.isArray(options.history) && options.history.length > 0) {
-      const recentHistory = options.history.slice(-4);
-      chatContextSection = `\nPREVIOUS CASE CONVERSATION HISTORY:\n${recentHistory.map((h) => `${h.sender === 'user' ? 'Citizen' : 'VidhiSetu'}: ${h.text}`).join('\n')}\n`;
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     }
 
     if (geminiClient.isConfigured()) {
@@ -499,9 +332,6 @@ SUMMARY OF CITIZEN'S GRIEVANCE:
 LEGAL ISSUES DETECTED:
 - ${(analysis.legal_issues || []).join('\n- ')}
 
-ANTICIPATED INDIAN STATUTES:
-- ${(analysis.relevant_acts_anticipated || []).join('\n- ')}
-
 RETRIEVED LEGAL EVIDENCE (AUTHENTIC INDIAN KANOON RECORDS):
 ${evidenceContext}
 
@@ -510,26 +340,14 @@ ${analysis.detected_language || 'English'}
 
 CRITICAL TASK REQUIREMENTS:
 1. Synthesize a comprehensive, evidence-grounded legal analysis for the citizen adhering strictly to the schema.
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-2. MULTI-TURN CONVERSATION MEMORY: Maintain full conversational memory. When the user asks a follow-up, provides new details, or asks about notice/timeline/deductions/process, integrate all facts previously discussed in the chat and build directly on earlier turns.
-3. SUITABLE INDIVIDUALIZED PROCESS: Provide a clear, chronological, step-by-step procedural roadmap tailored specifically to this problem (Immediate Evidence Gathering -> Statutory Notice & Cure Period -> Pre-Litigation Portals/Mediation -> Court/Tribunal Filing & Limitation -> Remedies & Damages).
-4. Multilingual: If user input was in Telugu or Tanglish, provide accessible explanations in Telugu or Tanglish in "guidance" so they clearly understand their rights, preserving Indian statutory names in English.
-5. Grounded in Evidence: Cite ONLY authentic Indian Kanoon records from the retrieved evidence. Do NOT fabricate citations or case names.
-6. Follow all safety rules: no guaranteed wins, cautious language.`;
-<<<<<<< HEAD
-=======
 2. ANCHOR INTEGRITY: You MUST keep your entire response strictly anchored to the citizen's actual grievance and category: "${analysis.category}".
    - If the dispute is a Tenancy dispute (e.g., landlord withholding security deposit), your advice MUST focus exclusively on tenancy law, deposit refund, statutory demand notice to landlord, and civil recovery / rent tribunal. Do NOT mention builder delay, RERA, or homebuyer rights!
    - If the dispute is a Real Estate / RERA dispute (e.g., builder delayed flat possession), your advice MUST focus on RERA Section 18, delay compensation interest, and homebuyer remedies.
-3. Multilingual: If user input was in Telugu or Tanglish, provide accessible explanations in Telugu or Tanglish in "guidance" so they clearly understand their rights, preserving Indian statutory names in English.
-4. Grounded in Evidence: Cite ONLY authentic Indian Kanoon records from the retrieved evidence. Do NOT fabricate citations or case names.
-5. Follow all safety rules: no guaranteed wins, cautious language.`;
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+3. MULTI-TURN CONVERSATION MEMORY: Maintain full conversational memory. When the user asks a follow-up, provides new details, or asks about notice/timeline/deductions/process, integrate all facts previously discussed in the chat and build directly on earlier turns.
+4. SUITABLE INDIVIDUALIZED PROCESS: Provide a clear, chronological, step-by-step procedural roadmap tailored specifically to this problem (Immediate Evidence Gathering -> Statutory Notice & Cure Period -> Pre-Litigation Portals/Mediation -> Court/Tribunal Filing & Limitation -> Remedies & Damages).
+5. Multilingual: If user input was in Telugu or Tanglish, provide accessible explanations in Telugu or Tanglish in "guidance" so they clearly understand their rights, preserving Indian statutory names in English.
+6. Grounded in Evidence: Cite ONLY authentic Indian Kanoon records from the retrieved evidence. State a statute, section, deadline, remedy, or legal test only when directly supported by retrieved evidence. Do NOT fabricate citations or case names; leave unsupported fields empty.
+7. Follow all safety rules: no guaranteed wins, cautious language.`;
 
         const response = await geminiClient.generateStructured({
           prompt: structuredPrompt,
@@ -540,133 +358,50 @@ CRITICAL TASK REQUIREMENTS:
 
         if (response && response.data) {
           const guardedData = this.validateAndGuardGeneratedGuidance(response.data, analysis, query, chunks, options);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-          const domain = matchLegalDomain(query, analysis.category, options.history);
+
           return {
-            problemSummary: guardedData.problemSummary || analysis.summary,
-            legalIssues: Array.isArray(guardedData.legalIssues) ? guardedData.legalIssues : analysis.legal_issues,
-            possibleRights: Array.isArray(guardedData.possibleRights) && guardedData.possibleRights.length > 0 ? guardedData.possibleRights : domain.rights,
-            relevantLaws: Array.isArray(guardedData.relevantLaws) && guardedData.relevantLaws.length > 0 ? guardedData.relevantLaws : domain.acts,
-            relevantJudgments: Array.isArray(guardedData.relevantJudgments) && guardedData.relevantJudgments.length > 0 ? guardedData.relevantJudgments : domain.precedents,
-            evidenceSuggestions: Array.isArray(guardedData.evidenceSuggestions) ? guardedData.evidenceSuggestions : domain.selfHelp?.requiredDocuments,
-            missingEvidence: Array.isArray(guardedData.missingEvidence) ? guardedData.missingEvidence : domain.missingInformation,
-            nextActions: Array.isArray(guardedData.nextActions) ? guardedData.nextActions : domain.nextSteps,
-            guidance: guardedData.guidance || response.text,
-            selfHelp: domain.selfHelp,
+          problemSummary: guardedData.problemSummary || analysis.summary,
+          legalIssues: Array.isArray(guardedData.legalIssues) ? guardedData.legalIssues : analysis.legal_issues,
+          possibleRights: Array.isArray(guardedData.possibleRights) ? guardedData.possibleRights : [],
+          relevantLaws: Array.isArray(guardedData.relevantLaws) ? guardedData.relevantLaws : [],
+          relevantJudgments: Array.isArray(guardedData.relevantJudgments) ? guardedData.relevantJudgments : [],
+          evidenceSuggestions: Array.isArray(guardedData.evidenceSuggestions) ? guardedData.evidenceSuggestions : [],
+          missingEvidence: Array.isArray(guardedData.missingEvidence) ? guardedData.missingEvidence : analysis.missing_information || [],
+          nextActions: Array.isArray(guardedData.nextActions) ? guardedData.nextActions : [],
+          guidance: guardedData.guidance || response.text,
+          selfHelp: null,
             disclaimer: guardedData.disclaimer || STANDARD_DISCLAIMER,
-<<<<<<< HEAD
-=======
-          return {
-            problemSummary: guardedData.problemSummary || analysis.summary,
-            legalIssues: Array.isArray(guardedData.legalIssues) ? guardedData.legalIssues : analysis.legal_issues,
-            possibleRights: Array.isArray(guardedData.possibleRights) ? guardedData.possibleRights : [],
-            relevantLaws: Array.isArray(guardedData.relevantLaws) ? guardedData.relevantLaws : [],
-            relevantJudgments: Array.isArray(guardedData.relevantJudgments) ? guardedData.relevantJudgments : [],
-            evidenceSuggestions: Array.isArray(guardedData.evidenceSuggestions) ? guardedData.evidenceSuggestions : [],
-            missingEvidence: Array.isArray(guardedData.missingEvidence) ? guardedData.missingEvidence : analysis.missing_information,
-            nextActions: Array.isArray(guardedData.nextActions) ? guardedData.nextActions : [],
-            guidance: guardedData.guidance || response.text,
-            disclaimer: guardedData.disclaimer || 'AI legal information based on Indian Kanoon records; does not constitute legal representation.',
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
             modelUsed: response.modelUsed,
             executionMode: guardedData.executionMode || 'gemini_llm',
           };
         }
       } catch (err) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-        console.warn(`[RagPipeline] Gemini generation failed (${err.code || err.message}); engaging comprehensive domain knowledge engine.`);
+
+        console.warn(`[RagPipeline] Gemini generation failed (${err.code || err.message}); withholding unverified legal conclusions.`);
       }
     }
-
-    // High-Fidelity 6-Pillar Domain Expert Generation (Flowchart Step 4 Alignment)
-    const domain = matchLegalDomain(query, analysis.category, options.history);
-    
-    const summaryHeading = `### 📄 Case Summary\nBased on your inquiry regarding **${domain.category}**, here is an individualized legal assessment under Indian jurisprudence:\n${analysis.summary || domain.summary}\n`;
-
-    const lawsList = domain.acts.map((a) => `- ⚖️ **${a.act} (${a.section})**: ${a.plainMeaning}\n  *Applicability: ${a.applicability}*`).join('\n\n');
-    const lawsSection = `\n### ⚖️ Relevant Laws & Statutory Sections\n${lawsList}\n`;
-
-    const precedentsList = (domain.precedents || []).map((p) => `- 🏛️ **${p.title}** (${p.citation}, *${p.court}*):\n  > "${p.keyExtract}"\n  💡 *Takeaway: ${p.whyRelevant}*`).join('\n\n');
-    const precedentsSection = `\n### 🏛️ Similar Previous Cases (Indian Kanoon)\n${precedentsList}\n`;
-
-    const rightsList = (domain.rights || []).map((r) => `- 💡 **${r}**`).join('\n');
-    const rightsSection = `\n### 💡 Rights & Possible Options\n${rightsList}\n`;
-
-    // Flowchart & User Request Alignment: Suitable Individualized Legal Process
-    const processStepsList = (domain.selfHelp?.actionPlan || domain.nextSteps || []).map((s, idx) => {
-      if (typeof s === 'string') return `- **Step ${idx + 1}**: ${s}`;
-      return `- **Step ${s.step || idx + 1}: ${s.title}**\n  ${s.desc || s.description || ''}`;
-    }).join('\n\n');
-    const processSection = `\n### 📋 Suitable Legal Process & Step-by-Step Procedure\nHere is the tailored, step-by-step procedural roadmap to resolve this specific problem:\n\n${processStepsList}\n\n*Official Filing Portal:* **${domain.selfHelp?.portalName || 'District Court / eCourts'}** (${domain.selfHelp?.portalUrl || 'https://districts.ecourts.gov.in/'})\n`;
-
-    const nextStepsList = (domain.nextSteps || []).map((s) => `- ${s}`).join('\n');
-    const nextStepsSection = `\n### 📋 Immediate Practical Next Steps\n${nextStepsList}\n`;
-
-    const missingList = (domain.missingInformation || []).map((m) => `- ❓ ${m}`).join('\n');
-    const missingSection = `\n### ℹ️ Missing Information & Facts to Clarify\nTo strengthen your legal standing, please consider clarifying:\n${missingList}\n`;
-
-    const synthesizedGuidance = `${summaryHeading}\n${lawsSection}\n${precedentsSection}\n${rightsSection}\n${processSection}\n${nextStepsSection}\n${missingSection}\n\n---\n*Disclaimer: ${STANDARD_DISCLAIMER}*`;
 
     return {
-      problemSummary: analysis.summary || domain.summary,
-      legalIssues: analysis.legal_issues && analysis.legal_issues.length > 0 ? analysis.legal_issues : [`Assessment under ${domain.acts[0]?.act}`, 'Dispute redressal and statutory remedies'],
-      possibleRights: domain.rights,
-      relevantLaws: domain.acts.map((a) => ({
-        act: a.act,
-        section: a.section,
-        plainMeaning: a.plainMeaning,
-        applicability: a.applicability,
-      })),
-      relevantJudgments: (domain.precedents || []).map((p) => ({
-        id: p.kanoonId,
-        caseId: p.kanoonId,
-        title: p.title,
-        caseName: p.title,
-        court: p.court,
-        citation: p.citation,
-        publishDate: p.publishDate,
-        date: p.publishDate,
-        sourceUrl: p.sourceUrl,
-        keyExtract: p.keyExtract,
-        whyRelevant: p.whyRelevant,
-      })),
-      evidenceSuggestions: domain.selfHelp?.requiredDocuments || [],
-      missingEvidence: domain.missingInformation || [],
-      nextActions: domain.nextSteps || [],
-      guidance: synthesizedGuidance,
-      selfHelp: domain.selfHelp,
-      modelUsed: 'VidhiSetu Indian Legal Engine (Local RAG)',
-      executionMode: 'grounded_domain_engine',
+      problemSummary: analysis.summary || query,
+      legalIssues: analysis.legal_issues || [],
+      possibleRights: [],
+      relevantLaws: [],
+      relevantJudgments: [],
+      evidenceSuggestions: [],
+      missingEvidence: analysis.missing_information || [],
+      nextActions: [],
+      guidance: 'I retrieved legal records, but automated legal analysis is unavailable right now. I am not applying those records to your situation or presenting unverified laws, rights, deadlines, or next steps. Please review the linked source records or consult a qualified advocate.',
+      selfHelp: null,
+      modelUsed: 'none',
+      executionMode: 'llm_unavailable',
     };
-<<<<<<< HEAD
-=======
-        console.warn(`[RagPipeline] Gemini LLM generation failed (${err.code || err.message}), engaging high-fidelity deterministic grounded engine.`);
-      }
-    }
-
-    // High-fidelity domain expert grounded fallback synthesis
-    return this.generateDeterministicGuidance(query, analysis, chunks, options);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
   }
 
   /**
    * Response Guard: Ensures the generated response did not drift from the anchor legal problem
    */
   validateAndGuardGeneratedGuidance(data, analysis, query, chunks, options = {}) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     const withheldResponse = {
       problemSummary: analysis.summary,
       legalIssues: analysis.legal_issues || [],
@@ -682,26 +417,12 @@ CRITICAL TASK REQUIREMENTS:
 
     if (!data || !data.guidance) {
       return withheldResponse;
-<<<<<<< HEAD
-=======
-    if (!data || !data.guidance) {
-      return this.generateDeterministicGuidance(query, analysis, chunks, options);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     }
 
     const catLower = (analysis.category || '').toLowerCase();
     const isTenancy = catLower.includes('tenan') || catLower.includes('deposit') || catLower.includes('rent');
     const isRera = catLower.includes('rera') || catLower.includes('real estate') || catLower.includes('builder');
-<<<<<<< HEAD
-<<<<<<< HEAD
     const isDomesticSafety = catLower.includes('domestic / family safety');
-=======
->>>>>>> origin/main
-=======
-    const isDomesticSafety = catLower.includes('domestic / family safety');
->>>>>>> 3aab4be (dhanush commits)
 
     const guidanceLower = (data.guidance || '').toLowerCase();
     const summaryLower = (data.problemSummary || '').toLowerCase();
@@ -712,18 +433,8 @@ CRITICAL TASK REQUIREMENTS:
       const mentionsTenancy = guidanceLower.includes('deposit') || guidanceLower.includes('landlord') || guidanceLower.includes('tenant') || guidanceLower.includes('rent');
 
       if (mentionsRera && !mentionsTenancy) {
-<<<<<<< HEAD
-<<<<<<< HEAD
         console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Withholding response.');
         return withheldResponse;
-=======
-        console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Engaging grounded domain synthesis.');
-        return this.generateDeterministicGuidance(query, analysis, chunks, options);
->>>>>>> origin/main
-=======
-        console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (RERA instead of Tenancy). Withholding response.');
-        return withheldResponse;
->>>>>>> 3aab4be (dhanush commits)
       }
     }
 
@@ -731,10 +442,7 @@ CRITICAL TASK REQUIREMENTS:
     if (isRera) {
       const mentionsLandlord = guidanceLower.includes('landlord') && !guidanceLower.includes('builder');
       if (mentionsLandlord) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
         console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (Tenancy instead of RERA). Withholding response.');
         return withheldResponse;
       }
@@ -746,38 +454,19 @@ CRITICAL TASK REQUIREMENTS:
       if (!isOnTopic || mentionsUnrelatedHousing) {
         console.warn('[RagPipeline Guard] Withholding legal guidance that drifted from domestic/family safety.');
         return withheldResponse;
-<<<<<<< HEAD
-=======
-        console.warn('[RagPipeline Guard] Detected domain drift in Gemini response (Tenancy instead of RERA). Engaging grounded domain synthesis.');
-        return this.generateDeterministicGuidance(query, analysis, chunks, options);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       }
     }
 
     return data;
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   buildGreetingResponse(analysis, options = {}) {
     const greetingText = `Hello! I am **VidhiSetu AI**, your Indian legal assistant.
 
-I can help analyze your legal questions under Indian law, cite authentic precedents from **Indian Kanoon**, and suggest actionable next steps.
+I can help organize the facts you share and, when verified legal records are available, provide cautious information with source links. This is not a substitute for advice from a qualified advocate.
 
-### How can I help you today?
-Here are some of the most common issues I can assist you with:
-- 🏠 **Tenancy & Landlord Disputes**: Security deposit refunds, arbitrary deductions (painting / wear-and-tear), unlawful eviction, and 15-day statutory demand notices.
-- 🏢 **Real Estate & RERA**: Builder delays in flat handover, statutory delay interest, or 100% refund under Section 18 of RERA.
-- 🛍️ **Consumer Protection**: Defective products, refused refunds from e-commerce platforms, and service deficiencies under CPA 2019.
-- 💼 **Employment & Labour**: Unpaid salary, wrongful termination, notice pay disputes, and full & final settlements.
-- 💳 **Banking & Cheque Bounce**: Dishonour of cheques and statutory demand notices under Section 138 of the Negotiable Instruments Act.
-- 🛡️ **Cyber Crime & UPI Fraud**: Unauthorized bank debits, online scams, and immediate freezing via 1930 / cybercrime portal.
-
-Please describe what happened in your own words, and I will guide you through your legal rights and options!`;
+Please describe what happened, where it happened, and what outcome you are seeking. Avoid sharing passwords, OTPs, or other sensitive account credentials.`;
 
     return {
       summary: 'VidhiSetu Legal AI Assistant introduction and domain capabilities.',
@@ -790,22 +479,10 @@ Please describe what happened in your own words, and I will guide you through yo
       kanoon_search_queries: [],
       legal_issues: ['Overview of Indian statutory rights, Kanoon precedents, and case assessment'],
       legalIssues: ['Overview of Indian statutory rights, Kanoon precedents, and case assessment'],
-      possible_rights: [
-        'Right to access statutory legal information',
-        'Right to pre-litigation resolution and legal notice',
-      ],
-      possibleRights: [
-        'Right to access statutory legal information',
-        'Right to pre-litigation resolution and legal notice',
-      ],
-      relevant_laws: [
-        { act: 'Constitution of India', section: 'Article 39A', plainMeaning: 'Equal justice and free legal aid to all citizens', applicability: 'Constitutional guarantee of access to justice' },
-        { act: 'Code of Civil Procedure, 1908', section: 'Section 89', plainMeaning: 'Settlement of disputes outside the court (ADR)', applicability: 'Pre-litigation dispute resolution' },
-      ],
-      relevantLaws: [
-        { act: 'Constitution of India', section: 'Article 39A', plainMeaning: 'Equal justice and free legal aid to all citizens', applicability: 'Constitutional guarantee of access to justice' },
-        { act: 'Code of Civil Procedure, 1908', section: 'Section 89', plainMeaning: 'Settlement of disputes outside the court (ADR)', applicability: 'Pre-litigation dispute resolution' },
-      ],
+      possible_rights: [],
+      possibleRights: [],
+      relevant_laws: [],
+      relevantLaws: [],
       similar_cases: [],
       relevantJudgments: [],
       guidance: greetingText,
@@ -822,87 +499,15 @@ Please describe what happened in your own words, and I will guide you through yo
         'City or State where the dispute arose',
         'Whether you have a written agreement or receipts',
       ],
-      suggestedNextSteps: [
-        'My landlord is not refunding my security deposit',
-        'Builder delayed my flat possession by 2 years',
-        'Company terminated me without notice or salary',
-        'Cheque given to me bounced due to insufficient funds',
-      ],
+      suggestedNextSteps: [],
       nextActions: [
         'Describe your legal dispute with key dates and amounts',
         'Mention any written agreement or notices exchanged',
       ],
-      confidence: 'high',
+      confidence: 'none',
       modelUsed: 'conversational_intro',
       executionMode: 'conversational_intro',
       disclaimer: STANDARD_DISCLAIMER,
-<<<<<<< HEAD
-=======
-=======
-    };
-  }
-
->>>>>>> 3aab4be (dhanush commits)
-  /**
-   * Deterministic grounded template engine for offline / test / fallback scenarios
-   */
-  generateDeterministicGuidance(query, analysis, chunks, options = {}) {
-    const leadSource = chunks[0];
-    const secondSource = chunks[1] || chunks[0];
-    const statutes = (analysis.relevant_acts_anticipated || []).join(', ');
-
-    let guidanceBody = '';
-
-    if (analysis.category.includes('Tenancy')) {
-      guidanceBody = `Based on Indian tenancy laws and judicial principles, particularly **${leadSource.caseTitle}** (${leadSource.court}), a landlord cannot arbitrarily withhold or deduct a tenant's security deposit once the premises have been vacated after due notice.\n\n### Key Legal Principles:\n1. **Right to Refund**: Security deposits are held in trust as collateral against actual physical damages or unpaid utility bills. In the absence of documented damage or arrears, the full amount must be refunded within a reasonable timeframe.\n2. **Burden of Proof**: A landlord claiming deductions bears the burden of establishing itemized proof of damage beyond normal wear and tear.\n3. **Statutory Framework**: Governed by the **${statutes}**.\n\n### Relevant Judicial Context:\n- **${leadSource.caseTitle}** (${leadSource.court}): Courts emphasize that contractual obligations regarding return of deposit upon peaceful handover must be honored.\n${chunks.length > 1 ? `- **${secondSource.caseTitle}**: Illustrates judicial interpretation regarding tenancy covenants and refund recovery.` : ''}\n\n### Recommended Next Steps:\n1. **Document Delivery**: Consolidate written proof of notice, handover of keys, and move-out inspection.\n2. **Statutory Demand Notice**: Dispatch a formal 15-day legal notice demanding immediate refund of the deposit with interest.\n3. **Legal Redress**: If unreturned, legal recourse may be initiated before the Rent Authority / Rent Tribunal or Consumer/Civil Court depending on the agreement.`;
-    } else if (analysis.category.includes('RERA') || analysis.category.includes('Real Estate')) {
-      guidanceBody = `Based on the Real Estate (Regulation and Development) Act, 2016 (RERA) and landmark judicial precedents such as **${leadSource.caseTitle}** (${leadSource.court}), homebuyers are legally protected against unreasonable possession delays by real estate developers.\n\n### Key Legal Principles:\n1. **Statutory Delay Compensation**: Under **Section 18 of RERA**, if a developer fails to deliver possession within the timeframe specified in the Agreement for Sale, the allottee has the right to claim interest for every month of delay until actual handover.\n2. **Option to Withdraw**: The homebuyer may alternatively choose to withdraw from the project and demand a full refund of all payments made, along with interest prescribed under State RERA Rules.\n3. **Concurrent Remedies**: Judicial rulings affirm that homebuyers can seek relief before the State RERA Authority as well as Consumer Commissions.\n\n### Relevant Judicial Context:\n- **${leadSource.caseTitle}** (${leadSource.court}): Reaffirms the mandatory nature of developer accountability and buyer compensation under RERA.\n${chunks.length > 1 ? `- **${secondSource.caseTitle}**: Highlights judicial enforcement of promised handover schedules and statutory interest.` : ''}\n\n### Recommended Next Steps:\n1. **Review Agreement for Sale**: Verify the promised delivery date, grace period clauses, and payment receipts.\n2. **Issue Demand Notice**: Serve a written notice demanding immediate payment of delay compensation interest.\n3. **File RERA Complaint**: If unresolved, lodge a complaint online before your State RERA Authority or Consumer Forum.`;
-    } else {
-      guidanceBody = `Based on Indian judicial precedents, particularly **${leadSource.caseTitle}** (${leadSource.court}), Indian courts enforce strict adherence to statutory procedures and contractual good faith.\n\n### Key Legal Principles:\n1. **Statutory Protection**: Your issue is governed by **${statutes}**.\n2. **Judicial Precedent**: In **${leadSource.caseTitle}**, the court observed that legal rights and procedures must be scrupulously maintained.\n\n### Recommended Next Steps:\n1. **Evidence Gathering**: Organize all written communications, receipts, and contract copies.\n2. **Statutory Notice**: Issue a formal pre-litigation notice setting out the grievance.\n3. **Advocate Consultation**: Consult an advocate in ${analysis.jurisdiction} for representation if required.`;
-    }
-
-    const fullGuidance = `${guidanceBody}\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*`;
-
-    return {
-      problemSummary: analysis.summary,
-      legalIssues: analysis.legal_issues,
-      possibleRights: [
-        'Right to statutory notice and procedural fairness',
-        'Right to recovery of withheld amounts or delay compensation',
-      ],
-      relevantLaws: (analysis.relevant_acts_anticipated || []).map((name) => ({
-        name,
-        section: '',
-        explanation: 'Statute governing the primary dispute domain',
-      })),
-      relevantJudgments: chunks.map((c) => ({
-        caseName: c.caseTitle,
-        court: c.court,
-        date: c.publishDate,
-        whyRelevant: `Judicial precedent from ${c.court} addressing ${analysis.category}`,
-        extract: c.chunkText.slice(0, 200),
-        sourceUrl: c.sourceUrl,
-        documentId: c.kanoonId,
-      })),
-      evidenceSuggestions: [
-        'Agreement or contract document copy',
-        'Proof of payments, bank statements, and invoices',
-        'Written notices or email communications',
-      ],
-      missingEvidence: analysis.missing_information,
-      nextActions: [
-        'Consolidate documentary evidence into a timeline',
-        'Dispatch a formal written legal notice',
-        'Seek professional advocate representation if informal resolution fails',
-      ],
-      guidance: fullGuidance,
-      disclaimer: 'This guidance is based on Indian Kanoon precedents and statutory provisions. It does not constitute formal legal representation.',
-      modelUsed: 'deterministic_expert_engine',
-      executionMode: 'deterministic_fallback',
-<<<<<<< HEAD
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     };
   }
 
@@ -930,10 +535,7 @@ Please describe what happened in your own words, and I will guide you through yo
   }
 
   buildInsufficientEvidenceResponse(analysis, query, options = {}) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     const category = (analysis.category || '').toLowerCase();
     const isDomesticSafety = category.includes('domestic / family safety');
     const isHarassment = category.includes('harassment');
@@ -953,12 +555,6 @@ Please describe what happened in your own words, and I will guide you through yo
       : isHarassment
         ? 'I’m sorry you’re dealing with sexual harassment. Your message does not yet say what happened or what support you need, and I do not have relevant retrieved legal records to make a grounded legal assessment. Are you in immediate danger? If so, contact local emergency services. You can share where this happened, when it happened, whether it is ongoing, and what support you need. I will keep this separate from any earlier issue in the chat.'
       : 'Available legal records and previous court judgments on Indian Kanoon are currently insufficient to provide high-confidence guidance on this specific query. I have not substituted unrelated cases or an offline legal template. Please add the relevant facts or consult a qualified advocate.';
-<<<<<<< HEAD
-=======
-    const text = 'Available legal records and previous court judgments on Indian Kanoon are currently insufficient to provide high-confidence statutory guidance on this specific query. A professional consultation with a licensed advocate is strongly advised.\n\n*(Note: Retrieved cases provide judicial context; applicability depends on specific factual correspondence with your case.)*';
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     return {
       summary: analysis.summary,
       problemSummary: analysis.summary,
@@ -980,28 +576,15 @@ Please describe what happened in your own words, and I will guide you through yo
       evidence_suggestions: [],
       missing_information: analysis.missing_information,
       missingInformation: analysis.missing_information,
-<<<<<<< HEAD
-<<<<<<< HEAD
       suggestedNextSteps: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
       nextActions: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
-=======
-      suggestedNextSteps: ['Consult a licensed advocate for personalized advice'],
-      nextActions: ['Consult a licensed advocate for personalized advice'],
->>>>>>> origin/main
-=======
-      suggestedNextSteps: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
-      nextActions: isBankTransaction ? (analysis.nextActions || []) : isDomesticSafety ? [] : ['Consult a licensed advocate for personalized advice'],
->>>>>>> 3aab4be (dhanush commits)
       confidence: 'low',
       modelUsed: 'none',
       executionMode: 'insufficient_evidence',
       disclaimer: STANDARD_DISCLAIMER,
     };
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 
   buildClarificationResponse(analysis) {
     const text = analysis.clarificationPrompt || 'I can help. What kind of problem are you dealing with? Please tell me what happened, who was involved, where and when it happened, and what outcome you want. If anyone is in immediate danger, contact local emergency services now.';
@@ -1033,11 +616,7 @@ Please describe what happened in your own words, and I will guide you through yo
       disclaimer: STANDARD_DISCLAIMER,
     };
   }
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 }
 
 export default RagPipeline;

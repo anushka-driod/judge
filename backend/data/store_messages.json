@@ -1,0 +1,537 @@
+{
+  "case-1793039244953": [
+    {
+      "id": "msg_815b6fa7af9c9bd7",
+      "conversation_id": "case-1793039244953",
+      "conversationId": "case-1793039244953",
+      "user_id": "usr_c80e074887dfe4c3",
+      "userId": "usr_c80e074887dfe4c3",
+      "sender": "user",
+      "text": "My employer removed me from my job without giving me notice or severance pay. What are my rights under Indian labour law?",
+      "message_text": "My employer removed me from my job without giving me notice or severance pay. What are my rights under Indian labour law?",
+      "detected_emotion": null,
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [],
+      "factGatheringQuestions": [],
+      "agentSteps": [],
+      "timestamp": "11:57 pm",
+      "created_at": "2026-10-26T18:27:25.025Z"
+    },
+    {
+      "id": "ai-msg-1793039255367",
+      "conversation_id": "case-1793039244953",
+      "conversationId": "case-1793039244953",
+      "user_id": "usr_c80e074887dfe4c3",
+      "userId": "usr_c80e074887dfe4c3",
+      "sender": "ai",
+      "text": "### ⚖️ Legal Analysis: Employment & Labour Law\n\nBased on your inquiry regarding \"My employer removed me from my job without giving me notice or severance pay. What are my rights under Indian labour law?\", the following Indian legal framework governs your situation:\n\n#### 1. Applicable Statutes & Legal Rights\n• **Payment of Wages Act, 1936 (Section 15)**: Mandates payment of earned wages without unauthorized deductions within 7-10 days of completion of wage period or termination.\n  *Summary:* Empowers labour commissioner to direct payment of delayed wages with up to 10x penalty.\n\n• **Industrial Disputes Act, 1947 (Section 25F)**: Conditions precedent to retrenchment: requires 1 month notice or wages in lieu thereof, plus retrenchment compensation (15 days pay per year of service).\n  *Summary:* Governs illegal termination and compensation mandates.\n\n• **Payment of Gratuity Act, 1972 (Section 4 & Section 7)**: Mandatory gratuity payment for employees with 5+ years of continuous service, payable within 30 days with statutory interest.\n  *Summary:* Enforces statutory post-employment retirement benefit.\n\n• **State Shops and Commercial Establishments Act (Notice & Relieving Provisions)**: Requires employer to furnish notice pay and release relieving letter and statutory settlement upon lawful exit.\n  *Summary:* Applies to private IT, corporate, and commercial establishment staff.\n\n---\n\n#### 2. Judicial Precedents & Evidentiary Standards\n• **Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997** (Supreme Court of India • `AIR 1997 SUPREME COURT 3297`)\n  *Ratio:* Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997 Equivalent citations: AIR\n\n• **The U.P. Factories Rules, 1950** (State of Uttar Pradesh - Act • `The U.P. Factories Rules, 1950`)\n  *Ratio:* The U.P. Factories Rules, 1950 UTTAR PRADESH India The U.P. Factories Rules, 1950\n\n• **J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025** (Income Tax Appellate Tribunal - Mumbai • `J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025`)\n  *Ratio:* J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July\n\n---\n\n#### 3. Recommended Step-by-Step Action Plan\n1. **Preserve Documentary Evidence**: Maintain original contracts, receipts, bank records, and communications.\n2. **Serve Statutory 15-Day Demand Notice**: Dispatch a formal notice by Registered Speed Post with tracking.\n3. **Approach Pre-Litigation Conciliation (DLSA)**: Apply for free dispute mediation before your local District Legal Services Authority (`nalsa.gov.in`).\n\n---\n\n### 📜 Prepared Statutory Demand Notice Draft:\n```\nEDITABLE DISPUTE CORRESPONDENCE TEMPLATE — NOT SENT OR LEGALLY REVIEWED\n\nDate: 26 October 2026\n\nTO:\n[Recipient name and address]\n\nSUBJECT: REQUEST TO RESOLVE THE DISPUTE\n\nSir/Madam,\n\nI am writing to describe a matter I would like to resolve:\n\n1. Relevant transaction or agreement:\n   \"My employer removed me from my job without giving me notice or severance pay. What are my rights under Indian labour law?\".\n\n2. Issue to be resolved: [Describe the issue and supporting facts].\n\n3. Requested outcome: [Describe the requested resolution].\n\n4. Please respond by [date after checking applicable law and obtaining legal advice].\n\nSincerely,\n[Sender name and contact details]\n```",
+      "message_text": "### ⚖️ Legal Analysis: Employment & Labour Law\n\nBased on your inquiry regarding \"My employer removed me from my job without giving me notice or severance pay. What are my rights under Indian labour law?\", the following Indian legal framework governs your situation:\n\n#### 1. Applicable Statutes & Legal Rights\n• **Payment of Wages Act, 1936 (Section 15)**: Mandates payment of earned wages without unauthorized deductions within 7-10 days of completion of wage period or termination.\n  *Summary:* Empowers labour commissioner to direct payment of delayed wages with up to 10x penalty.\n\n• **Industrial Disputes Act, 1947 (Section 25F)**: Conditions precedent to retrenchment: requires 1 month notice or wages in lieu thereof, plus retrenchment compensation (15 days pay per year of service).\n  *Summary:* Governs illegal termination and compensation mandates.\n\n• **Payment of Gratuity Act, 1972 (Section 4 & Section 7)**: Mandatory gratuity payment for employees with 5+ years of continuous service, payable within 30 days with statutory interest.\n  *Summary:* Enforces statutory post-employment retirement benefit.\n\n• **State Shops and Commercial Establishments Act (Notice & Relieving Provisions)**: Requires employer to furnish notice pay and release relieving letter and statutory settlement upon lawful exit.\n  *Summary:* Applies to private IT, corporate, and commercial establishment staff.\n\n---\n\n#### 2. Judicial Precedents & Evidentiary Standards\n• **Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997** (Supreme Court of India • `AIR 1997 SUPREME COURT 3297`)\n  *Ratio:* Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997 Equivalent citations: AIR\n\n• **The U.P. Factories Rules, 1950** (State of Uttar Pradesh - Act • `The U.P. Factories Rules, 1950`)\n  *Ratio:* The U.P. Factories Rules, 1950 UTTAR PRADESH India The U.P. Factories Rules, 1950\n\n• **J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025** (Income Tax Appellate Tribunal - Mumbai • `J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025`)\n  *Ratio:* J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July\n\n---\n\n#### 3. Recommended Step-by-Step Action Plan\n1. **Preserve Documentary Evidence**: Maintain original contracts, receipts, bank records, and communications.\n2. **Serve Statutory 15-Day Demand Notice**: Dispatch a formal notice by Registered Speed Post with tracking.\n3. **Approach Pre-Litigation Conciliation (DLSA)**: Apply for free dispute mediation before your local District Legal Services Authority (`nalsa.gov.in`).\n\n---\n\n### 📜 Prepared Statutory Demand Notice Draft:\n```\nEDITABLE DISPUTE CORRESPONDENCE TEMPLATE — NOT SENT OR LEGALLY REVIEWED\n\nDate: 26 October 2026\n\nTO:\n[Recipient name and address]\n\nSUBJECT: REQUEST TO RESOLVE THE DISPUTE\n\nSir/Madam,\n\nI am writing to describe a matter I would like to resolve:\n\n1. Relevant transaction or agreement:\n   \"My employer removed me from my job without giving me notice or severance pay. What are my rights under Indian labour law?\".\n\n2. Issue to be resolved: [Describe the issue and supporting facts].\n\n3. Requested outcome: [Describe the requested resolution].\n\n4. Please respond by [date after checking applicable law and obtaining legal advice].\n\nSincerely,\n[Sender name and contact details]\n```",
+      "detected_emotion": "Normal",
+      "detectedLaws": [],
+      "detectedPrecedents": [
+        {
+          "title": "Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997",
+          "court": "Supreme Court of India",
+          "citation": "AIR 1997 SUPREME COURT 3297",
+          "url": "https://indiankanoon.org/doc/1969682/"
+        },
+        {
+          "title": "The U.P. Factories Rules, 1950",
+          "court": "State of Uttar Pradesh - Act",
+          "citation": "The U.P. Factories Rules, 1950",
+          "url": "https://indiankanoon.org/doc/78673455/"
+        },
+        {
+          "title": "J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025",
+          "court": "Income Tax Appellate Tribunal - Mumbai",
+          "citation": "J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025",
+          "url": "https://indiankanoon.org/doc/136837833/"
+        }
+      ],
+      "suggestedNextSteps": [
+        "Preserve all relevant contracts, receipts, and correspondence",
+        "Issue a 15-day pre-litigation demand notice via Registered Post",
+        "Approach the District Legal Services Authority (DLSA) for free mediation"
+      ],
+      "factGatheringQuestions": [],
+      "agentSteps": [
+        {
+          "step": "FETCH_HISTORY",
+          "tool": "get_conversation_history",
+          "status": "completed",
+          "summary": "Loaded 1 authorized prior turn(s)."
+        },
+        {
+          "step": "QUERY_STATUTES",
+          "tool": "search_laws_and_statutes",
+          "status": "unavailable",
+          "summary": "No matching statutory provisions were found.",
+          "data": []
+        },
+        {
+          "step": "SEARCH_PRECEDENTS",
+          "tool": "search_kanoon_precedents",
+          "status": "completed",
+          "summary": "Retrieved 3 Indian Kanoon precedent(s).",
+          "data": [
+            {
+              "title": "Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997",
+              "court": "Supreme Court of India",
+              "citation": "AIR 1997 SUPREME COURT 3297",
+              "excerpt": "Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997 Equivalent citations: AIR",
+              "ratio": "Samatha vs State Of Andhra Pradesh And Ors on 11 July, 1997 Equivalent citations: AIR",
+              "url": "https://indiankanoon.org/doc/1969682/"
+            },
+            {
+              "title": "The U.P. Factories Rules, 1950",
+              "court": "State of Uttar Pradesh - Act",
+              "citation": "The U.P. Factories Rules, 1950",
+              "excerpt": "The U.P. Factories Rules, 1950 UTTAR PRADESH India The U.P. Factories Rules, 1950",
+              "ratio": "The U.P. Factories Rules, 1950 UTTAR PRADESH India The U.P. Factories Rules, 1950",
+              "url": "https://indiankanoon.org/doc/78673455/"
+            },
+            {
+              "title": "J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025",
+              "court": "Income Tax Appellate Tribunal - Mumbai",
+              "citation": "J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July, 2025",
+              "excerpt": "J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July",
+              "ratio": "J Kumar Infraprojects Limited,Mumbai vs The Dy. Commissioner Of Income Tax ... on 3 July",
+              "url": "https://indiankanoon.org/doc/136837833/"
+            }
+          ]
+        },
+        {
+          "step": "DRAFT_NOTICE",
+          "tool": "draft_legal_notice",
+          "status": "completed",
+          "summary": "Prepared an editable draft; it was not sent and requires advocate review."
+        },
+        {
+          "step": "PREPARE_ACTION_ITEM",
+          "tool": "prepare_case_action_item",
+          "status": "completed",
+          "summary": "Prepared a suggested action item; it was not saved: \"Preserve relevant documents and record key event dates\"."
+        }
+      ],
+      "timestamp": "11:57 pm",
+      "created_at": "2026-10-26T18:27:35.427Z"
+    }
+  ],
+  "case-1793039286186": [
+    {
+      "id": "msg_de2784125d5bf6ff",
+      "conversation_id": "case-1793039286186",
+      "conversationId": "case-1793039286186",
+      "user_id": "usr_c80e074887dfe4c3",
+      "userId": "usr_c80e074887dfe4c3",
+      "sender": "user",
+      "text": "i have some family issues",
+      "message_text": "i have some family issues",
+      "detected_emotion": null,
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [],
+      "factGatheringQuestions": [],
+      "agentSteps": [],
+      "timestamp": "11:58 pm",
+      "created_at": "2026-10-26T18:28:06.348Z"
+    },
+    {
+      "id": "ai-msg-1793039301983",
+      "conversation_id": "case-1793039286186",
+      "conversationId": "case-1793039286186",
+      "user_id": "usr_c80e074887dfe4c3",
+      "userId": "usr_c80e074887dfe4c3",
+      "sender": "ai",
+      "text": "### ⚖️ Legal Analysis: Civil & Statutory Legal Guidance\n\nBased on your inquiry regarding \"i have some family issues\", the following Indian legal framework governs your situation:\n\n#### 1. Applicable Statutes & Legal Rights\n• **Constitution of India (Article 39A & Article 21)**: Guarantees equal justice, protection of life and personal liberty, and access to free legal aid for all citizens.\n  *Summary:* Fundamental right to justice and fair legal representation.\n\n• **Code of Civil Procedure, 1908 (Section 9 & Section 89)**: Jurisdiction of civil courts to try all civil disputes and alternative dispute resolution through mediation, conciliation, and Lok Adalat.\n  *Summary:* Procedural recourse for dispute resolution outside of or before courts.\n\n• **Indian Contract Act, 1872 (Section 73)**: Right to compensation for loss or damage caused by breach of contractual obligations or covenants.\n  *Summary:* Governs civil recovery and monetary damages.\n\n---\n\n#### 2. Judicial Precedents & Evidentiary Standards\n• **Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017** (Income Tax Appellate Tribunal - Mumbai • `Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017`)\n  *Ratio:* rates or tax exemption. It is further intimated that Shri Ajay Doshi, HUF , has also claimed bogus/artificial Long Term Capital Gain amounting ... year under consideration. In view of the aforesaid, I have reason to believe that income chargeable to tax to the extent\n\n• **Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003** (Income Tax Appellate Tribunal - Delhi • `[2003]87ITD323(DELHI)`)\n  *Ratio:* Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003 Equivalent\n\n• **Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023** (Income Tax Appellate Tribunal - Mumbai • `Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023`)\n  *Ratio:* Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023 IN\n\n---\n\n#### 3. Recommended Step-by-Step Action Plan\n1. **Preserve Documentary Evidence**: Maintain original contracts, receipts, bank records, and communications.\n2. **Serve Statutory 15-Day Demand Notice**: Dispatch a formal notice by Registered Speed Post with tracking.\n3. **Approach Pre-Litigation Conciliation (DLSA)**: Apply for free dispute mediation before your local District Legal Services Authority (`nalsa.gov.in`).\n",
+      "message_text": "### ⚖️ Legal Analysis: Civil & Statutory Legal Guidance\n\nBased on your inquiry regarding \"i have some family issues\", the following Indian legal framework governs your situation:\n\n#### 1. Applicable Statutes & Legal Rights\n• **Constitution of India (Article 39A & Article 21)**: Guarantees equal justice, protection of life and personal liberty, and access to free legal aid for all citizens.\n  *Summary:* Fundamental right to justice and fair legal representation.\n\n• **Code of Civil Procedure, 1908 (Section 9 & Section 89)**: Jurisdiction of civil courts to try all civil disputes and alternative dispute resolution through mediation, conciliation, and Lok Adalat.\n  *Summary:* Procedural recourse for dispute resolution outside of or before courts.\n\n• **Indian Contract Act, 1872 (Section 73)**: Right to compensation for loss or damage caused by breach of contractual obligations or covenants.\n  *Summary:* Governs civil recovery and monetary damages.\n\n---\n\n#### 2. Judicial Precedents & Evidentiary Standards\n• **Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017** (Income Tax Appellate Tribunal - Mumbai • `Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017`)\n  *Ratio:* rates or tax exemption. It is further intimated that Shri Ajay Doshi, HUF , has also claimed bogus/artificial Long Term Capital Gain amounting ... year under consideration. In view of the aforesaid, I have reason to believe that income chargeable to tax to the extent\n\n• **Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003** (Income Tax Appellate Tribunal - Delhi • `[2003]87ITD323(DELHI)`)\n  *Ratio:* Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003 Equivalent\n\n• **Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023** (Income Tax Appellate Tribunal - Mumbai • `Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023`)\n  *Ratio:* Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023 IN\n\n---\n\n#### 3. Recommended Step-by-Step Action Plan\n1. **Preserve Documentary Evidence**: Maintain original contracts, receipts, bank records, and communications.\n2. **Serve Statutory 15-Day Demand Notice**: Dispatch a formal notice by Registered Speed Post with tracking.\n3. **Approach Pre-Litigation Conciliation (DLSA)**: Apply for free dispute mediation before your local District Legal Services Authority (`nalsa.gov.in`).\n",
+      "detected_emotion": "Normal",
+      "detectedLaws": [],
+      "detectedPrecedents": [
+        {
+          "title": "Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017",
+          "court": "Income Tax Appellate Tribunal - Mumbai",
+          "citation": "Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017",
+          "url": "https://indiankanoon.org/doc/89009088/"
+        },
+        {
+          "title": "Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003",
+          "court": "Income Tax Appellate Tribunal - Delhi",
+          "citation": "[2003]87ITD323(DELHI)",
+          "url": "https://indiankanoon.org/doc/525757/"
+        },
+        {
+          "title": "Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023",
+          "court": "Income Tax Appellate Tribunal - Mumbai",
+          "citation": "Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023",
+          "url": "https://indiankanoon.org/doc/38019909/"
+        }
+      ],
+      "suggestedNextSteps": [
+        "Preserve all relevant contracts, receipts, and correspondence",
+        "Issue a 15-day pre-litigation demand notice via Registered Post",
+        "Approach the District Legal Services Authority (DLSA) for free mediation"
+      ],
+      "factGatheringQuestions": [],
+      "agentSteps": [
+        {
+          "step": "FETCH_HISTORY",
+          "tool": "get_conversation_history",
+          "status": "completed",
+          "summary": "Loaded 1 authorized prior turn(s)."
+        },
+        {
+          "step": "QUERY_STATUTES",
+          "tool": "search_laws_and_statutes",
+          "status": "unavailable",
+          "summary": "No matching statutory provisions were found.",
+          "data": []
+        },
+        {
+          "step": "SEARCH_PRECEDENTS",
+          "tool": "search_kanoon_precedents",
+          "status": "completed",
+          "summary": "Retrieved 3 Indian Kanoon precedent(s).",
+          "data": [
+            {
+              "title": "Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017",
+              "court": "Income Tax Appellate Tribunal - Mumbai",
+              "citation": "Ajay J Doshi ( Huf ), Mumbai vs Ito 12(2)(4), Mumbai on 31 May, 2017",
+              "excerpt": "rates or tax exemption. It is further intimated that Shri Ajay Doshi, HUF , has also claimed bogus/artificial Long Term Capital Gain amounting ... year under consideration. In view of the aforesaid, I have reason to believe that income chargeable to tax to the extent",
+              "ratio": "rates or tax exemption. It is further intimated that Shri Ajay Doshi, HUF , has also claimed bogus/artificial Long Term Capital Gain amounting ... year under consideration. In view of the aforesaid, I have reason to believe that income chargeable to tax to the extent",
+              "url": "https://indiankanoon.org/doc/89009088/"
+            },
+            {
+              "title": "Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003",
+              "court": "Income Tax Appellate Tribunal - Delhi",
+              "citation": "[2003]87ITD323(DELHI)",
+              "excerpt": "Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003 Equivalent",
+              "ratio": "Finquick Finance (P.) Ltd. vs Deputy Commissioner Of Income-Tax on 25 August, 2003 Equivalent",
+              "url": "https://indiankanoon.org/doc/525757/"
+            },
+            {
+              "title": "Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023",
+              "court": "Income Tax Appellate Tribunal - Mumbai",
+              "citation": "Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023",
+              "excerpt": "Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023 IN",
+              "ratio": "Addl.C. I .T. Ltu, Mumbai vs Acc Ltd., Mumbai on 28 February, 2023 IN",
+              "url": "https://indiankanoon.org/doc/38019909/"
+            }
+          ]
+        },
+        {
+          "step": "PREPARE_ACTION_ITEM",
+          "tool": "prepare_case_action_item",
+          "status": "completed",
+          "summary": "Prepared a suggested action item; it was not saved: \"Preserve relevant documents and record key event dates\"."
+        }
+      ],
+      "timestamp": "11:58 pm",
+      "created_at": "2026-10-26T18:28:22.078Z"
+    }
+  ],
+  "case-1793044421295": [
+    {
+      "id": "msg_b136963920da667c",
+      "conversation_id": "case-1793044421295",
+      "conversationId": "case-1793044421295",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "user",
+      "text": "namaste",
+      "message_text": "namaste",
+      "detected_emotion": null,
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [],
+      "factGatheringQuestions": [],
+      "agentSteps": [],
+      "timestamp": "01:23 am",
+      "created_at": "2026-10-26T19:53:41.608Z"
+    },
+    {
+      "id": "ai-msg-1793044426261",
+      "conversation_id": "case-1793044421295",
+      "conversationId": "case-1793044421295",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "ai",
+      "text": "### ⚖️ Welcome to VidhiSetu Legal Assistance\n\nHello! I am **VidhiSetu**, an agentic legal AI assistant designed to provide transparent, grounded legal guidance and advocate consultation for Indian citizens.\n\n#### How I Can Assist You:\n1. **Statutory Legal Rights**: Tenancy & security deposits, cheque dishonour (Section 138 NI Act), consumer complaints (CPA 2019), and employment rights.\n2. **Authentic Court Precedents**: Real judgments retrieved from Indian Kanoon without fabricated citations.\n3. **Statutory Demand Notices**: Automated drafting of pre-litigation demand notices under applicable Indian statutes.\n4. **Verified Advocate Discovery**: Connect with Bar Council verified advocates across Delhi, Telangana, Karnataka, Maharashtra, and other High Court jurisdictions.\n\nPlease describe your situation in plain English, Telugu (తెలుగు), or Hindi (हिंदी) to begin.",
+      "message_text": "### ⚖️ Welcome to VidhiSetu Legal Assistance\n\nHello! I am **VidhiSetu**, an agentic legal AI assistant designed to provide transparent, grounded legal guidance and advocate consultation for Indian citizens.\n\n#### How I Can Assist You:\n1. **Statutory Legal Rights**: Tenancy & security deposits, cheque dishonour (Section 138 NI Act), consumer complaints (CPA 2019), and employment rights.\n2. **Authentic Court Precedents**: Real judgments retrieved from Indian Kanoon without fabricated citations.\n3. **Statutory Demand Notices**: Automated drafting of pre-litigation demand notices under applicable Indian statutes.\n4. **Verified Advocate Discovery**: Connect with Bar Council verified advocates across Delhi, Telangana, Karnataka, Maharashtra, and other High Court jurisdictions.\n\nPlease describe your situation in plain English, Telugu (తెలుగు), or Hindi (हिंदी) to begin.",
+      "detected_emotion": "Normal",
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [
+        "Type your specific legal question or dispute to receive tailored guidance",
+        "Ask for an advocate in your city if you require professional legal representation"
+      ],
+      "factGatheringQuestions": [],
+      "agentSteps": [
+        {
+          "step": "FETCH_HISTORY",
+          "tool": "get_conversation_history",
+          "status": "completed",
+          "summary": "Loaded 1 authorized prior turn(s)."
+        }
+      ],
+      "timestamp": "01:23 am",
+      "created_at": "2026-10-26T19:53:46.401Z"
+    },
+    {
+      "id": "usr-msg-1793044439810",
+      "conversation_id": "case-1793044421295",
+      "conversationId": "case-1793044421295",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "user",
+      "text": "chating telugu",
+      "message_text": "chating telugu",
+      "detected_emotion": null,
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [],
+      "factGatheringQuestions": [],
+      "agentSteps": [],
+      "timestamp": "01:23 am",
+      "created_at": "2026-10-26T19:53:59.860Z"
+    },
+    {
+      "id": "ai-msg-1793044447041",
+      "conversation_id": "case-1793044421295",
+      "conversationId": "case-1793044421295",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "ai",
+      "text": "### ⚖️ Legal Analysis: Tenancy & Rental Disputes\n\nBased on your inquiry regarding \"chating telugu\", the following Indian legal framework governs your situation:\n\n#### 1. Applicable Statutes & Legal Rights\n• **Constitution of India (Article 39A & Article 21)**: Article 39A & Article 21 - Constitution of India\n  *Summary:* undefined\n\n• **Code of Civil Procedure, 1908 (Section 9 & Section 89)**: Section 9 & Section 89 - Code of Civil Procedure, 1908\n  *Summary:* undefined\n\n• **Indian Contract Act, 1872 (Section 73)**: Section 73 - Indian Contract Act, 1872\n  *Summary:* undefined\n\n---\n\n#### 2. Judicial Precedents & Evidentiary Standards\n• **507 vs On on 18 August, 2026** (Andhra Pradesh High Court - Amravati • `507 vs On on 18 August, 2026`)\n  *Ratio:* 507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT\n\n• **507 vs On on 18 August, 2026** (Andhra Pradesh High Court - Amravati • `507 vs On on 18 August, 2026`)\n  *Ratio:* 507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT\n\n• **507 vs On on 18 August, 2026** (Andhra Pradesh High Court - Amravati • `507 vs On on 18 August, 2026`)\n  *Ratio:* 507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT\n\n---\n\n#### 3. Recommended Step-by-Step Action Plan\n1. **Preserve Documentary Evidence**: Maintain original contracts, receipts, bank records, and communications.\n2. **Serve Statutory 15-Day Demand Notice**: Dispatch a formal notice by Registered Speed Post with tracking.\n3. **Approach Pre-Litigation Conciliation (DLSA)**: Apply for free dispute mediation before your local District Legal Services Authority (`nalsa.gov.in`).\n",
+      "message_text": "### ⚖️ Legal Analysis: Tenancy & Rental Disputes\n\nBased on your inquiry regarding \"chating telugu\", the following Indian legal framework governs your situation:\n\n#### 1. Applicable Statutes & Legal Rights\n• **Constitution of India (Article 39A & Article 21)**: Article 39A & Article 21 - Constitution of India\n  *Summary:* undefined\n\n• **Code of Civil Procedure, 1908 (Section 9 & Section 89)**: Section 9 & Section 89 - Code of Civil Procedure, 1908\n  *Summary:* undefined\n\n• **Indian Contract Act, 1872 (Section 73)**: Section 73 - Indian Contract Act, 1872\n  *Summary:* undefined\n\n---\n\n#### 2. Judicial Precedents & Evidentiary Standards\n• **507 vs On on 18 August, 2026** (Andhra Pradesh High Court - Amravati • `507 vs On on 18 August, 2026`)\n  *Ratio:* 507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT\n\n• **507 vs On on 18 August, 2026** (Andhra Pradesh High Court - Amravati • `507 vs On on 18 August, 2026`)\n  *Ratio:* 507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT\n\n• **507 vs On on 18 August, 2026** (Andhra Pradesh High Court - Amravati • `507 vs On on 18 August, 2026`)\n  *Ratio:* 507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT\n\n---\n\n#### 3. Recommended Step-by-Step Action Plan\n1. **Preserve Documentary Evidence**: Maintain original contracts, receipts, bank records, and communications.\n2. **Serve Statutory 15-Day Demand Notice**: Dispatch a formal notice by Registered Speed Post with tracking.\n3. **Approach Pre-Litigation Conciliation (DLSA)**: Apply for free dispute mediation before your local District Legal Services Authority (`nalsa.gov.in`).\n",
+      "detected_emotion": "Normal",
+      "detectedLaws": [
+        {
+          "act": "Constitution of India",
+          "section": "Article 39A & Article 21",
+          "title": "Article 39A & Article 21 - Constitution of India"
+        },
+        {
+          "act": "Code of Civil Procedure, 1908",
+          "section": "Section 9 & Section 89",
+          "title": "Section 9 & Section 89 - Code of Civil Procedure, 1908"
+        },
+        {
+          "act": "Indian Contract Act, 1872",
+          "section": "Section 73",
+          "title": "Section 73 - Indian Contract Act, 1872"
+        }
+      ],
+      "detectedPrecedents": [
+        {
+          "title": "507 vs On on 18 August, 2026",
+          "court": "Andhra Pradesh High Court - Amravati",
+          "citation": "507 vs On on 18 August, 2026",
+          "url": "https://indiankanoon.org/doc/177239856/"
+        },
+        {
+          "title": "507 vs On on 18 August, 2026",
+          "court": "Andhra Pradesh High Court - Amravati",
+          "citation": "507 vs On on 18 August, 2026",
+          "url": "https://indiankanoon.org/doc/7334407/"
+        },
+        {
+          "title": "507 vs On on 18 August, 2026",
+          "court": "Andhra Pradesh High Court - Amravati",
+          "citation": "507 vs On on 18 August, 2026",
+          "url": "https://indiankanoon.org/doc/19479957/"
+        }
+      ],
+      "suggestedNextSteps": [
+        "Preserve all relevant contracts, receipts, and correspondence",
+        "Issue a 15-day pre-litigation demand notice via Registered Post",
+        "Approach the District Legal Services Authority (DLSA) for free mediation"
+      ],
+      "factGatheringQuestions": [],
+      "agentSteps": [
+        {
+          "step": "FETCH_HISTORY",
+          "tool": "get_conversation_history",
+          "status": "completed",
+          "summary": "Loaded 3 authorized prior turn(s)."
+        },
+        {
+          "step": "QUERY_STATUTES",
+          "tool": "search_laws_and_statutes",
+          "status": "completed",
+          "summary": "Retrieved 3 statutory section(s).",
+          "data": [
+            {
+              "act": "Constitution of India",
+              "section": "Article 39A & Article 21",
+              "title": "Article 39A & Article 21 - Constitution of India",
+              "plainMeaning": "Guarantees equal justice, protection of life and personal liberty, and access to free legal aid for all citizens.",
+              "applicability": "Fundamental right to justice and fair legal representation."
+            },
+            {
+              "act": "Code of Civil Procedure, 1908",
+              "section": "Section 9 & Section 89",
+              "title": "Section 9 & Section 89 - Code of Civil Procedure, 1908",
+              "plainMeaning": "Jurisdiction of civil courts to try all civil disputes and alternative dispute resolution through mediation, conciliation, and Lok Adalat.",
+              "applicability": "Procedural recourse for dispute resolution outside of or before courts."
+            },
+            {
+              "act": "Indian Contract Act, 1872",
+              "section": "Section 73",
+              "title": "Section 73 - Indian Contract Act, 1872",
+              "plainMeaning": "Right to compensation for loss or damage caused by breach of contractual obligations or covenants.",
+              "applicability": "Governs civil recovery and monetary damages."
+            }
+          ]
+        },
+        {
+          "step": "SEARCH_PRECEDENTS",
+          "tool": "search_kanoon_precedents",
+          "status": "completed",
+          "summary": "Retrieved 3 Indian Kanoon precedent(s).",
+          "data": [
+            {
+              "title": "507 vs On on 18 August, 2026",
+              "court": "Andhra Pradesh High Court - Amravati",
+              "citation": "507 vs On on 18 August, 2026",
+              "excerpt": "507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT",
+              "ratio": "507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT",
+              "url": "https://indiankanoon.org/doc/177239856/"
+            },
+            {
+              "title": "507 vs On on 18 August, 2026",
+              "court": "Andhra Pradesh High Court - Amravati",
+              "citation": "507 vs On on 18 August, 2026",
+              "excerpt": "507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT",
+              "ratio": "507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT",
+              "url": "https://indiankanoon.org/doc/7334407/"
+            },
+            {
+              "title": "507 vs On on 18 August, 2026",
+              "court": "Andhra Pradesh High Court - Amravati",
+              "citation": "507 vs On on 18 August, 2026",
+              "excerpt": "507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT",
+              "ratio": "507 vs On on 18 August, 2026 Nar PRADES! & whee aS < > PRESENT",
+              "url": "https://indiankanoon.org/doc/19479957/"
+            }
+          ]
+        },
+        {
+          "step": "PREPARE_ACTION_ITEM",
+          "tool": "prepare_case_action_item",
+          "status": "completed",
+          "summary": "Prepared a suggested action item; it was not saved: \"Preserve relevant documents and record key event dates\"."
+        }
+      ],
+      "timestamp": "01:24 am",
+      "created_at": "2026-10-26T19:54:07.078Z"
+    }
+  ],
+  "case-1793048379344": [
+    {
+      "id": "msg_f03bb717366df855",
+      "conversation_id": "case-1793048379344",
+      "conversationId": "case-1793048379344",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "user",
+      "text": "namaste",
+      "message_text": "namaste",
+      "detected_emotion": null,
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [],
+      "factGatheringQuestions": [],
+      "agentSteps": [],
+      "timestamp": "02:29 am",
+      "created_at": "2026-10-26T20:59:39.399Z"
+    },
+    {
+      "id": "ai-msg-1793048383236",
+      "conversation_id": "case-1793048379344",
+      "conversationId": "case-1793048379344",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "ai",
+      "text": "### ⚖️ Welcome to VidhiSetu Legal Assistance\n\nHello! How can I assist you today? \n\nYou can ask me about your legal rights under Indian law (such as tenancy deposits, cheque dishonour, or consumer disputes), search authentic court precedents on Indian Kanoon, or connect with verified legal counsel in your jurisdiction.",
+      "message_text": "### ⚖️ Welcome to VidhiSetu Legal Assistance\n\nHello! How can I assist you today? \n\nYou can ask me about your legal rights under Indian law (such as tenancy deposits, cheque dishonour, or consumer disputes), search authentic court precedents on Indian Kanoon, or connect with verified legal counsel in your jurisdiction.",
+      "detected_emotion": "Normal",
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [
+        "Type your legal question or dispute to receive tailored guidance",
+        "Ask for an advocate in your city if you require representation"
+      ],
+      "factGatheringQuestions": [],
+      "agentSteps": [
+        {
+          "step": "FETCH_HISTORY",
+          "tool": "get_conversation_history",
+          "status": "completed",
+          "summary": "Loaded 1 authorized prior turn(s)."
+        },
+        {
+          "step": "NATURAL_CONVERSATION",
+          "tool": "conversational_engine",
+          "status": "completed",
+          "summary": "Acknowledged friendly conversational exchange without invoking statutory litigation tools."
+        }
+      ],
+      "timestamp": "02:29 am",
+      "created_at": "2026-10-26T20:59:43.304Z"
+    },
+    {
+      "id": "usr-msg-1793048423319",
+      "conversation_id": "case-1793048379344",
+      "conversationId": "case-1793048379344",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "user",
+      "text": "i have some family issues iam about to  cry",
+      "message_text": "i have some family issues iam about to  cry",
+      "detected_emotion": null,
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [],
+      "factGatheringQuestions": [],
+      "agentSteps": [],
+      "timestamp": "02:30 am",
+      "created_at": "2026-10-26T21:00:23.740Z"
+    },
+    {
+      "id": "ai-msg-1793048429554",
+      "conversation_id": "case-1793048379344",
+      "conversationId": "case-1793048379344",
+      "user_id": "usr_44436907a9ef9ee8",
+      "userId": "usr_44436907a9ef9ee8",
+      "sender": "ai",
+      "text": "### 💙 Understanding Your Situation\n\nI hear you, and I understand that family matters can be deeply personal, sensitive, and emotionally stressful to navigate. When family problems arise, you do not have to carry the burden all by yourself.\n\nBefore assuming an adversarial legal dispute or considering formal court procedures, it helps to understand what you are currently experiencing. Family situations often involve different paths—ranging from peaceful communication, family counseling, and mediation, to formal legal protections.\n\n#### To help me guide you appropriately, could you share a bit more context?\nFor instance, does your situation relate to:\n1. **Marital Disagreement or Relationship Strain**: Separation, divorce, or resolving differences?\n2. **Child Welfare & Care**: Custody, visitation, or maintenance for children?\n3. **Property or Financial Disputes**: Inheritance, ancestral property, or shared financial obligations?\n4. **Domestic Wellbeing or Safety**: Or are you experiencing intimidation, distress, or conflict at home?\n\nPlease share only what you feel comfortable discussing. If you simply need information on peaceful mediation or family counseling resources, we can start with that as well.",
+      "message_text": "### 💙 Understanding Your Situation\n\nI hear you, and I understand that family matters can be deeply personal, sensitive, and emotionally stressful to navigate. When family problems arise, you do not have to carry the burden all by yourself.\n\nBefore assuming an adversarial legal dispute or considering formal court procedures, it helps to understand what you are currently experiencing. Family situations often involve different paths—ranging from peaceful communication, family counseling, and mediation, to formal legal protections.\n\n#### To help me guide you appropriately, could you share a bit more context?\nFor instance, does your situation relate to:\n1. **Marital Disagreement or Relationship Strain**: Separation, divorce, or resolving differences?\n2. **Child Welfare & Care**: Custody, visitation, or maintenance for children?\n3. **Property or Financial Disputes**: Inheritance, ancestral property, or shared financial obligations?\n4. **Domestic Wellbeing or Safety**: Or are you experiencing intimidation, distress, or conflict at home?\n\nPlease share only what you feel comfortable discussing. If you simply need information on peaceful mediation or family counseling resources, we can start with that as well.",
+      "detected_emotion": "Normal",
+      "detectedLaws": [],
+      "detectedPrecedents": [],
+      "suggestedNextSteps": [
+        "Reflect on whether peaceful family mediation or counseling could assist",
+        "Share more details when ready if you wish to explore specific legal rights or options"
+      ],
+      "factGatheringQuestions": [],
+      "agentSteps": [
+        {
+          "step": "FETCH_HISTORY",
+          "tool": "get_conversation_history",
+          "status": "completed",
+          "summary": "Loaded 3 authorized prior turn(s)."
+        },
+        {
+          "step": "EVALUATE_LEGAL_NEED",
+          "tool": "search_laws_and_statutes",
+          "status": "skipped",
+          "summary": "Statutory and Kanoon research tools were intentionally skipped because this message is a personal/emotional inquiry without an active legal dispute."
+        }
+      ],
+      "timestamp": "02:30 am",
+      "created_at": "2026-10-26T21:00:29.624Z"
+    }
+  ]
+}

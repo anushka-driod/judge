@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 import assert from 'node:assert';
 import app from '../src/app.js';
 import AuthService from '../src/services/authService.js';
@@ -203,3 +204,4 @@ runAuthTests().catch((err) => {
   console.error('Test Suite Failed:', err);
   process.exit(1);
 });
+import './helpers/safeTestEnvironment.js';

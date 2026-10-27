@@ -4,9 +4,9 @@
 
 .vidhisetu-sidebar {
   width: 270px;
-  background: #0f172a; /* Deep trustworthy slate */
-  color: #f1f5f9;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-right: 1px solid var(--border-subtle);
   height: calc(100vh - var(--navbar-height, 60px));
   position: sticky;
   top: var(--navbar-height, 60px);
@@ -23,7 +23,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 14px 12px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .sidebar-brand {
@@ -38,12 +38,13 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, var(--accent-400) 0%, var(--accent-600) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+  color: #0a0b0e;
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+  font-weight: 800;
 }
 
 .brand-text-block {
@@ -134,7 +135,7 @@
 }
 
 .btn-plus-icon {
-  color: #60a5fa;
+  color: var(--accent-400);
 }
 
 /* 3. MY CASES Section Header */
@@ -151,7 +152,7 @@
 }
 
 .sidebar-scroll-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(212, 175, 55, 0.2);
   border-radius: 4px;
 }
 
@@ -165,15 +166,15 @@
 .cases-section-label {
   font-size: 0.6875rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--text-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .cases-count-badge {
   font-size: 0.6875rem;
-  color: #94a3b8;
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--accent-300);
+  background: rgba(212, 175, 55, 0.12);
   padding: 1px 6px;
   border-radius: 999px;
   font-weight: 600;
@@ -213,12 +214,12 @@
 }
 
 .case-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+  background: var(--bg-hover);
+  color: var(--accent-300);
 }
 
 .case-item-active {
-  background: rgba(59, 130, 246, 0.18) !important;
+  background: rgba(212, 175, 55, 0.15) !important;
   color: #ffffff !important;
   font-weight: 600;
 }
@@ -230,19 +231,20 @@
   top: 8px;
   bottom: 8px;
   width: 3px;
-  background: #3b82f6;
+  background: var(--accent-500);
   border-radius: 2px;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
 }
 
 .case-item-pinned {
-  border-left: 2px solid #eab308;
+  border-left: 2px solid var(--accent-400);
 }
 
 .pin-indicator {
   margin-right: 6px;
   display: flex;
   align-items: center;
-  color: #eab308;
+  color: var(--accent-400);
   flex-shrink: 0;
 }
 
@@ -423,10 +425,7 @@
   flex-shrink: 0;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 /* Sidebar Auth Strip */
 .sidebar-auth-strip {
   margin-top: 10px;
@@ -447,8 +446,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #2563eb;
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent-400), var(--accent-600));
+  color: #0a0b0e;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -475,7 +474,7 @@
 
 .sidebar-user-role {
   font-size: 0.6875rem;
-  color: #94a3b8;
+  color: var(--accent-400);
   text-transform: capitalize;
 }
 
@@ -525,21 +524,17 @@
 }
 
 .sidebar-signup-btn {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent-500) 0%, var(--accent-600) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #0a0b0e;
 }
 
 .sidebar-signup-btn:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: linear-gradient(135deg, var(--accent-400) 0%, var(--accent-500) 100%);
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.35);
 }
 
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 /* =========================================================================
    Collapsed State (Icon-Only Mode)
    ========================================================================= */

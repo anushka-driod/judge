@@ -1,21 +1,11 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useCases } from '../../context/CaseContext';
+import { useAuth } from '../../hooks/useAuth';
 import { aiLegalService } from '../../services/aiLegalService';
+import { lawyerService } from '../../services/lawyerService';
 import { MarkdownMessage } from '../../components/chat/MarkdownMessage';
-<<<<<<< HEAD
-=======
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useCases } from '../../context/CaseContext';
-import { aiLegalService } from '../../services/aiLegalService';
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { FileUpload } from '../../components/common/FileUpload';
@@ -26,6 +16,7 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
+  XCircle,
   FileText,
   User,
   Users,
@@ -34,10 +25,6 @@ import {
   Clock,
   Sparkles,
   ArrowUp,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
   ArrowDown,
   Copy,
   Check,
@@ -57,39 +44,28 @@ import {
   Phone,
   Video,
 } from 'lucide-react';
-import { mockLawyers } from '../../data/mockData';
-<<<<<<< HEAD
-=======
-} from 'lucide-react';
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 import './AIChatPage.css';
 
 export function AIChatPage() {
+  const { currentUser } = useAuth();
+  const sessionKey = currentUser?.id ? `user:${currentUser.id}` : 'anonymous';
+  return <AIChatSessionPage key={sessionKey} />;
+}
+
+function AIChatSessionPage() {
   const {
     activeCaseId,
     activeCase,
+    conversationError,
     createChatCase,
     addMessageToCase,
-<<<<<<< HEAD
-<<<<<<< HEAD
     updateMessageInCase,
     removeLastMessage,
-=======
->>>>>>> origin/main
-=======
-    updateMessageInCase,
-    removeLastMessage,
->>>>>>> 3aab4be (dhanush commits)
     startFreshChat,
   } = useCases();
 
   const navigate = useNavigate();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   const location = useLocation();
 
   // Input & composer state
@@ -120,6 +96,27 @@ export function AIChatPage() {
   const streamingMetaRef = useRef(null);
   const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
   const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
+  const [verifiedLawyers, setVerifiedLawyers] = useState([]);
+  const [lawyerLoading, setLawyerLoading] = useState(true);
+  const [lawyerLoadError, setLawyerLoadError] = useState('');
+  const [chatError, setChatError] = useState('');
+
+  useEffect(() => {
+    let isCurrent = true;
+    lawyerService.getAllLawyers()
+      .then((lawyers) => {
+        if (isCurrent) setVerifiedLawyers(Array.isArray(lawyers) ? lawyers : []);
+      })
+      .catch((err) => {
+        if (isCurrent) setLawyerLoadError(err.message || 'Unable to load verified advocates.');
+      })
+      .finally(() => {
+        if (isCurrent) setLawyerLoading(false);
+      });
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -152,6 +149,8 @@ export function AIChatPage() {
       }
     }
   }, [location.state]);
+
+  useEffect(() => () => abortControllerRef.current?.abort(), []);
 
   useEffect(() => {
     if (abortControllerRef.current && currentCaseIdRef.current !== activeCaseId) {
@@ -220,29 +219,6 @@ export function AIChatPage() {
       }
     }
   }, [streamingText, isStreaming]);
-<<<<<<< HEAD
-=======
-
-  const [inputText, setInputText] = useState('');
-  const [attachedFiles, setAttachedFiles] = useState([]);
-  const [showAttachModal, setShowAttachModal] = useState(false);
-  const [isAiThinking, setIsAiThinking] = useState(false);
-  const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-
-  // Active messages from current selected case (or empty for new case)
-  const currentMessages = activeCase?.messages || [];
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [currentMessages, isAiThinking]);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 
   // Autofocus input when starting a fresh case conversation
   useEffect(() => {
@@ -251,10 +227,7 @@ export function AIChatPage() {
     }
   }, [activeCaseId]);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   // Refocus input whenever AI generation completes, errors, or is stopped
   const wasGeneratingRef = useRef(false);
   useEffect(() => {
@@ -268,12 +241,7 @@ export function AIChatPage() {
   }, [isAiThinking, isStreaming]);
 
   // Adjust textarea height dynamically up to 180px
-<<<<<<< HEAD
-=======
   // Adjust textarea height dynamically
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
   const handleTextChange = (e) => {
     setInputText(e.target.value);
     if (textareaRef.current) {
@@ -282,10 +250,7 @@ export function AIChatPage() {
     }
   };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
   const handleClarificationAnswer = (question) => {
     setInputText('My answer: ');
     requestAnimationFrame(() => {
@@ -382,37 +347,23 @@ export function AIChatPage() {
    */
   const getRecommendedLawyers = (category = '') => {
     const cat = (category || '').toLowerCase();
-    let matches = [];
-
-    if (cat.includes('crim') || cat.includes('bail') || cat.includes('fir') || cat.includes('police')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /criminal|bail|police/i.test(p)));
-    } else if (cat.includes('fam') || cat.includes('divorce') || cat.includes('matrimonial') || cat.includes('domestic')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /family|divorce|matrimonial/i.test(p)));
-    } else if (cat.includes('cyber') || cat.includes('fraud') || cat.includes('scam') || cat.includes('online')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /cyber|fraud|tech/i.test(p)));
-    } else if (cat.includes('tenan') || cat.includes('rent') || cat.includes('deposit') || cat.includes('eviction')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /tenancy|rent|property|eviction/i.test(p)));
-    } else if (cat.includes('labour') || cat.includes('employ') || cat.includes('salary') || cat.includes('termination')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /employment|labour/i.test(p)));
-    } else if (cat.includes('rera') || cat.includes('builder') || cat.includes('real estate')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /rera|real estate|builder/i.test(p)));
-    } else if (cat.includes('cheque') || cat.includes('138') || cat.includes('bank') || cat.includes('negotiable')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /banking|cheque|financial|disputes/i.test(p)));
-    } else if (cat.includes('consumer') || cat.includes('defect') || cat.includes('e-commerce') || cat.includes('refund')) {
-      matches = mockLawyers.filter((l) => l.practiceAreas.some((p) => /consumer|contract/i.test(p)));
-    }
-
-    if (matches.length < 2) {
-      const ids = new Set(matches.map((m) => m.id));
-      for (const l of mockLawyers) {
-        if (!ids.has(l.id)) {
-          matches.push(l);
-          if (matches.length >= 2) break;
-        }
-      }
-    }
-
-    return matches.slice(0, 2);
+    const categoryTerms = [
+      { match: /crim|bail|fir|police/, terms: /criminal|bail|police/ },
+      { match: /fam|divorce|matrimonial|domestic/, terms: /family|divorce|matrimonial/ },
+      { match: /cyber|fraud|scam|online/, terms: /cyber|fraud|tech/ },
+      { match: /tenan|rent|deposit|eviction/, terms: /tenancy|rent|property|eviction/ },
+      { match: /labour|employ|salary|termination/, terms: /employment|labour/ },
+      { match: /rera|builder|real estate/, terms: /rera|real estate|builder/ },
+      { match: /cheque|138|bank|negotiable/, terms: /banking|cheque|financial|disputes/ },
+      { match: /consumer|defect|e-commerce|refund/, terms: /consumer|contract/ },
+    ];
+    const categoryRule = categoryTerms.find((rule) => rule.match.test(cat));
+    const availableLawyers = categoryRule
+      ? verifiedLawyers.filter((lawyer) =>
+        categoryRule.terms.test((lawyer.specializations || lawyer.practiceAreas || []).join(' ').toLowerCase())
+      )
+      : verifiedLawyers;
+    return availableLawyers.slice(0, 2);
   };
 
   /**
@@ -434,14 +385,7 @@ export function AIChatPage() {
     if (isSubmittingRef.current || isAiThinking || isStreaming) return;
 
     isSubmittingRef.current = true;
-<<<<<<< HEAD
-=======
-  const handleSendMessage = async (textToSend = inputText) => {
-    const trimmed = textToSend.trim();
-    if (!trimmed && attachedFiles.length === 0) return;
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+    setChatError('');
 
     const userMessage = {
       id: `usr-msg-${Date.now()}`,
@@ -451,49 +395,31 @@ export function AIChatPage() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
     let targetCaseId = currentCaseIdRef.current || activeCaseId;
 
-    // New Case Flow: If no active case, create one automatically
-    if (!targetCaseId) {
-      const createdCase = createChatCase(trimmed);
-      targetCaseId = createdCase.id;
-      currentCaseIdRef.current = targetCaseId;
-<<<<<<< HEAD
-=======
-    let targetCaseId = activeCaseId;
-
-    // 7. New Case Flow: If no active case, create one automatically from first message
-    if (!targetCaseId) {
-      const createdCase = createChatCase(trimmed);
-      targetCaseId = createdCase.id;
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
-    } else {
-      addMessageToCase(targetCaseId, userMessage);
+    // Persist the conversation and user turn before requesting authorized history.
+    try {
+      if (!targetCaseId) {
+        const createdCase = await createChatCase(trimmed);
+        targetCaseId = createdCase.id;
+        currentCaseIdRef.current = targetCaseId;
+      } else if (!(await addMessageToCase(targetCaseId, userMessage))) {
+        throw new Error('Your message could not be saved. Please check your connection and try again.');
+      }
+    } catch (err) {
+      setChatError(err.message || 'Unable to save this conversation.');
+      isSubmittingRef.current = false;
+      return;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     // Reset composer immediately so input is cleared and ready for next turn
-=======
->>>>>>> origin/main
-=======
-    // Reset composer immediately so input is cleared and ready for next turn
->>>>>>> 3aab4be (dhanush commits)
     setInputText('');
     setAttachedFiles([]);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 
     // Always scroll to bottom when user explicitly sends a message
     isNearBottomRef.current = true;
@@ -519,6 +445,10 @@ export function AIChatPage() {
             id: `ai-msg-rescued-${Date.now()}`,
             sender: 'ai',
             text: streamingTextRef.current,
+            executionPlan: streamingMetaRef.current?.executionPlan || [],
+            agentSteps: streamingMetaRef.current?.agentSteps || [],
+            language: streamingMetaRef.current?.language || null,
+            legalNoticeDraft: streamingMetaRef.current?.legalNoticeDraft || null,
             detectedLaws: streamingMetaRef.current?.detectedLaws || [],
             detectedPrecedents: streamingMetaRef.current?.detectedPrecedents || [],
             possibleRights: streamingMetaRef.current?.possibleRights || [],
@@ -550,6 +480,7 @@ export function AIChatPage() {
         attachedFiles,
         {
           signal: abortController.signal,
+          conversationId: targetCaseId,
           onMeta: (meta) => {
             streamingMetaRef.current = meta;
             setStreamingMeta(meta);
@@ -573,12 +504,20 @@ export function AIChatPage() {
               id: `ai-msg-${Date.now()}`,
               sender: 'ai',
               text: replyToSave,
+              executionPlan: metaToSave?.executionPlan || [],
+              agentSteps: metaToSave?.agentSteps || [],
+              language: metaToSave?.language || null,
+              legalNoticeDraft: metaToSave?.legalNoticeDraft || null,
               detectedLaws: metaToSave?.detectedLaws || metaToSave?.relevant_laws || [],
               detectedPrecedents: metaToSave?.detectedPrecedents || metaToSave?.similar_cases || [],
               possibleRights: metaToSave?.possibleRights || metaToSave?.rights_and_options || [],
               selfHelp: metaToSave?.selfHelp || null,
               suggestedNextSteps: metaToSave?.suggestedNextSteps || [],
               missingInformation: metaToSave?.missingInformation || metaToSave?.missing_information || [],
+              factGatheringQuestions: metaToSave?.factGatheringQuestions || metaToSave?.fact_gathering_questions || [],
+              detectedEmotion: metaToSave?.detectedEmotion || metaToSave?.detected_emotion || 'Normal',
+              emotionalTone: metaToSave?.emotionalTone || metaToSave?.emotional_tone || '',
+              emotionalAcknowledgment: metaToSave?.emotionalAcknowledgment || metaToSave?.emotional_acknowledgment || '',
               category: metaToSave?.category || '',
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
@@ -605,14 +544,7 @@ export function AIChatPage() {
       clearTimeout(safetyTimeout);
       if (err.name !== 'AbortError') {
         console.error('Chat error:', err);
-        const fallbackText = 'The legal AI service is unavailable, so no answer was generated. Please try again when the service is connected.';
-        const fallbackAi = {
-          id: `err-${Date.now()}`,
-          sender: 'ai',
-          text: fallbackText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        addMessageToCase(targetCaseId, fallbackAi);
+        setChatError(err.message || 'The legal AI service is unavailable. No answer was generated; please try again.');
       }
     } finally {
       clearTimeout(safetyTimeout);
@@ -651,6 +583,9 @@ export function AIChatPage() {
         selfHelp: streamingMeta?.selfHelp || null,
         suggestedNextSteps: streamingMeta?.suggestedNextSteps || [],
         missingInformation: streamingMeta?.missingInformation || [],
+        factGatheringQuestions: streamingMeta?.factGatheringQuestions || [],
+        detectedEmotion: streamingMeta?.detectedEmotion || 'Normal',
+        emotionalTone: streamingMeta?.emotionalTone || '',
         category: streamingMeta?.category || '',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
@@ -733,45 +668,6 @@ export function AIChatPage() {
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 60);
-<<<<<<< HEAD
-=======
-    setIsAiThinking(true);
-
-    try {
-      // Call Member 3 RAG Pipeline / Legal Analyzer
-      const aiResponse = await aiLegalService.sendMessage(
-        trimmed,
-        currentMessages,
-        attachedFiles
-      );
-
-      const aiMessage = {
-        id: `ai-msg-${Date.now()}`,
-        sender: 'ai',
-        text: aiResponse.reply || aiResponse.guidance || 'I have analyzed your situation under Indian legal principles.',
-        detectedLaws: aiResponse.detectedLaws || aiResponse.relevant_laws || [],
-        detectedPrecedents: aiResponse.detectedPrecedents || aiResponse.similar_cases || [],
-        suggestedNextSteps: aiResponse.suggestedNextSteps || [],
-        missingInformation: aiResponse.missing_information || [],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-
-      addMessageToCase(targetCaseId, aiMessage);
-    } catch (err) {
-      console.error('Chat error:', err);
-      const fallbackAi = {
-        id: `err-${Date.now()}`,
-        sender: 'ai',
-        text: 'I apologize, but I encountered an issue analyzing this specific issue. Please ensure your problem includes context like dates, state, or contract terms.',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-      addMessageToCase(targetCaseId, fallbackAi);
-    } finally {
-      setIsAiThinking(false);
-    }
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
   };
 
   const handleStarterClick = (starterText) => {
@@ -780,21 +676,12 @@ export function AIChatPage() {
 
   const starterCards = [
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
       icon: '🏠',
       title: 'Security Deposit Withheld',
       desc: 'Landlord refuses deposit refund or made arbitrary deductions',
       prompt: 'My landlord is withholding my ₹70,000 security deposit after I vacated the house with proper 30-day notice and claims ₹25,000 for painting.',
     },
     {
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       icon: '🏢',
       title: 'Wrongful Job Dismissal',
       desc: 'Terminated without 30 days statutory notice or severance pay',
@@ -807,31 +694,18 @@ export function AIChatPage() {
       prompt: 'A business client gave me a cheque of ₹2,50,000 which bounced due to insufficient funds. What is the legal procedure and time limit to take action?',
     },
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
       icon: '🛡️',
       title: 'Cyber Fraud & Unauthorized Debit',
       desc: 'Unrecognized UPI/bank debit and 1930 reporting helpline',
       prompt: '₹45,000 was debited from my bank account via unauthorized UPI transactions without any OTP or alert. What immediate steps and legal notice should I issue?',
     },
     {
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
       icon: '📦',
       title: 'Defective Product & Refund',
       desc: 'E-commerce platform refused return for damaged goods',
       prompt: 'I purchased an electronic appliance online that arrived damaged and defective, but the seller refused refund citing their 7-day return policy.',
     },
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
       icon: '🏗️',
       title: 'Builder Possession Delay',
       desc: 'RERA delayed handover compensation or 100% full refund',
@@ -849,24 +723,11 @@ export function AIChatPage() {
       desc: 'Ancestral property share dispute among legal heirs',
       prompt: 'My siblings are refusing to give me my lawful share of our ancestral residential property after our father passed away without leaving a will. What legal steps should I take?',
     },
-<<<<<<< HEAD
-=======
-      icon: '🏠',
-      title: 'Builder Possession Delay',
-      desc: 'RERA delayed handover compensation or full refund',
-      prompt: 'My builder delayed flat possession by over 14 months beyond the date promised in the Agreement for Sale. Can I claim full refund under RERA?',
-    },
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
   ];
 
   return (
     <div className="vidhisetu-chat-layout animate-fade-in">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
       {/* 1. Header Toolbar */}
       <header className="chat-top-toolbar">
         <div className="chat-top-left">
@@ -912,15 +773,6 @@ export function AIChatPage() {
       >
         <div className="chat-inner-column">
           {/* Empty State / Welcome Screen */}
-<<<<<<< HEAD
-=======
-      {/* Scrollable Conversation Stream */}
-      <div className="chat-scroll-area">
-        <div className="chat-inner-column">
-          {/* Empty State / New Case Screen */}
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
           {currentMessages.length === 0 ? (
             <div className="chat-empty-hero animate-fade-in">
               <div className="hero-badge-container">
@@ -928,10 +780,7 @@ export function AIChatPage() {
                   <Scale size={32} />
                 </div>
               </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
               <h1 className="hero-title">Public AI Legal Agent</h1>
               <p className="hero-subtitle">
                 Individualized Legal Procedures • Authentic Kanoon Precedents • Multi-Turn Memory
@@ -954,18 +803,6 @@ export function AIChatPage() {
 
               <p className="hero-explanation">
                 Explain any legal grievance in your own words (English, Telugu, or Tanglish). VidhiSetu tailors a suitable legal roadmap for your specific issue, cites authentic Indian judicial precedents, and remembers your facts as you ask follow-up questions.
-<<<<<<< HEAD
-=======
-              <h1 className="hero-title">VidhiSetu AI</h1>
-              <p className="hero-subtitle">
-                How can I help with your legal situation today?
-              </p>
-              <p className="hero-explanation">
-                Describe your dispute in everyday words. VidhiSetu researches relevant Indian statutes,
-                court precedents, and guides you on self-help or advocate consultation.
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
               </p>
 
               <div className="hero-starters-grid">
@@ -988,10 +825,7 @@ export function AIChatPage() {
           ) : (
             /* Active Conversation Messages */
             <div className="chat-messages-list">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
               {currentMessages.map((msg, index) => {
                 const isLastAiMessage =
                   msg.sender === 'ai' && index === currentMessages.length - 1;
@@ -1018,8 +852,82 @@ export function AIChatPage() {
                         <span className="message-sender-name">
                           {msg.sender === 'ai' ? 'VidhiSetu AI' : 'You'}
                         </span>
+                        {msg.sender === 'ai' && msg.detectedEmotion && msg.detectedEmotion !== 'Normal' && (
+                          <span
+                            className={`emotion-badge emotion-${msg.detectedEmotion.toLowerCase()}`}
+                            title={`Emotional State: ${msg.detectedEmotion} • Tone: ${msg.emotionalTone || ''}`}
+                          >
+                            {msg.detectedEmotion === 'Sad' && '💙 Compassionate Assessment'}
+                            {msg.detectedEmotion === 'Angry' && '🛡️ Calm Legal Recourse'}
+                            {msg.detectedEmotion === 'Confused' && '💡 Plain-Language Demystified'}
+                            {msg.detectedEmotion === 'Happy' && '✨ Encouraging Next Steps'}
+                          </span>
+                        )}
                         <span className="message-time">{msg.timestamp}</span>
                       </div>
+
+                      {/* Multi-Step Agentic Reasoning Timeline & Language Adaptation */}
+                      {msg.sender === 'ai' && ((msg.agentSteps && msg.agentSteps.length > 0) || msg.language) && (
+                        <div className="agent-workflow-card animate-fade-in" aria-label="Agentic Multi-Step Reasoning Process">
+                          <div className="agent-workflow-header">
+                            <div className="agent-badge-title">
+                              <Sparkles size={14} className="agent-sparkle-icon" />
+                              <span>Agentic Multi-Step Reasoning</span>
+                              {msg.agentSteps && msg.agentSteps.length > 0 && (
+                                <span className="agent-step-count-pill">{msg.agentSteps.length} tools executed</span>
+                              )}
+                            </div>
+                            {msg.language && (
+                              <span className="agent-lang-pill">
+                                🌐 {msg.language}
+                              </span>
+                            )}
+                          </div>
+                          {msg.agentSteps && msg.agentSteps.length > 0 && (
+                            <div className="agent-steps-list">
+                              {msg.agentSteps.map((step, idx) => (
+                                <div key={idx} className="agent-step-row">
+                                  <div className="agent-step-col-num">
+                                    <span className="step-num">{idx + 1}</span>
+                                  </div>
+                                  <div className="agent-step-col-content">
+                                    <div className="step-tool-name">{step.tool || step.step || `Tool ${idx + 1}`}</div>
+                                    <div className="step-summary-text">{step.summary || 'Execution completed.'}</div>
+                                  </div>
+                                  <div className="agent-step-col-status">
+                                    {step.status === 'needs_input' ? (
+                                      <span className="step-status-chip warning" title="Action required / input needed">
+                                        <AlertTriangle size={12} />
+                                        <span className="step-status-label">Needs Input</span>
+                                      </span>
+                                    ) : step.status === 'unavailable' || step.status === 'failed' ? (
+                                      <span className="step-status-chip unavailable" title="No matching records or unavailable">
+                                        <XCircle size={12} />
+                                        <span className="step-status-label">Unavailable</span>
+                                      </span>
+                                    ) : step.status === 'skipped' ? (
+                                      <span className="step-status-chip skipped" title="Intentionally skipped">
+                                        <Clock size={12} />
+                                        <span className="step-status-label">Skipped</span>
+                                      </span>
+                                    ) : step.status === 'completed' ? (
+                                      <span className="step-status-chip completed" title="Executed and verified">
+                                        <CheckCircle2 size={12} />
+                                        <span className="step-status-label">Completed</span>
+                                      </span>
+                                    ) : (
+                                      <span className="step-status-chip pending" title="Pending execution">
+                                        <Clock size={12} />
+                                        <span className="step-status-label">Pending</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Render Rich Markdown Text */}
                       <div className="message-text">
@@ -1121,6 +1029,42 @@ export function AIChatPage() {
                         </div>
                       )}
 
+                      {/* Statutory Legal Notice Draft */}
+                      {msg.legalNoticeDraft && (
+                        <div className="chat-sources-block agent-notice-block animate-fade-in">
+                          <div className="sources-heading notice-heading">
+                            <div className="notice-heading-left">
+                              <FileText size={15} />
+                              <span>Statutory Legal Demand Notice Draft (Ready to Dispatch)</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="btn-copy-notice"
+                              onClick={() => {
+                                navigator.clipboard.writeText(msg.legalNoticeDraft);
+                                setCopiedMessageId(`notice-${msg.id}`);
+                                setTimeout(() => setCopiedMessageId(null), 2000);
+                              }}
+                            >
+                              {copiedMessageId === `notice-${msg.id}` ? (
+                                <>
+                                  <Check size={12} className="text-success" />
+                                  <span>Copied!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={12} />
+                                  <span>Copy Notice</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          <div className="agent-notice-container">
+                            <pre className="agent-notice-pre">{msg.legalNoticeDraft}</pre>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Statutory Rights & Possible Options (Flowchart Step 4 - Pillar 4) */}
                       {msg.possibleRights && msg.possibleRights.length > 0 && (
                         <div className="chat-sources-block rights-options-block">
@@ -1165,6 +1109,36 @@ export function AIChatPage() {
                               </li>
                             ))}
                           </ul>
+                        </div>
+                      )}
+
+                      {/* Interactive Active-Agent Fact Gathering (Selectable Options & Checkboxes) */}
+                      {msg.factGatheringQuestions && msg.factGatheringQuestions.length > 0 && (
+                        <div className="fact-gathering-card">
+                          <div className="fact-gathering-header">
+                            <Compass size={15} />
+                            <span>Select Case Details to Narrow Legal Assessment:</span>
+                          </div>
+                          <div className="fact-questions-list">
+                            {msg.factGatheringQuestions.map((qItem, qIdx) => (
+                              <div key={qIdx} className="fact-question-item">
+                                <span className="fact-question-text">{qItem.question}</span>
+                                <div className="fact-options-grid">
+                                  {qItem.options.map((opt, optIdx) => (
+                                    <button
+                                      key={optIdx}
+                                      type="button"
+                                      className="fact-option-chip"
+                                      onClick={() => handleSendMessage(`Regarding "${qItem.question}": ${opt}`)}
+                                      title={`Click to provide fact: ${opt}`}
+                                    >
+                                      <span className="fact-chip-bullet">▪</span> {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
 
@@ -1350,16 +1324,26 @@ export function AIChatPage() {
                                 Top verified advocates matching <strong>{msg.category || activeCase?.category || 'your legal issue'}</strong>:
                               </p>
 
+                              {lawyerLoading && <p role="status">Loading verified advocates…</p>}
+                              {lawyerLoadError && <p role="alert">{lawyerLoadError}</p>}
+                              {!lawyerLoading && !lawyerLoadError && getRecommendedLawyers(msg.category || activeCase?.category).length === 0 && (
+                                <p>No verified advocates currently match this issue.</p>
+                              )}
                               <div className="lawyers-recommendation-grid">
-                                {getRecommendedLawyers(msg.category || activeCase?.category).map((advocate) => (
+                                {!lawyerLoadError && getRecommendedLawyers(msg.category || activeCase?.category).map((advocate) => (
                                   <div key={advocate.id} className="rec-lawyer-card">
                                     <div className="rec-lawyer-top">
-                                      <img src={advocate.photoUrl} alt={advocate.name} className="rec-lawyer-avatar" />
+                                      {advocate.photoUrl && <img src={advocate.photoUrl} alt="" className="rec-lawyer-avatar" />}
                                       <div className="rec-lawyer-meta">
                                         <strong className="rec-lawyer-name">{advocate.name}</strong>
-                                        <span className="rec-lawyer-bar">{advocate.barCouncilId} • {advocate.experienceYears}+ Yrs Exp</span>
+                                        {advocate.barCouncilId && <span className="rec-lawyer-bar">{advocate.barCouncilId}</span>}
+                                        {advocate.experienceYears > 0 && <span className="rec-lawyer-bar">{advocate.experienceYears}+ Yrs Exp</span>}
                                         <span className="rec-lawyer-court">{advocate.court}</span>
-                                        <span className="rec-lawyer-stars">⭐ {advocate.rating} ({advocate.reviewCount} reviews)</span>
+                                        {advocate.rating && advocate.reviewCount > 0 ? (
+                                          <span className="rec-lawyer-stars">⭐ {advocate.rating} ({advocate.reviewCount} reviews)</span>
+                                        ) : (
+                                          <span className="rec-lawyer-stars" style={{ color: 'var(--accent-400, #e5c07b)', fontWeight: 600 }}>Verified VidhiSetu Advocate</span>
+                                        )}
                                       </div>
                                     </div>
 
@@ -1380,7 +1364,7 @@ export function AIChatPage() {
                                     <div className="rec-lawyer-bottom">
                                       <div className="fee-info">
                                         <span className="fee-title">Consultation Fee</span>
-                                        <strong className="fee-val">₹{advocate.consultationFee}</strong>
+                                        <strong className="fee-val">{advocate.consultationFee ? `₹${advocate.consultationFee}` : 'Fee not listed'}</strong>
                                       </div>
                                       <Link to={`/lawyers/${advocate.id}`} className="request-consult-btn">
                                         Request Consultation →
@@ -1391,7 +1375,7 @@ export function AIChatPage() {
                               </div>
 
                               <div className="lawyer-flow-more-row">
-                                <Link to={`/cases/${activeCaseId || 'case-101'}/lawyers`} className="view-all-advocates-link">
+                                <Link to="/lawyers" className="view-all-advocates-link">
                                   <Users size={14} />
                                   <span>View All Verified Advocates on VidhiSetu Network →</span>
                                 </Link>
@@ -1489,212 +1473,16 @@ export function AIChatPage() {
                           {streamingMeta.detectedLaws.slice(0, 2).map((law, idx) => (
                             <div key={idx} className="source-card">
                               <strong>{law.act || law.act_name || law.name}</strong>
-<<<<<<< HEAD
-=======
-              {currentMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`chat-message-row message-from-${msg.sender}`}
-                >
-                  <div className="message-avatar">
-                    {msg.sender === 'ai' ? (
-                      <div className="ai-avatar-badge">
-                        <Scale size={16} />
-                      </div>
-                    ) : (
-                      <div className="user-avatar-badge">
-                        <User size={16} />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="message-bubble">
-                    <div className="message-header-meta">
-                      <span className="message-sender-name">
-                        {msg.sender === 'ai' ? 'VidhiSetu AI' : 'You'}
-                      </span>
-                      <span className="message-time">{msg.timestamp}</span>
-                    </div>
-
-                    {/* Body text with formatted paragraphs */}
-                    <div className="message-text">
-                      {msg.text.split('\n\n').map((para, i) => (
-                        <p
-                          key={i}
-                          dangerouslySetInnerHTML={{
-                            __html: para
-                              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                              .replace(/\*(.*?)\*/g, '<em>$1</em>'),
-                          }}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Attached file chips */}
-                    {msg.attachedFiles && msg.attachedFiles.length > 0 && (
-                      <div className="message-attachments">
-                        <span className="attachments-title">Attached Proofs:</span>
-                        {msg.attachedFiles.map((file, idx) => (
-                          <span key={idx} className="attachment-chip">
-                            <FileText size={14} /> {file.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Relevant Statutory Laws */}
-                    {msg.detectedLaws && msg.detectedLaws.length > 0 && (
-                      <div className="chat-sources-block">
-                        <div className="sources-heading">
-                          <BookOpen size={16} />
-                          <span>Relevant Indian Statutes:</span>
-                        </div>
-                        <div className="sources-cards-list">
-                          {msg.detectedLaws.map((law, idx) => (
-                            <div key={idx} className="source-card">
-                              <strong>
-                                {law.act || law.act_name} {law.section ? `– ${law.section}` : ''}
-                              </strong>
-                              {law.plainMeaning && <p>{law.plainMeaning}</p>}
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
                             </div>
                           ))}
-                        </div>
-                      </div>
-                    )}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-                  </div>
-                </div>
-              )}
-
-              {/* AI Thinking Animation (Initial phase before tokens arrive) */}
-<<<<<<< HEAD
-=======
-
-                    {/* Cited Judicial Precedents (Indian Kanoon) */}
-                    {msg.detectedPrecedents && msg.detectedPrecedents.length > 0 && (
-                      <div className="chat-sources-block precedents-block">
-                        <div className="sources-heading">
-                          <Scale size={16} />
-                          <span>Retrieved Legal Precedents (Indian Kanoon):</span>
-                        </div>
-                        <div className="sources-cards-list">
-                          {msg.detectedPrecedents.map((judg, idx) => (
-                            <div key={idx} className="source-card precedent-source-card">
-                              <div className="precedent-card-top">
-                                <strong>
-                                  {judg.title} {judg.year ? `(${judg.year})` : ''}
-                                </strong>
-                                {judg.court && (
-                                  <span className="citation-badge" style={{ background: '#f1f5f9', color: '#475569' }}>
-                                    {judg.court}
-                                  </span>
-                                )}
-                                {judg.citation && (
-                                  <span className="citation-badge">{judg.citation}</span>
-                                )}
-                              </div>
-                              {judg.keyExtract && (
-                                <blockquote
-                                  style={{
-                                    fontSize: '0.82rem',
-                                    color: '#334155',
-                                    background: '#f8fafc',
-                                    borderLeft: '3px solid #3b82f6',
-                                    padding: '6px 10px',
-                                    margin: '6px 0',
-                                    borderRadius: '0 4px 4px 0',
-                                  }}
-                                >
-                                  <strong>Relevant Case Extract:</strong> "{judg.keyExtract.length > 250 ? judg.keyExtract.slice(0, 250) + '...' : judg.keyExtract}"
-                                </blockquote>
-                              )}
-                              {judg.keyTakeaway && !judg.keyExtract && (
-                                <p className="takeaway-text">💡 {judg.keyTakeaway}</p>
-                              )}
-                              <div className="precedent-links-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '6px', flexWrap: 'wrap' }}>
-                                <Link
-                                  to={`/judgments/${judg.caseId || judg.id || '109283'}`}
-                                  className="precedent-kanoon-link"
-                                  style={{ fontWeight: 600, color: '#2563eb' }}
-                                >
-                                  View Full Court Judgment →
-                                </Link>
-                                {judg.sourceUrl && (
-                                  <a
-                                    href={judg.sourceUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="precedent-kanoon-link"
-                                    style={{ color: '#64748b' }}
-                                  >
-                                    Indian Kanoon Source ↗
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Missing Information / Follow-up Questions */}
-                    {msg.missingInformation && msg.missingInformation.length > 0 && (
-                      <div className="missing-info-card">
-                        <div className="missing-info-header">
-                          <HelpCircle size={15} />
-                          <span>Important Questions to Clarify:</span>
-                        </div>
-                        <ul className="missing-info-list">
-                          {msg.missingInformation.map((item, idx) => (
-                            <li key={idx}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Suggested Next Steps */}
-                    {msg.suggestedNextSteps && msg.suggestedNextSteps.length > 0 && (
-                      <div className="suggested-actions-box">
-                        <span className="suggested-actions-title">
-                          <CheckCircle2 size={15} /> Recommended Next Steps:
-                        </span>
-                        <ul className="suggested-actions-list">
-                          {msg.suggestedNextSteps.map((step, idx) => (
-                            <li key={idx}>{step}</li>
-                          ))}
-                        </ul>
-                        <div className="action-box-footer">
-                          <Link
-                            to={`/cases/${activeCaseId || 'case-101'}/action-plan`}
-                            className="action-link-btn"
-                          >
-                            <span>Open Step-by-Step Action Plan</span>
-                            <ArrowRight size={14} />
-                          </Link>
-                          <Link
-                            to={`/cases/${activeCaseId || 'case-101'}/lawyers`}
-                            className="action-link-btn btn-secondary"
-                          >
-                            <Users size={14} />
-                            <span>Find Recommended Advocates</span>
-                          </Link>
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
-              ))}
+              )}
 
               {/* AI Thinking Animation */}
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
               {isAiThinking && (
                 <div className="chat-message-row message-from-ai">
                   <div className="message-avatar">
@@ -1715,26 +1503,14 @@ export function AIChatPage() {
                 </div>
               )}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
               {/* Bottom anchor for scrolling */}
               <div ref={messagesEndRef} className="scroll-sentinel" />
-=======
-              <div ref={messagesEndRef} />
->>>>>>> origin/main
-=======
-              {/* Bottom anchor for scrolling */}
-              <div ref={messagesEndRef} className="scroll-sentinel" />
->>>>>>> 3aab4be (dhanush commits)
             </div>
           )}
         </div>
       </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
       {/* 3. Floating Jump to Bottom Button */}
       {showScrollBottomBtn && (
         <button
@@ -1753,23 +1529,11 @@ export function AIChatPage() {
       <footer className="chat-bottom-dock">
         <div className="chat-dock-inner">
           {/* File Attachment Tray */}
-<<<<<<< HEAD
-=======
-      {/* 6. Message Input Box Fixed at Bottom (ChatGPT style) */}
-      <div className="chat-bottom-dock">
-        <div className="chat-dock-inner">
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
           {attachedFiles.length > 0 && (
             <div className="chat-attached-tray">
               {attachedFiles.map((f, i) => (
                 <span key={i} className="tray-chip">
                   <FileText size={14} /> {f.name}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
                   <button
                     type="button"
                     className="tray-chip-remove"
@@ -1778,20 +1542,11 @@ export function AIChatPage() {
                   >
                     ×
                   </button>
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
                 </span>
               ))}
             </div>
           )}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
           {/* Voice Input Listening State Indicator */}
           {isListening && (
             <div className="voice-listening-banner animate-fade-in">
@@ -1800,36 +1555,25 @@ export function AIChatPage() {
             </div>
           )}
 
-          {/* Composer Input Box */}
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+              {(chatError || conversationError) && (
+                <div role="alert" className="chat-error-banner">
+                  {chatError || conversationError}
+                </div>
+              )}
+
+              {/* Composer Input Box */}
           <div className="chat-composer-box">
             <button
               type="button"
               className="composer-attach-btn"
               onClick={() => setShowAttachModal(true)}
-<<<<<<< HEAD
-<<<<<<< HEAD
               title="Attach Agreements, Invoices, Dishonour Memos, or Notice Copies"
-=======
-              title="Attach Agreements, Receipts, or Bounced Cheques"
->>>>>>> origin/main
-=======
-              title="Attach Agreements, Invoices, Dishonour Memos, or Notice Copies"
->>>>>>> 3aab4be (dhanush commits)
               aria-label="Attach Documents"
             >
               <Paperclip size={18} />
             </button>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-            {/* Flowchart Step 2: Voice Input Button */}
+            {/* Voice Input Button */}
             <button
               type="button"
               className={`composer-mic-btn ${isListening ? 'mic-active' : ''}`}
@@ -1848,15 +1592,6 @@ export function AIChatPage() {
                   ? 'VidhiSetu AI is analyzing Indian statutes & precedents…'
                   : 'Ask VidhiSetu about your legal rights, notice procedure, or dispute…'
               }
-<<<<<<< HEAD
-=======
-            <textarea
-              ref={textareaRef}
-              className="composer-textarea"
-              placeholder="Ask VidhiSetu about your legal issue, rights, notice period, or dispute…"
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
               value={inputText}
               rows={1}
               onChange={handleTextChange}
@@ -1866,10 +1601,6 @@ export function AIChatPage() {
                   handleSendMessage();
                 }
               }}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
               disabled={isAiThinking || isStreaming}
               id="chat-composer-textarea"
             />
@@ -1909,32 +1640,6 @@ export function AIChatPage() {
           </div>
         </div>
       </footer>
-<<<<<<< HEAD
-=======
-            />
-
-            <button
-              type="button"
-              className={`composer-send-btn ${inputText.trim() || attachedFiles.length > 0 ? 'send-btn-active' : ''}`}
-              onClick={() => handleSendMessage()}
-              disabled={!inputText.trim() && attachedFiles.length === 0}
-              title="Send message (Enter)"
-              aria-label="Send message"
-            >
-              <ArrowUp size={18} />
-            </button>
-          </div>
-
-          <div className="chat-legal-footnote">
-            <span>
-              VidhiSetu provides informational legal guidance based on Indian law and judicial records. It does not replace professional legal representation.
-            </span>
-          </div>
-        </div>
-      </div>
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 
       {/* Document Attachment Modal */}
       {showAttachModal && (
@@ -1943,15 +1648,7 @@ export function AIChatPage() {
             <Card className="attach-modal-card">
               <h3 className="card-title">Attach Supporting Evidence</h3>
               <p className="card-subtitle">
-<<<<<<< HEAD
-<<<<<<< HEAD
                 Upload rental agreements, cheques, invoices, or written correspondence to assist VidhiSetu.
-=======
-                Upload invoices, agreements, emails, or bank dishonour memos to help VidhiSetu assess your case.
->>>>>>> origin/main
-=======
-                Upload rental agreements, cheques, invoices, or written correspondence to assist VidhiSetu.
->>>>>>> 3aab4be (dhanush commits)
               </p>
               <div style={{ marginTop: '16px' }}>
                 <FileUpload
@@ -1964,15 +1661,7 @@ export function AIChatPage() {
                   Cancel
                 </Button>
                 <Button variant="primary" onClick={() => setShowAttachModal(false)}>
-<<<<<<< HEAD
-<<<<<<< HEAD
                   Done ({attachedFiles.length} files)
-=======
-                  Attach ({attachedFiles.length} files)
->>>>>>> origin/main
-=======
-                  Done ({attachedFiles.length} files)
->>>>>>> 3aab4be (dhanush commits)
                 </Button>
               </div>
             </Card>
@@ -1982,13 +1671,5 @@ export function AIChatPage() {
     </div>
   );
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 export default AIChatPage;
-=======
->>>>>>> origin/main
-=======
-
-export default AIChatPage;
->>>>>>> 3aab4be (dhanush commits)

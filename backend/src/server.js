@@ -2,12 +2,10 @@ import dotenv from 'dotenv';
 import app from './app.js';
 import db from './config/db.js';
 
-dotenv.config();
+if (!(process.env.NODE_ENV === 'test' && process.env.VIDHISETU_TEST_MODE === 'isolated')) {
+  dotenv.config();
+}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Global Crash-Proof Process Guards (Never let unhandled errors terminate the server)
@@ -19,28 +17,23 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('[CRITICAL PROCESS GUARD] Caught Unhandled Rejection:', reason);
 });
-<<<<<<< HEAD
-=======
-const PORT = process.env.PORT || 5000;
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 
 async function startServer() {
   console.log('====================================================');
   console.log('EarnLaw Central Integration Server (Member 2)');
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
   console.log('High-Resilience Server Engine Active');
   console.log('====================================================');
 
-  // Test AnuDB PostgreSQL Connection (gracefully falls back to memory layer)
+  // Verify the selected persistence mode before serving requests.
   try {
-    await db.testConnection();
+    const connected = await db.testConnection();
+    if (!connected && db.getPersistenceMode() === 'memory') {
+      console.warn('[Persistence] PostgreSQL unavailable; using configured memory/disk fallback.');
+    } else if (!connected) {
+      console.error('[Persistence] PostgreSQL unavailable and memory fallback is disabled.');
+    }
   } catch (dbErr) {
-    console.warn('[Server Startup] DB connection deferred to in-memory fallback:', dbErr.message);
+    console.error('[Persistence] PostgreSQL connection check failed:', dbErr.message);
   }
 
   const server = app.listen(PORT, '0.0.0.0', () => {
@@ -50,7 +43,6 @@ async function startServer() {
   });
 
   // Server Socket & Timeout Hardening
-  // Prevents "Website Not Responding" and connection dropping
   server.keepAliveTimeout = 120000; // 2 minutes keep-alive
   server.headersTimeout = 125000;   // 125 seconds header timeout
   server.requestTimeout = 300000;   // 5 minutes request timeout
@@ -74,29 +66,9 @@ async function startServer() {
 
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
-<<<<<<< HEAD
-=======
-  console.log('====================================================');
-
-  // Test AnuDB PostgreSQL Connection
-  await db.testConnection();
-
-  app.listen(PORT, () => {
-    console.log(`[Member 2 Server] Listening on http://localhost:${PORT}`);
-    console.log(`- Healthcheck: http://localhost:${PORT}/health`);
-  });
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 }
 
 startServer().catch((err) => {
   console.error('Fatal Server Startup Error:', err);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   process.exit(1);
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
 });

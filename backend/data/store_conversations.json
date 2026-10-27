@@ -1,0 +1,58 @@
+[
+  {
+    "id": "case-1793039244953",
+    "user_id": "usr_c80e074887dfe4c3",
+    "userId": "usr_c80e074887dfe4c3",
+    "case_id": null,
+    "title": "My employer removed me from…",
+    "category": "Legal Consultation",
+    "is_pinned": false,
+    "isPinned": false,
+    "conversation_summary": "",
+    "metadata": {},
+    "created_at": "2026-10-26T18:27:25.001Z",
+    "updated_at": "2026-10-26T18:27:35.427Z"
+  },
+  {
+    "id": "case-1793039286186",
+    "user_id": "usr_c80e074887dfe4c3",
+    "userId": "usr_c80e074887dfe4c3",
+    "case_id": null,
+    "title": "I have some family issues",
+    "category": "Legal Consultation",
+    "is_pinned": false,
+    "isPinned": false,
+    "conversation_summary": "",
+    "metadata": {},
+    "created_at": "2026-10-26T18:28:06.227Z",
+    "updated_at": "2026-10-26T18:28:22.078Z"
+  },
+  {
+    "id": "case-1793044421295",
+    "user_id": "usr_44436907a9ef9ee8",
+    "userId": "usr_44436907a9ef9ee8",
+    "case_id": null,
+    "title": "Namaste",
+    "category": "Legal Consultation",
+    "is_pinned": false,
+    "isPinned": false,
+    "conversation_summary": "",
+    "metadata": {},
+    "created_at": "2026-10-26T19:53:41.529Z",
+    "updated_at": "2026-10-26T19:54:07.078Z"
+  },
+  {
+    "id": "case-1793048379344",
+    "user_id": "usr_44436907a9ef9ee8",
+    "userId": "usr_44436907a9ef9ee8",
+    "case_id": null,
+    "title": "Namaste",
+    "category": "Legal Consultation",
+    "is_pinned": false,
+    "isPinned": false,
+    "conversation_summary": "",
+    "metadata": {},
+    "created_at": "2026-10-26T20:59:39.365Z",
+    "updated_at": "2026-10-26T21:00:29.624Z"
+  }
+]

@@ -63,7 +63,15 @@ export function LawyerProfilePage() {
                 <Briefcase size={14} /> {lawyer.experienceYears} Years Experience
               </span>
               <span className="profile-meta-chip">
-                <Star size={14} fill="#f59e0b" color="#f59e0b" /> {lawyer.rating} ({lawyer.reviewCount} Reviews)
+                {lawyer.rating && lawyer.reviewCount > 0 ? (
+                  <>
+                    <Star size={14} fill="#f59e0b" color="#f59e0b" /> {lawyer.rating} ({lawyer.reviewCount} Verified Reviews)
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck size={14} color="#e5c07b" /> Verified VidhiSetu Advocate
+                  </>
+                )}
               </span>
               <span className="profile-meta-chip">
                 <Award size={14} /> Bar Enrollment: {lawyer.barCouncilId}

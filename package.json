@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "start": "node backend/src/server.js",
+    "server": "node backend/src/server.js",
+    "migrate": "node backend/src/db/migrate.js",
+    "build:all": "vite build && npm --prefix backend install",
     "lint": "oxlint",
     "preview": "vite preview"
   },

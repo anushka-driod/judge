@@ -32,18 +32,8 @@ export class LegalCorpusRepository {
   async persistJudgments(judgments = [], embeddedChunks = []) {
     if (!judgments.length || !embeddedChunks.length) return { persisted: 0 };
 
-<<<<<<< HEAD
     const connection = await this.database.query('SELECT 1 AS available');
     if (connection.isFallback) return { persisted: 0, unavailable: true };
-=======
-    let connection;
-    try {
-      connection = await this.database.query('SELECT 1 AS available');
-    } catch {
-      return { persisted: 0, unavailable: true };
-    }
-    if (!connection || connection.isFallback) return { persisted: 0, unavailable: true };
->>>>>>> 3aab4be (dhanush commits)
 
     const chunksByDocument = new Map();
     for (const chunk of embeddedChunks) {
@@ -134,7 +124,6 @@ export class LegalCorpusRepository {
     const patterns = searchPatterns(queryText);
     if (!patterns.length) return { chunks: [], judgments: [], unavailable: false };
 
-<<<<<<< HEAD
     const result = await this.database.query(
       `SELECT
           chunk.chunk_id,
@@ -160,38 +149,6 @@ export class LegalCorpusRepository {
       [patterns]
     );
     if (result.isFallback) return { chunks: [], judgments: [], unavailable: true };
-=======
-    let result;
-    try {
-      result = await this.database.query(
-        `SELECT
-            chunk.chunk_id,
-            chunk.kanoon_id,
-            chunk.chunk_index,
-            chunk.chunk_type,
-            chunk.chunk_text,
-            chunk.embedding,
-            chunk.source_url,
-            chunk.citation,
-            legal_case.case_name,
-            legal_case.court,
-            legal_case.jurisdiction,
-            legal_case.judgment_date,
-            legal_case.case_type,
-            judgment.full_text
-         FROM legal_judgment_chunks AS chunk
-         JOIN legal_cases AS legal_case ON legal_case.id = chunk.case_id
-         LEFT JOIN judgments AS judgment ON judgment.case_id = legal_case.id
-         WHERE chunk.chunk_text ILIKE ANY($1::text[])
-         ORDER BY legal_case.judgment_date DESC NULLS LAST
-         LIMIT 500`,
-        [patterns]
-      );
-    } catch {
-      return { chunks: [], judgments: [], unavailable: true };
-    }
-    if (!result || result.isFallback) return { chunks: [], judgments: [], unavailable: true };
->>>>>>> 3aab4be (dhanush commits)
 
     const candidates = result.rows.map((row) => ({
       chunkId: row.chunk_id,

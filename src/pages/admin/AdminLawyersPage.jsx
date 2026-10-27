@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Alert } from '../../components/common/Alert';
 import { lawyerPortalClient } from '../../services/lawyerPortalClient';
 import {
   ShieldCheck,
@@ -13,6 +14,7 @@ import {
   RefreshCw,
   Search,
   Filter,
+  Mail,
 } from 'lucide-react';
 import '../../components/lawyer/LawyerPortal.css';
 
@@ -22,11 +24,14 @@ export function AdminLawyersPage() {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [selectedLawyer, setSelectedLawyer] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [retryLoading, setRetryLoading] = useState(false);
   const [actionRemarks, setActionRemarks] = useState('');
   const [auditLogs, setAuditLogs] = useState([]);
+  const [fetchError, setFetchError] = useState('');
 
   const fetchLawyers = async () => {
     setLoading(true);
+    setFetchError('');
     try {
       const res = await lawyerPortalClient.adminGetLawyers(
         filterStatus === 'ALL' ? null : filterStatus
@@ -43,6 +48,7 @@ export function AdminLawyersPage() {
       setAuditLogs(logs?.auditLogs || []);
     } catch (err) {
       console.warn('Failed to fetch admin lawyers list:', err.message);
+      setFetchError(err.message || 'Failed to fetch advocate applications.');
     } finally {
       setLoading(false);
     }
@@ -53,9 +59,13 @@ export function AdminLawyersPage() {
   }, [filterStatus]);
 
   const handleApprove = async (id) => {
+    if (!actionRemarks.trim()) {
+      alert('Record the verification checks completed before approving this application.');
+      return;
+    }
     setActionLoading(true);
     try {
-      const remarks = actionRemarks || 'Bar Council registration & credentials verified.';
+      const remarks = actionRemarks.trim();
       await lawyerPortalClient.adminApproveLawyer(id, remarks);
       setActionRemarks('');
       await fetchLawyers();
@@ -125,6 +135,19 @@ export function AdminLawyersPage() {
     }
   };
 
+  const handleRetryNotification = async (id) => {
+    setRetryLoading(true);
+    try {
+      const res = await lawyerPortalClient.adminRetryNotification(id);
+      alert(res.delivered ? 'Notification email accepted by SMTP provider!' : (res.error ? `Notification failed: ${res.error}` : 'Retry completed.'));
+      await fetchLawyers();
+    } catch (err) {
+      alert('Failed to retry notification: ' + err.message);
+    } finally {
+      setRetryLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -136,6 +159,7 @@ export function AdminLawyersPage() {
       }}
     >
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        {fetchError && <Alert type="danger">{fetchError}</Alert>}
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
@@ -276,6 +300,49 @@ export function AdminLawyersPage() {
                     <div style={{ fontWeight: 700, color: '#34d399' }}>₹{selectedLawyer.consultation_fee}</div>
                   </div>
                 </div>
+              </div>
+
+              {/* Admin Registration Notification Status & Retry Box */}
+              <div style={{ background: '#0e1320', padding: '16px', borderRadius: '10px', border: '1px solid #22304d', marginBottom: '18px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Mail size={16} color="#d4af37" />
+                    <strong style={{ fontSize: '0.8125rem', color: '#fff' }}>Admin Registration Notification (adminvidhisetu@gmail.com)</strong>
+                  </div>
+                  <span className={`lp-badge lp-badge-${selectedLawyer.notification_status === 'accepted' ? 'verified' : (selectedLawyer.notification_status === 'failed' ? 'rejected' : 'pending')}`}>
+                    {selectedLawyer.notification_status === 'accepted' ? 'ACCEPTED BY PROVIDER' : (selectedLawyer.notification_status === 'failed' ? 'DELIVERY FAILED' : 'QUEUED / PENDING')}
+                  </span>
+                </div>
+
+                <div style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '10px' }}>
+                  {selectedLawyer.notification_status === 'accepted' && (
+                    <span style={{ color: '#34d399' }}>✓ Notification email accepted by configured SMTP provider.</span>
+                  )}
+                  {selectedLawyer.notification_status === 'failed' && (
+                    <span style={{ color: '#f87171' }}>
+                      ✗ Delivery failure: {selectedLawyer.notification_error || 'SMTP credentials unconfigured or delivery failed.'} Application is safely retained for administrative audit.
+                    </span>
+                  )}
+                  {(!selectedLawyer.notification_status || selectedLawyer.notification_status === 'pending') && (
+                    <span>Notification queued for administrator dispatch.</span>
+                  )}
+                  {selectedLawyer.notification_attempted_at && (
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
+                      Last Attempt: {new Date(selectedLawyer.notification_attempted_at).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRetryNotification(selectedLawyer.id)}
+                  disabled={retryLoading}
+                  className="lp-btn-action"
+                  style={{ fontSize: '0.75rem', padding: '6px 12px', background: 'rgba(212, 175, 55, 0.15)', borderColor: '#d4af37', color: '#d4af37' }}
+                >
+                  <RefreshCw size={13} className={retryLoading ? 'animate-spin' : ''} />
+                  <span>{retryLoading ? 'Retrying Notification...' : 'Retry Admin Notification Email'}</span>
+                </button>
               </div>
 
               {/* Submitted Verification Documents */}

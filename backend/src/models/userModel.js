@@ -1,13 +1,29 @@
 import crypto from 'node:crypto';
 import db from '../config/db.js';
+import { loadUsersFromDisk, saveUsersToDisk } from '../utils/fileStore.js';
 
-// Fallback in-memory storage for resilient local execution
+// Fallback in-memory storage (backed by disk persistence for server restarts)
 const memoryUsers = new Map();
+try {
+  const diskUsers = loadUsersFromDisk();
+  for (const u of diskUsers) {
+    if (u && u.email) {
+      memoryUsers.set(u.email.toLowerCase().trim(), u);
+    }
+  }
+} catch (e) {
+  console.warn('[UserModel] Failed to load users from disk store:', e.message);
+}
+
 const memoryLoginLogs = [];
 const phoneOtpSessions = new Map();
 const otpRequestCooldowns = new Map();
+const emailVerificationTokens = new Map(); // tokenHash -> { email, expiresAt }
 
-const OTP_SALT = process.env.JWT_SECRET || 'vidhisetu_secure_otp_salt_2026';
+const OTP_SALT = process.env.JWT_SECRET;
+if (!OTP_SALT && process.env.NODE_ENV !== 'test') {
+  throw new Error('JWT_SECRET must be configured before OTP verification can start.');
+}
 
 /**
  * Computes a secure SHA-256 cryptographic hash of the plain OTP code.
@@ -49,41 +65,20 @@ export function sanitizeUser(u) {
     ...safe
   } = u;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   const metadata = safe.user_metadata || safe.metadata || {};
 
-=======
->>>>>>> origin/main
-=======
-  const metadata = safe.user_metadata || safe.metadata || {};
-
->>>>>>> 3aab4be (dhanush commits)
   return {
     id: safe.id,
     name: safe.name,
     email: safe.email,
     phone: safe.phone,
     role: safe.role || 'user',
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
     accountType: safe.role === 'lawyer' ? 'advocate' : (safe.role === 'admin' ? 'admin' : (metadata.accountType || 'candidate')),
     emailVerified: Boolean(safe.email_verified ?? safe.emailVerified),
     lastLoginAt: safe.last_login_at || safe.lastLoginAt || null,
     provider: metadata.provider || (safe.password_hash?.includes('google') ? 'google' : 'local'),
     picture: metadata.picture || metadata.avatar || null,
     metadata,
-<<<<<<< HEAD
-=======
-    accountType: safe.role === 'lawyer' ? 'advocate' : (safe.role === 'admin' ? 'admin' : 'candidate'),
-    emailVerified: Boolean(safe.email_verified ?? safe.emailVerified),
-    lastLoginAt: safe.last_login_at || safe.lastLoginAt || null,
-    metadata: safe.user_metadata || safe.metadata || {},
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     createdAt: safe.created_at || safe.createdAt,
     updatedAt: safe.updated_at || safe.updatedAt,
   };
@@ -145,6 +140,7 @@ export const UserModel = {
       updated_at: now.toISOString(),
     };
     memoryUsers.set(userRecord.email, userRecord);
+    saveUsersToDisk(memoryUsers);
     return userRecord;
   },
 
@@ -233,6 +229,7 @@ export const UserModel = {
         u.otp_expires_at = null;
         u.otp_attempts = 0;
         u.updated_at = now.toISOString();
+        saveUsersToDisk(memoryUsers);
         return u;
       }
     }
@@ -266,6 +263,7 @@ export const UserModel = {
       u.otp_expires_at = expiresAt;
       u.otp_attempts = 0;
       u.updated_at = now.toISOString();
+      saveUsersToDisk(memoryUsers);
       return u;
     }
     return null;
@@ -303,6 +301,49 @@ export const UserModel = {
   },
 
   /**
+   * Set single-use email verification token (SHA-256 hashed)
+   */
+  setVerificationToken(email, plainToken, expiresAt) {
+    if (!email || !plainToken) return;
+    const tokenHash = hashOtp(plainToken);
+    emailVerificationTokens.set(tokenHash, {
+      email: email.toLowerCase().trim(),
+      expiresAt: expiresAt || new Date(Date.now() + 5 * 60 * 1000),
+    });
+  },
+
+  /**
+   * Verify and consume single-use email verification token (single use: immediately deleted)
+   */
+  async verifyAndConsumeEmailToken(email, plainToken) {
+    if (!email || !plainToken) return null;
+    const cleanEmail = email.toLowerCase().trim();
+    const tokenHash = hashOtp(plainToken);
+    const session = emailVerificationTokens.get(tokenHash);
+
+    if (!session || session.email !== cleanEmail) {
+      return null;
+    }
+
+    if (new Date(session.expiresAt) < new Date()) {
+      emailVerificationTokens.delete(tokenHash);
+      const error = new Error('Email verification link has expired. Please request a new verification email.');
+      error.status = 400;
+      throw error;
+    }
+
+    // Single-use guarantee: consume immediately
+    emailVerificationTokens.delete(tokenHash);
+
+    const user = await this.findByEmail(cleanEmail);
+    if (user) {
+      await this.markEmailVerified(user.id);
+      return await this.findById(user.id);
+    }
+    return null;
+  },
+
+  /**
    * Check resend / request cooldown (60 seconds)
    */
   checkCooldown(identifier) {
@@ -326,24 +367,44 @@ export const UserModel = {
   },
 
   /**
-   * Store phone OTP session
+   * Store phone OTP session (strictly SHA-256 hashed, never plain text)
    */
-  setPhoneOtp(phone10, plainOtp, expiresAt) {
+  setPhoneOtp(phone10, plainOtp, expiresAt, verificationProvider = 'local') {
     const key = String(phone10).slice(-10);
     phoneOtpSessions.set(key, {
       phone: key,
       otpHash: hashOtp(plainOtp),
-<<<<<<< HEAD
-<<<<<<< HEAD
-      plainOtp: String(plainOtp).trim(),
-=======
->>>>>>> origin/main
-=======
-      plainOtp: String(plainOtp).trim(),
->>>>>>> 3aab4be (dhanush commits)
-      expiresAt,
+      expiresAt: expiresAt || new Date(Date.now() + 5 * 60 * 1000),
       attempts: 0,
+      verificationProvider,
     });
+  },
+
+  /**
+   * Verify phone OTP using constant-time hash comparison and enforce single-use revocation
+   */
+  verifyPhoneOtp(phone10, plainOtp) {
+    const key = String(phone10).slice(-10);
+    const session = phoneOtpSessions.get(key);
+    if (!session) {
+      return { valid: false, reason: 'No active verification session found for this mobile number.' };
+    }
+    if (new Date(session.expiresAt) < new Date()) {
+      phoneOtpSessions.delete(key);
+      return { valid: false, reason: 'Verification code has expired. Please request a new OTP.' };
+    }
+    if ((session.attempts || 0) >= 3) {
+      phoneOtpSessions.delete(key);
+      return { valid: false, reason: 'Maximum verification attempts exceeded. Please request a new OTP.' };
+    }
+    const matches = verifyOtpHash(plainOtp, session.otpHash);
+    if (!matches) {
+      session.attempts = (session.attempts || 0) + 1;
+      return { valid: false, reason: 'Invalid verification code.', remainingAttempts: 3 - session.attempts };
+    }
+    // Single-use: delete immediately on success
+    phoneOtpSessions.delete(key);
+    return { valid: true };
   },
 
   /**
@@ -373,27 +434,6 @@ export const UserModel = {
   revokePhoneOtp(phone10) {
     const key = String(phone10).slice(-10);
     phoneOtpSessions.delete(key);
-  },
-
-  /**
-   * Find user by phone, or create a candidate account if phone verified
-   */
-  async findOrCreateByPhone(rawPhone) {
-    let user = await this.findByPhone(rawPhone);
-    if (!user) {
-      const national10 = rawPhone.replace(/[^\d]/g, '').slice(-10);
-      user = await this.create({
-        name: `Citizen ${national10.slice(-4)}`,
-        email: `mobile.${national10}@vidhisetu.in`,
-        phone: `+91${national10}`,
-        passwordHash: '$2a$10$e.phone.auth.placeholder.password.hash',
-        role: 'user',
-        emailVerified: true,
-      });
-    } else {
-      user.email_verified = true;
-    }
-    return user;
   },
 
   /**
@@ -471,10 +511,7 @@ export const UserModel = {
       .slice(-limit)
       .reverse();
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 
   /**
    * Update user metadata (e.g. Google profile info, provider, location)
@@ -499,6 +536,7 @@ export const UserModel = {
 
     user.user_metadata = merged;
     user.updated_at = now.toISOString();
+    saveUsersToDisk(memoryUsers);
     return user;
   },
 
@@ -534,6 +572,7 @@ export const UserModel = {
     user.phone = updatedPhone;
     user.user_metadata = updatedMeta;
     user.updated_at = now.toISOString();
+    saveUsersToDisk(memoryUsers);
     return user;
   },
 
@@ -554,6 +593,7 @@ export const UserModel = {
     if (user) {
       user.password_hash = passwordHash;
       user.updated_at = now.toISOString();
+      saveUsersToDisk(memoryUsers);
       return user;
     }
     return null;
@@ -585,15 +625,12 @@ export const UserModel = {
       user.reset_token = tokenHash;
       user.reset_expires_at = expiresAt;
       user.updated_at = now.toISOString();
+      saveUsersToDisk(memoryUsers);
       return user;
     }
     return null;
   },
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 };
 
 export default UserModel;

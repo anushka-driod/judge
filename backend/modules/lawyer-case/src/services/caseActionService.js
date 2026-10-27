@@ -90,6 +90,66 @@ export const SELF_HELP_TEMPLATES = {
       dueDays: 16,
     },
   ],
+  tenancy_deposit: [
+    {
+      title: 'Collate Lease Deed, Security Deposit Receipts & Move-Out Handover Proof',
+      description: 'Gather the original executed rental agreement, bank/UPI deposit transfer proof, and signed keys handover acknowledgement.',
+      whyItMatters: 'Establishes lawful tenancy, contractual deposit amount, and confirms peaceful delivery of possession.',
+      requiredDocumentType: 'rental_agreement',
+      priority: 'high',
+      dueDays: 3,
+    },
+    {
+      title: 'Compile Move-Out Condition Photos & Utility Clearance Receipts',
+      description: 'Collect high-resolution photographs of apartment walls and final electricity/water bill payment vouchers.',
+      whyItMatters: 'Protects against arbitrary painting deductions under Section 108 of Transfer of Property Act.',
+      requiredDocumentType: 'handover_photos',
+      priority: 'high',
+      dueDays: 5,
+    },
+    {
+      title: 'Serve 15-Day Statutory Legal Demand Notice by Registered Speed Post',
+      description: 'Dispatch a formal notice demanding full refund of security deposit with statutory interest within 15 days.',
+      whyItMatters: 'Mandatory pre-litigation step; proves landlord received formal notice of breach.',
+      requiredDocumentType: 'legal_notice',
+      priority: 'high',
+      dueDays: 10,
+    },
+    {
+      title: 'Apply for Free Pre-Litigation Mediation via DLSA',
+      description: 'Submit an application for conciliation before the jurisdictional District Legal Services Authority.',
+      whyItMatters: 'DLSA mediation is free, legally recognized, and resolves majority of security deposit withholdings without civil court fees.',
+      requiredDocumentType: 'dlsa_application',
+      priority: 'medium',
+      dueDays: 20,
+    },
+  ],
+  general_civil: [
+    {
+      title: 'Gather All Relevant Agreements, Contracts, and Transaction Records',
+      description: 'Compile signed contracts, purchase orders, invoices, bank statements, or digital payment proofs.',
+      whyItMatters: 'Primary documentary evidence is indispensable under the Indian Evidence Act.',
+      requiredDocumentType: 'contract_records',
+      priority: 'high',
+      dueDays: 3,
+    },
+    {
+      title: 'Preserve Communications and Demand Refusal Proof',
+      description: 'Export email correspondence, WhatsApp chats with Section 65B certification, or written letters.',
+      whyItMatters: 'Demonstrates cause of action and willingness to resolve before litigation.',
+      requiredDocumentType: 'correspondence',
+      priority: 'high',
+      dueDays: 7,
+    },
+    {
+      title: 'Issue Formal Pre-Litigation Legal Notice (15-Day Notice Period)',
+      description: 'Dispatch a formal legal notice setting out claims, statutory provisions, and demand for remedy.',
+      whyItMatters: 'Pre-litigation notice is favored by courts and often leads to negotiated settlement.',
+      requiredDocumentType: 'legal_notice',
+      priority: 'high',
+      dueDays: 15,
+    },
+  ],
 };
 
 export class CaseActionService {

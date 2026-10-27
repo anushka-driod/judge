@@ -1,26 +1,24 @@
 import { request } from './api';
-import { mockNotifications } from '../data/mockData';
-
-let localNotifications = [...mockNotifications];
 
 export const notificationService = {
   async getNotifications() {
-    return request('/notifications', {}, () => [...localNotifications]);
+    const response = await request('/notifications');
+    const notifications = Array.isArray(response) ? response : response?.notifications;
+    if (!Array.isArray(notifications)) {
+      throw new Error('The notifications service returned an invalid response.');
+    }
+    return notifications.map((notification) => ({
+      ...notification,
+      isRead: Boolean(notification.isRead ?? notification.read),
+      date: notification.date || notification.createdAt,
+    }));
   },
 
   async markAsRead(id) {
-    return request(`/notifications/${id}/read`, { method: 'PATCH' }, () => {
-      localNotifications = localNotifications.map((n) =>
-        n.id === id ? { ...n, isRead: true } : n
-      );
-      return { success: true };
-    });
+    return request(`/notifications/${id}/read`, { method: 'PATCH' });
   },
 
   async markAllAsRead() {
-    return request('/notifications/read-all', { method: 'PATCH' }, () => {
-      localNotifications = localNotifications.map((n) => ({ ...n, isRead: true }));
-      return { success: true };
-    });
+    return request('/notifications/read-all', { method: 'PATCH' });
   },
 };

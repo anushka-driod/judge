@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(30) NOT NULL DEFAULT 'user', -- 'user', 'lawyer', 'admin'
     email_verified BOOLEAN DEFAULT FALSE,
+    verification_token VARCHAR(255),
+    verification_token_expires TIMESTAMP WITH TIME ZONE,
     otp_code VARCHAR(10),
     otp_expires_at TIMESTAMP WITH TIME ZONE,
     reset_token VARCHAR(255),
@@ -30,6 +32,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token_expires TIMESTAMP WITH TIME ZONE;
 
 -- User Login Audit & Session Logs
 CREATE TABLE IF NOT EXISTS user_login_logs (
@@ -161,6 +165,7 @@ CREATE TABLE IF NOT EXISTS lawyers (
     consultation_fee INT NOT NULL DEFAULT 500,
     consultation_modes JSONB DEFAULT '["video", "phone", "in_person"]'::jsonb,
     verification_status VARCHAR(30) NOT NULL DEFAULT 'pending_verification',
+    admin_remarks TEXT,
     is_available BOOLEAN DEFAULT TRUE,
     profile_bio TEXT,
     rating_avg NUMERIC(3, 2) DEFAULT 5.0,
@@ -171,6 +176,7 @@ CREATE TABLE IF NOT EXISTS lawyers (
 
 CREATE INDEX IF NOT EXISTS idx_lawyers_city ON lawyers(location_city);
 CREATE INDEX IF NOT EXISTS idx_lawyers_verification ON lawyers(verification_status);
+ALTER TABLE lawyers ADD COLUMN IF NOT EXISTS admin_remarks TEXT;
 
 CREATE TABLE IF NOT EXISTS lawyer_verification_docs (
     id SERIAL PRIMARY KEY,

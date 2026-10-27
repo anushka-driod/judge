@@ -61,7 +61,7 @@ export function EmailVerificationPage() {
   const [error, setError] = useState('');
   const [remainingAttempts, setRemainingAttempts] = useState(null);
   const [infoMessage, setInfoMessage] = useState(
-    location.state?.message || 'A 6-digit verification code has been dispatched to your registered contact details.'
+    location.state?.message || 'Enter the verification code sent to your registered contact.'
   );
 
   // 60-second cooldown for resend button
@@ -225,7 +225,7 @@ export function EmailVerificationPage() {
       setCountdown(60);
       setExpirySeconds(300); // Reset 5-minute expiry timer
       setInfoMessage(res?.message || 'A fresh 6-digit verification code has been dispatched. Valid for 5 minutes.');
-      showToast('A fresh verification code has been sent.', 'info');
+      showToast(res?.message || 'Verification delivery status updated.', 'info');
       setOtpDigits(['', '', '', '', '', '']);
       if (inputRefs.current[0]) inputRefs.current[0].focus();
     } catch (err) {
@@ -257,29 +257,34 @@ export function EmailVerificationPage() {
         <div
           className="verified-contacts-card"
           style={{
-            backgroundColor: '#f8fafc',
-            border: '1px solid #e2e8f0',
+            backgroundColor: 'var(--bg-surface-elevated, #181920)',
+            border: '1px solid var(--border-gold, rgba(212, 175, 55, 0.35))',
             borderRadius: '10px',
-            padding: '14px 18px',
-            margin: '18px 0 6px 0',
+            padding: '16px 20px',
+            margin: '18px 0 10px 0',
             textAlign: 'left',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.35)',
           }}
         >
-          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b', fontWeight: 'bold', marginBottom: '8px' }}>
-            Code dispatched to:
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--accent-400, #e5c07b)', fontWeight: '700', marginBottom: '10px' }}>
+            🔒 Verification Code Destination:
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {displayMaskedPhone && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#1e293b' }}>
-                <Smartphone size={15} color="#2563eb" />
-                <span>Mobile SMS: <strong style={{ fontFamily: 'monospace', letterSpacing: '0.5px' }}>{displayMaskedPhone}</strong></span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {displayMaskedEmail && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', fontSize: '13px', color: 'var(--text-primary, #f8fafc)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Mail size={16} color="var(--accent-400, #e5c07b)" />
+                  <span>Email Inbox: <strong style={{ fontFamily: 'var(--font-mono, monospace)', letterSpacing: '0.5px', color: '#ffffff' }}>{displayMaskedEmail}</strong></span>
+                </div>
               </div>
             )}
-            {displayMaskedEmail && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#1e293b' }}>
-                <Mail size={15} color="#2563eb" />
-                <span>Email Inbox: <strong style={{ fontFamily: 'monospace', letterSpacing: '0.5px' }}>{displayMaskedEmail}</strong></span>
+            {displayMaskedPhone && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', fontSize: '13px', color: 'var(--text-primary, #f8fafc)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Smartphone size={16} color="var(--accent-400, #e5c07b)" />
+                  <span>Mobile Phone: <strong style={{ fontFamily: 'var(--font-mono, monospace)', letterSpacing: '0.5px', color: '#ffffff' }}>{displayMaskedPhone}</strong></span>
+                </div>
               </div>
             )}
           </div>
@@ -373,7 +378,7 @@ export function EmailVerificationPage() {
                 gap: '6px',
                 background: 'none',
                 border: 'none',
-                color: '#2563eb',
+                color: 'var(--accent-400, #e5c07b)',
                 fontWeight: '600',
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -387,16 +392,16 @@ export function EmailVerificationPage() {
                 type="button"
                 onClick={() => handleResend('sms')}
                 disabled={resending}
-                style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', textDecoration: 'underline' }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary, #cbd5e1)', cursor: 'pointer', textDecoration: 'underline' }}
               >
                 Send via SMS
               </button>
-              <span style={{ color: '#cbd5e1' }}>•</span>
+              <span style={{ color: 'var(--border-medium, rgba(255,255,255,0.2))' }}>•</span>
               <button
                 type="button"
                 onClick={() => handleResend('email')}
                 disabled={resending}
-                style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', textDecoration: 'underline' }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary, #cbd5e1)', cursor: 'pointer', textDecoration: 'underline' }}
               >
                 Send via Email
               </button>
@@ -405,11 +410,11 @@ export function EmailVerificationPage() {
         )}
       </div>
 
-      <div className="auth-footer text-center" style={{ marginTop: '28px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-        <p style={{ fontSize: '13px', color: '#64748b' }}>
+      <div className="auth-footer text-center" style={{ marginTop: '28px', borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.08))', paddingTop: '16px' }}>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted, #94a3b8)' }}>
           Entered the wrong contact details?{' '}
-          <Link to="/register" className="auth-switch-link" style={{ fontWeight: '600', color: '#2563eb' }}>
-            Register with another number
+          <Link to="/register" className="auth-switch-link" style={{ fontWeight: '600', color: 'var(--accent-400, #e5c07b)' }}>
+            Register with another number / email
           </Link>
         </p>
       </div>

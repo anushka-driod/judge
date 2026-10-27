@@ -1,3 +1,4 @@
+import './helpers/safeTestEnvironment.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -73,3 +74,4 @@ if (hasChatLink && hasPrecedents) {
 console.log('\n================================================================');
 console.log('ALL + NEW CASE VERIFICATION CHECKS PASSED');
 console.log('================================================================\n');
+import './helpers/safeTestEnvironment.js';

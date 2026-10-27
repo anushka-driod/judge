@@ -118,6 +118,18 @@ export const CaseController = {
       const caseId = `case-${Date.now()}`;
       const now = new Date();
 
+      const categoryLower = (body.category || '').toLowerCase();
+      let categorySlug = 'consumer_dispute';
+      if (categoryLower.includes('rent') || categoryLower.includes('deposit') || categoryLower.includes('tenan')) {
+        categorySlug = 'tenancy_deposit';
+      } else if (categoryLower.includes('cheque') || categoryLower.includes('138') || categoryLower.includes('bank')) {
+        categorySlug = 'cheque_bounce';
+      } else if (categoryLower.includes('consumer') || categoryLower.includes('refund') || categoryLower.includes('product')) {
+        categorySlug = 'consumer_dispute';
+      } else {
+        categorySlug = 'general_civil';
+      }
+
       const newCase = {
         id: caseId,
         user_id: user.id,
@@ -136,7 +148,7 @@ export const CaseController = {
         mode: 'pending_selection',
         timeline: [{ event: 'Case Created', date: now.toISOString().split('T')[0], status: 'completed' }],
         documents: body.documents || [],
-        actionPlan: CaseActionService.generateSelfHelpPlan(caseId, 'consumer_dispute'),
+        actionPlan: CaseActionService.generateSelfHelpPlan(caseId, categorySlug),
       };
 
       // Try inserting into AnuDB

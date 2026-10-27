@@ -245,6 +245,12 @@ export const lawyerPortalClient = {
     });
   },
 
+  async adminRetryNotification(id) {
+    return request(`/admin/lawyers/${id}/retry-notification`, {
+      method: 'POST',
+    });
+  },
+
   async adminGetAuditLogs(limit = 50) {
     return request(`/admin/audit-logs?limit=${limit}`);
   },

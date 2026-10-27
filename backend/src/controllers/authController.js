@@ -48,8 +48,8 @@ export const AuthController = {
    */
   async verifyEmail(req, res) {
     try {
-      const { email, otp } = req.body;
-      const result = await AuthService.verifyEmail(email, otp);
+      const { email, otp, token } = req.body;
+      const result = await AuthService.verifyEmail(email, otp, token);
       res.json(result);
     } catch (err) {
       res.status(err.status || 400).json({
@@ -60,36 +60,16 @@ export const AuthController = {
   },
 
   /**
-   * POST /api/auth/send-otp
-   * Generates and dispatches OTP via SMS / Email
+   * POST /api/auth/resend-verification
    */
-  async sendOtp(req, res) {
+  async resendVerification(req, res) {
     try {
-      const { phone, email, purpose } = req.body;
-      const result = await AuthService.sendOtp({ phone, email, purpose });
+      const { email } = req.body;
+      const result = await AuthService.resendOtp(email, 'email');
       res.json(result);
     } catch (err) {
       res.status(err.status || 400).json({
-        error: err.message || 'Failed to dispatch OTP.',
-        code: err.code,
-        maskedPhone: err.maskedPhone,
-        ...(err.data || {}),
-      });
-    }
-  },
-
-  /**
-   * POST /api/auth/verify-otp
-   * Verifies OTP and returns auth session
-   */
-  async verifyOtp(req, res) {
-    try {
-      const { phone, email, otp } = req.body;
-      const result = await AuthService.verifyOtp({ phone, email, otp });
-      res.json(result);
-    } catch (err) {
-      res.status(err.status || 400).json({
-        error: err.message || 'OTP verification failed.',
+        error: err.message || 'Resending verification email failed.',
         code: err.code,
         ...(err.data || {}),
       });
@@ -101,13 +81,11 @@ export const AuthController = {
    */
   async resendOtp(req, res) {
     try {
-      const { email, phone, channel = 'both' } = req.body;
-      let result;
-      if (phone) {
-        result = await AuthService.sendOtp({ phone, email, purpose: 'resend' });
-      } else {
-        result = await AuthService.resendOtp(email, channel);
+      const { email, channel = 'both' } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: 'Email address is required to resend verification.' });
       }
+      const result = await AuthService.resendOtp(email, channel);
       res.json(result);
     } catch (err) {
       res.status(err.status || 400).json({
@@ -123,15 +101,7 @@ export const AuthController = {
    */
   async getMe(req, res) {
     try {
-<<<<<<< HEAD
-<<<<<<< HEAD
       const user = await AuthService.getCurrentUser(req.user.id, req.user);
-=======
-      const user = await AuthService.getCurrentUser(req.user.id);
->>>>>>> origin/main
-=======
-      const user = await AuthService.getCurrentUser(req.user.id, req.user);
->>>>>>> 3aab4be (dhanush commits)
       res.json({ user });
     } catch (err) {
       res.status(err.status || 500).json({
@@ -153,10 +123,7 @@ export const AuthController = {
   },
 
   /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
    * POST /api/auth/google
    * Authenticate via Google Identity Services / Google OAuth
    */
@@ -177,7 +144,7 @@ export const AuthController = {
    */
   async completeGoogleProfile(req, res) {
     try {
-      const result = await AuthService.completeGoogleProfile(req.body);
+      const result = await AuthService.completeGoogleProfile(req.user.id, req.body);
       res.json(result);
     } catch (err) {
       res.status(err.status || 400).json({
@@ -245,11 +212,7 @@ export const AuthController = {
   },
 
   /**
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+
    * POST /api/auth/logout
    */
   async logout(req, res) {

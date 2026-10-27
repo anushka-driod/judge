@@ -3,10 +3,15 @@ import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
 import UserModel, { sanitizeUser, verifyOtpHash } from '../models/userModel.js';
 import EmailService, { isRealUsableEmail, maskEmailAddress } from './emailService.js';
-import SmsService, { maskPhoneNumber, normalizePhoneNumber } from './smsService.js';
+import SmsService, { maskPhoneNumber, normalizePhoneNumber, parseAndValidatePhone } from './smsService.js';
+import LawyerPortalService from './lawyerPortalService.js';
 import db from '../config/db.js';
+import { storeVerificationDocument, validateVerificationDocument } from './verificationDocumentService.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'earnlaw_vidhisetu_jwt_super_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV !== 'test') {
+  throw new Error('JWT_SECRET must be configured before authentication can start.');
+}
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const MAX_OTP_ATTEMPTS = 5;
 
@@ -73,21 +78,41 @@ export const AuthService = {
     // Check if user already exists in AnuDB
     const existing = await UserModel.findByEmail(cleanEmail);
     if (existing) {
-<<<<<<< HEAD
-<<<<<<< HEAD
       const error = new Error('An account with this email already exists. Please log in.');
-=======
-      const error = new Error('An account with this email address already exists.');
->>>>>>> origin/main
-=======
-      const error = new Error('An account with this email already exists. Please log in.');
->>>>>>> 3aab4be (dhanush commits)
       error.status = 409;
       throw error;
     }
 
-    // Map role
-    const isAdvocate = accountType === 'advocate' || userData.role === 'lawyer';
+    const isAdvocate = accountType === 'advocate';
+    const advocateDetails = userData.advocateDetails || {};
+    const advocateDocuments = advocateDetails.documents;
+    if (isAdvocate) {
+      const enrollmentNumber = barNumber || advocateDetails.enrollmentNumber;
+      const council = barCouncilState || advocateDetails.barCouncil;
+      const city = userData.city || location?.city;
+      const state = userData.state || location?.state;
+      const years = Number(experienceYears ?? advocateDetails.experienceYears);
+      const fee = Number(consultationFee ?? advocateDetails.consultationFee);
+      if (
+        !enrollmentNumber || !council || !city || !state || !primaryCourt ||
+        !Number.isInteger(years) || years < 0 ||
+        !Number.isFinite(fee) || fee <= 0 ||
+        !Array.isArray(practiceAreas) || practiceAreas.length === 0 ||
+        !Array.isArray(languages) || languages.length === 0
+      ) {
+        const error = new Error('Complete the advocate profile with your actual Bar Council, enrollment, court, location, experience, fee, practice areas, and languages.');
+        error.status = 400;
+        throw error;
+      }
+      if (!Array.isArray(advocateDocuments) || advocateDocuments.length !== 2) {
+        const error = new Error('Upload both the Bar Enrollment Certificate and Advocate Identity Card before submitting.');
+        error.status = 400;
+        throw error;
+      }
+      for (const document of advocateDocuments) validateVerificationDocument(document);
+    }
+
+    // An advocate role represents a pending application; approved access is checked separately.
     const role = isAdvocate ? 'lawyer' : 'user';
 
     // Hash password with bcryptjs
@@ -97,12 +122,13 @@ export const AuthService = {
     // Generate fresh 6-digit OTP with strict 5-minute expiry
     const otpCode = generateSecureOtp();
     const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const metadata = {
       location: location || {
-        country: userData.country || 'India',
-        state: userData.state || 'Karnataka',
-        city: userData.city || 'Bengaluru',
+        country: userData.country || null,
+        state: userData.state || null,
+        city: userData.city || null,
       },
     };
 
@@ -119,65 +145,62 @@ export const AuthService = {
       metadata,
     });
 
-    // If advocate, create initial lawyer record in AnuDB lawyers table
-    if (isAdvocate) {
-      const lawyerId = `lawyer_${crypto.randomBytes(6).toString('hex')}`;
-      const city = userData.city || (location && location.city) || 'Bengaluru';
-      const state = barCouncilState || userData.state || (location && location.state) || 'Karnataka';
-
-      const lawyerSql = `
-        INSERT INTO lawyers (
-          id, user_id, name, email, phone, bar_registration_number, state_bar_council,
-          years_of_experience, primary_jurisdiction, primary_court, location_city,
-          languages, specializations, consultation_fee, verification_status, profile_bio
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-        ON CONFLICT (email) DO NOTHING;
-      `;
-      const lawyerParams = [
-        lawyerId,
-        createdUser.id,
-        name,
-        cleanEmail,
-        cleanPhone,
-        barNumber || `KAR/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`,
-        state,
-        parseInt(experienceYears || '3', 10),
-        state,
-        primaryCourt || 'District & Sessions Court',
-        city,
-        JSON.stringify(languages || ['English', 'Kannada']),
-        JSON.stringify(practiceAreas || ['Civil & Contract Law']),
-        parseInt(consultationFee || '500', 10),
-        'pending_verification',
-        profileBio || 'Advocate practicing at State Bar Council.',
-      ];
-
-      try {
-        await db.query(lawyerSql, lawyerParams);
-      } catch (err) {
-        console.warn('[Advocate Creation Warning] Could not insert into lawyers table:', err.message);
-      }
+    // Store single-use email verification token and establish 60s cooldown
+    UserModel.setVerificationToken(cleanEmail, verificationToken, otpExpiresAt);
+    UserModel.setCooldown(cleanEmail);
+    if (cleanPhone) {
+      UserModel.setCooldown(cleanPhone);
     }
 
-    // 4. Dispatch verification code via both Real Email and Real Mobile SMS
-    await Promise.allSettled([
-      EmailService.sendOtpEmail(createdUser.email, otpCode, name),
+    // If advocate, create initial lawyer record in AnuDB lawyers table and notify admin
+    if (isAdvocate) {
+      const lawyerId = `lawyer_${crypto.randomBytes(6).toString('hex')}`;
+      const storedDocuments = await Promise.all(advocateDocuments.map((document) => storeVerificationDocument(document)));
+      await LawyerPortalService.registerAdvocate({
+        id: lawyerId,
+        userId: createdUser.id,
+        name,
+        email: cleanEmail,
+        phone: cleanPhone,
+        barRegistrationNumber: barNumber || advocateDetails.enrollmentNumber,
+        stateBarCouncil: barCouncilState || advocateDetails.barCouncil,
+        yearOfEnrollment: advocateDetails.enrollmentYear,
+        yearsOfExperience: Number(experienceYears ?? advocateDetails.experienceYears),
+        primaryCourt,
+        city: userData.city || location?.city,
+        jurisdiction: userData.state || location?.state,
+        specializations: practiceAreas,
+        languages,
+        consultationModes: userData.consultationModes,
+        consultationFee: Number(consultationFee ?? advocateDetails.consultationFee),
+        bio: profileBio || advocateDetails.profileBio,
+        photoUrl: userData.photoUrl,
+        documents: storedDocuments,
+      });
+    }
+
+    // 4. Dispatch verification and report each provider outcome.
+    const [emailDispatch, smsDispatch] = await Promise.allSettled([
+      EmailService.sendVerificationEmail(createdUser.email, { token: verificationToken, otpCode, userName: name }),
       SmsService.sendOtpSms(cleanPhone, otpCode),
     ]);
 
     const maskedEmail = maskEmailAddress(createdUser.email);
     const maskedPhone = maskPhoneNumber(cleanPhone);
+    const emailAccepted = emailDispatch.status === 'fulfilled' && Boolean(emailDispatch.value?.delivered);
+    const smsAccepted = smsDispatch.status === 'fulfilled' && Boolean(smsDispatch.value?.delivered);
 
     // Secure Return: ZERO plain-text OTP leaks in production!
     return {
       success: true,
       email: createdUser.email,
-      accountType,
+      accountType: isAdvocate ? 'advocate' : 'candidate',
       maskedEmail,
       maskedPhone,
       expiresInSeconds: 300,
-      message: `A 6-digit verification code has been dispatched to ${maskedPhone} and ${maskedEmail}.`,
-      ...(process.env.NODE_ENV !== 'production' ? { otpPreview: otpCode } : {}),
+      emailStatus: emailAccepted ? 'accepted' : 'failed',
+      smsStatus: smsAccepted ? 'accepted' : 'failed',
+      message: `Verification delivery: email ${emailAccepted ? 'accepted by provider' : 'failed'}; SMS ${smsAccepted ? 'accepted by provider' : 'failed'}.`,
     };
   },
 
@@ -243,7 +266,7 @@ export const AuthService = {
       await UserModel.updateOtp(user.email, freshOtp, expiry);
 
       // Dispatch to both SMS and Email
-      await Promise.allSettled([
+      const [emailDispatch, smsDispatch] = await Promise.allSettled([
         EmailService.sendOtpEmail(user.email, freshOtp, user.name),
         user.phone ? SmsService.sendOtpSms(user.phone, freshOtp) : Promise.resolve(),
       ]);
@@ -267,7 +290,8 @@ export const AuthService = {
         maskedEmail,
         maskedPhone,
         expiresInSeconds: 300,
-        ...(process.env.NODE_ENV !== 'production' ? { otpPreview: freshOtp } : {}),
+        emailStatus: emailDispatch.status === 'fulfilled' && emailDispatch.value?.delivered ? 'accepted' : 'failed',
+        smsStatus: !user.phone ? 'not_configured' : (smsDispatch.status === 'fulfilled' && smsDispatch.value?.delivered ? 'accepted' : 'failed'),
       };
       throw error;
     }
@@ -302,23 +326,58 @@ export const AuthService = {
   },
 
   /**
-   * Verify OTP code securely against stored SHA-256 hash
+   * Verify email via single-use token or 6-digit OTP code securely
    */
-  async verifyEmail(email, otp) {
-    if (!email || !otp) {
-      const error = new Error('Email address and 6-digit verification code are required.');
+  async verifyEmail(email, otp, maybeToken = null) {
+    let cleanEmail = typeof email === 'object' && email !== null ? email.email : email;
+    let cleanOtp = typeof email === 'object' && email !== null ? (email.otp || email.otpCode) : otp;
+    let token = typeof email === 'object' && email !== null ? (email.token || email.verificationToken) : (maybeToken || (otp && String(otp).length > 10 ? otp : null));
+
+    if (!cleanEmail) {
+      const error = new Error('Email address is required.');
+      error.status = 400;
+      throw error;
+    }
+    cleanEmail = cleanEmail.toLowerCase().trim();
+
+    // 1. Single-use verification link token path
+    if (token) {
+      const updatedUser = await UserModel.verifyAndConsumeEmailToken(cleanEmail, token);
+      if (updatedUser) {
+        const authToken = jwt.sign(
+          {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            role: updatedUser.role,
+          },
+          JWT_SECRET,
+          { expiresIn: JWT_EXPIRES_IN }
+        );
+
+        return {
+          success: true,
+          token: authToken,
+          user: sanitizeUser(updatedUser),
+          message: 'Email verified successfully via secure token! Welcome to VidhiSetu.',
+        };
+      }
+    }
+
+    // 2. 6-digit OTP code path
+    if (!cleanOtp) {
+      const error = new Error('Email address and 6-digit verification code or token are required.');
       error.status = 400;
       throw error;
     }
 
-    const cleanOtp = String(otp).trim();
+    cleanOtp = String(cleanOtp).trim();
     if (!/^\d{6}$/.test(cleanOtp)) {
       const error = new Error('Verification code must consist of exactly 6 digits.');
       error.status = 400;
       throw error;
     }
 
-    const user = await UserModel.findByEmail(email);
+    const user = await UserModel.findByEmail(cleanEmail);
     if (!user) {
       const error = new Error('Account not found.');
       error.status = 404;
@@ -331,7 +390,7 @@ export const AuthService = {
 
     // 1. Check if user exceeded maximum attempts
     if (currentAttempts >= MAX_OTP_ATTEMPTS) {
-      await UserModel.revokeOtp(email);
+      await UserModel.revokeOtp(cleanEmail);
       const error = new Error('Too many failed attempts. For your security, this code has been revoked. Please click Resend OTP to request a new code.');
       error.status = 429;
       throw error;
@@ -339,7 +398,7 @@ export const AuthService = {
 
     // 2. Check if code has expired (5 minutes)
     if (!expiry || new Date(expiry) < new Date()) {
-      await UserModel.revokeOtp(email);
+      await UserModel.revokeOtp(cleanEmail);
       const error = new Error('Verification code has expired. Please request a fresh OTP.');
       error.status = 400;
       throw error;
@@ -349,11 +408,11 @@ export const AuthService = {
     const isValid = verifyOtpHash(cleanOtp, storedHash);
 
     if (!isValid) {
-      const newAttempts = await UserModel.recordFailedOtpAttempt(email);
+      const newAttempts = await UserModel.recordFailedOtpAttempt(cleanEmail);
       const remaining = Math.max(0, MAX_OTP_ATTEMPTS - newAttempts);
 
       if (remaining === 0) {
-        await UserModel.revokeOtp(email);
+        await UserModel.revokeOtp(cleanEmail);
         const error = new Error('Too many failed attempts. This code has been revoked. Please request a new code.');
         error.status = 429;
         throw error;
@@ -369,7 +428,7 @@ export const AuthService = {
     const updatedUser = await UserModel.markEmailVerified(user.id);
 
     // Issue JWT token
-    const token = jwt.sign(
+    const tokenIssued = jwt.sign(
       {
         id: updatedUser.id,
         email: updatedUser.email,
@@ -381,7 +440,7 @@ export const AuthService = {
 
     return {
       success: true,
-      token,
+      token: tokenIssued,
       user: sanitizeUser(updatedUser),
       message: 'Account verified and authenticated successfully!',
     };
@@ -397,29 +456,47 @@ export const AuthService = {
       throw error;
     }
 
-    const user = await UserModel.findByEmail(email);
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await UserModel.findByEmail(cleanEmail);
     if (!user) {
       const error = new Error('No registered account found with this email.');
       error.status = 404;
       throw error;
     }
 
+    // Check cooldown
+    const cooldown = UserModel.checkCooldown(cleanEmail);
+    if (!cooldown.allowed) {
+      const error = new Error(`Please wait ${cooldown.remainingSeconds} seconds before requesting a new code.`);
+      error.status = 429;
+      error.data = { remainingCooldown: cooldown.remainingSeconds };
+      throw error;
+    }
+
     const freshOtp = generateSecureOtp();
+    const freshToken = crypto.randomBytes(32).toString('hex');
     const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-    await UserModel.updateOtp(email, freshOtp, expiry);
+
+    await UserModel.updateOtp(cleanEmail, freshOtp, expiry);
+    UserModel.setVerificationToken(cleanEmail, freshToken, expiry);
+    UserModel.setCooldown(cleanEmail);
 
     // Dispatch according to requested channel
     const dispatchTasks = [];
     if (channel === 'email' || channel === 'both') {
-      dispatchTasks.push(EmailService.sendOtpEmail(email, freshOtp, user.name));
+      dispatchTasks.push(EmailService.sendVerificationEmail(cleanEmail, { token: freshToken, otpCode: freshOtp, userName: user.name }));
     }
     if ((channel === 'sms' || channel === 'both') && user.phone) {
       dispatchTasks.push(SmsService.sendOtpSms(user.phone, freshOtp));
     }
 
-    await Promise.allSettled(dispatchTasks);
+    const dispatchResults = await Promise.allSettled(dispatchTasks);
+    const emailDispatch = dispatchResults[0];
+    const smsDispatch = channel === 'email' || !user.phone ? null : dispatchResults[dispatchResults.length - 1];
+    const emailAccepted = channel === 'sms' || (emailDispatch?.status === 'fulfilled' && Boolean(emailDispatch.value?.delivered));
+    const smsAccepted = !smsDispatch || (smsDispatch.status === 'fulfilled' && Boolean(smsDispatch.value?.delivered));
 
-    const maskedEmail = maskEmailAddress(email);
+    const maskedEmail = maskEmailAddress(cleanEmail);
     const maskedPhone = user.phone ? maskPhoneNumber(user.phone) : null;
 
     return {
@@ -427,7 +504,9 @@ export const AuthService = {
       maskedEmail,
       maskedPhone,
       expiresInSeconds: 300,
-      message: `A new verification code has been dispatched. Valid for 5 minutes.`,
+      emailStatus: channel === 'sms' ? 'not_requested' : (emailAccepted ? 'accepted' : 'failed'),
+      smsStatus: !smsDispatch ? 'not_requested' : (smsAccepted ? 'accepted' : 'failed'),
+      message: `Verification delivery: email ${channel === 'sms' ? 'not requested' : (emailAccepted ? 'accepted by provider' : 'failed')}; SMS ${!smsDispatch ? 'not requested' : (smsAccepted ? 'accepted by provider' : 'failed')}.`,
     };
   },
 
@@ -435,14 +514,31 @@ export const AuthService = {
    * Dedicated Mobile / Contact Send OTP API
    * Handles: Invalid phone number, missing environment variables, SMS provider failure, 60s cooldown
    */
-  async sendOtp({ phone, email, purpose = 'auth' }) {
+  async sendOtp({ phone, email, purpose = 'auth', channel = 'whatsapp' }) {
     if (!phone && !email) {
       const error = new Error('Mobile phone number or email address is required.');
       error.status = 400;
       throw error;
     }
 
-    const identifier = phone || email;
+    let normalizedPhone = null;
+    if (phone) {
+      const parsedPhone = parseAndValidatePhone(phone);
+      if (!parsedPhone.valid) {
+        const error = new Error(parsedPhone.reason);
+        error.status = 400;
+        throw error;
+      }
+      normalizedPhone = parsedPhone.e164;
+      const account = await UserModel.findByPhone(normalizedPhone);
+      if (!account) {
+        const error = new Error('No registered account found with this mobile number. Create an account first.');
+        error.status = 404;
+        throw error;
+      }
+    }
+
+    const identifier = normalizedPhone || (email ? email.toLowerCase().trim() : null);
 
     // 1. Check 60-second cooldown
     const cooldown = UserModel.checkCooldown(identifier);
@@ -453,83 +549,92 @@ export const AuthService = {
       throw error;
     }
 
-    // 2. Validate Phone if provided
-    let parsedPhone = null;
-    if (phone) {
-      parsedPhone = SmsService.sendOtpSms ? { valid: true } : null;
+    // 2. Validate email if provided
+    let cleanEmail = null;
+    if (email) {
+      const emailValidation = isRealUsableEmail(email);
+      if (!emailValidation.valid) {
+        if (!phone) {
+          const error = new Error(emailValidation.reason);
+          error.status = 400;
+          throw error;
+        }
+      } else {
+        cleanEmail = emailValidation.email;
+      }
     }
 
     // 3. Generate secure OTP with 5-minute expiry
     const otpCode = generateSecureOtp();
-    const expiry = new Date(Date.now() + 5 * 60 * 1000);
-
-    // 4. Store in User and/or Phone sessions
-    if (phone) {
-      const national10 = phone.replace(/[^\d]/g, '').slice(-10);
-      UserModel.setPhoneOtp(national10, otpCode, expiry);
+    const phoneOtpConfig = phone ? SmsService.getPhoneOtpConfiguration() : null;
+    const expiryMinutes = phoneOtpConfig?.expiryMinutes;
+    if (phone && (!Number.isInteger(expiryMinutes) || expiryMinutes < 1 || expiryMinutes > 10080)) {
+      const error = new Error('Phone OTP expiry must be configured between 1 and 10080 minutes.');
+      error.status = 503;
+      error.code = 'PHONE_OTP_CONFIGURATION_INVALID';
+      throw error;
     }
-    if (email) {
-      await UserModel.updateOtp(email, otpCode, expiry);
-    }
+    const expiry = new Date(Date.now() + (phone ? expiryMinutes : 5) * 60 * 1000);
 
-    // Set cooldown
-    UserModel.setCooldown(identifier);
-
-    // 5. Dispatch SMS
-    let smsResult = null;
+    // Dispatch the requested phone channel before creating a verifiable session.
+    let phoneOtpResult = null;
     if (phone) {
       try {
-        smsResult = await SmsService.sendOtpSms(phone, otpCode);
-      } catch (smsErr) {
-        // If user explicitly asked for mobile SMS, surface the provider error
+        phoneOtpResult = await SmsService.sendPhoneOtp(normalizedPhone, otpCode, { channel });
+      } catch (phoneOtpError) {
         if (!email) {
-          throw smsErr;
+          throw phoneOtpError;
         }
-        console.warn('[AuthService] SMS dispatch warning:', smsErr.message);
+        console.warn('[AuthService] Phone OTP dispatch warning:', phoneOtpError.message);
       }
     }
 
-    // 6. Dispatch Email if provided
-    if (email) {
+    // 5. Dispatch Email if valid email provided
+    let emailResult = null;
+    if (cleanEmail) {
       try {
-        await EmailService.sendOtpEmail(email, otpCode);
+        emailResult = await EmailService.sendOtpEmail(cleanEmail, otpCode);
+        if (!emailResult?.delivered) {
+          const error = new Error(emailResult?.error || 'Email provider did not accept the verification message.');
+          error.status = 502;
+          error.code = 'EMAIL_DELIVERY_FAILED';
+          throw error;
+        }
       } catch (mailErr) {
+        if (!phone || !phoneOtpResult?.delivered) throw mailErr;
         console.warn('[AuthService] Email dispatch warning:', mailErr.message);
       }
     }
 
+    if (phone && phoneOtpResult?.providerAccepted) {
+      const national10 = normalizedPhone.slice(-10);
+      UserModel.setPhoneOtp(national10, otpCode, expiry, phoneOtpResult.verificationProvider);
+    }
+    if (cleanEmail && emailResult?.delivered) {
+      await UserModel.updateOtp(cleanEmail, otpCode, expiry);
+    }
+    UserModel.setCooldown(identifier);
+
     const maskedPhone = phone ? maskPhoneNumber(phone) : null;
     const maskedEmail = email ? maskEmailAddress(email) : null;
-<<<<<<< HEAD
-<<<<<<< HEAD
-    const isSimulated = smsResult?.simulated || smsResult?.provider === 'simulation';
-=======
->>>>>>> origin/main
-=======
-    const isSimulated = smsResult?.simulated || smsResult?.provider === 'simulation';
->>>>>>> 3aab4be (dhanush commits)
+    const deliveryChannels = [
+      phoneOtpResult?.providerAccepted
+        ? `${phoneOtpResult.channel === 'whatsapp' ? 'WhatsApp' : 'SMS'} accepted by provider`
+        : (phone ? 'phone delivery failed' : null),
+      emailResult?.delivered ? 'email accepted by provider' : (cleanEmail ? 'email delivery failed' : null),
+    ].filter(Boolean);
 
     return {
       success: true,
       maskedPhone,
       maskedEmail,
-      expiresInSeconds: 300,
-      provider: smsResult?.provider || SmsService.isConfigured().provider,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-      otpPreview: smsResult?.otpPreview || (process.env.NODE_ENV !== 'production' || isSimulated ? otpCode : undefined),
-      isSimulated,
-      message: isSimulated
-        ? `[Demo Mode] OTP: ${otpCode}. (SMS Gateway not configured in backend/.env)`
-        : `Verification code dispatched to ${[maskedPhone, maskedEmail].filter(Boolean).join(' and ')}. Valid for 5 minutes.`,
-<<<<<<< HEAD
-=======
-      message: `Verification code dispatched to ${[maskedPhone, maskedEmail].filter(Boolean).join(' and ')}. Valid for 5 minutes.`,
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
+      expiresInSeconds: phone ? expiryMinutes * 60 : 300,
+      provider: phoneOtpResult?.provider || (cleanEmail ? 'email' : 'none'),
+      channel: phoneOtpResult?.channel,
+      phoneStatus: phone ? (phoneOtpResult?.providerAccepted ? 'accepted' : 'failed') : undefined,
+      smsStatus: phoneOtpResult?.channel === 'sms' && phoneOtpResult?.providerAccepted ? 'accepted' : undefined,
+      emailStatus: cleanEmail ? (emailResult?.delivered ? 'accepted' : 'failed') : undefined,
+      message: `Verification code delivery: ${deliveryChannels.join('; ')}. Valid for ${expiryMinutes || 5} minutes.`,
     };
   },
 
@@ -567,9 +672,7 @@ export const AuthService = {
 
       // Check existing user in database
       targetUser = await UserModel.findByPhone(`+91${phone10}`);
-      if (!targetUser) {
-        targetUser = await UserModel.findByPhone(phone10);
-      }
+      if (!targetUser) targetUser = await UserModel.findByPhone(phone10);
 
       if (session) {
         // Check attempts limit (max 5)
@@ -588,31 +691,28 @@ export const AuthService = {
           throw error;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        isValid = verifyOtpHash(cleanOtp, session.otpHash) || (session.plainOtp && cleanOtp === session.plainOtp) || cleanOtp === '123456';
-=======
-        isValid = verifyOtpHash(cleanOtp, session.otpHash);
->>>>>>> origin/main
-=======
-        isValid = verifyOtpHash(cleanOtp, session.otpHash) || (session.plainOtp && cleanOtp === session.plainOtp) || cleanOtp === '123456';
->>>>>>> 3aab4be (dhanush commits)
-        if (!isValid) {
-          const attempts = UserModel.recordFailedPhoneAttempt(phone10);
-          const remaining = Math.max(0, MAX_OTP_ATTEMPTS - attempts);
-          if (remaining === 0) {
-            UserModel.revokePhoneOtp(phone10);
-            const error = new Error('Too many failed attempts. Code has been revoked. Please request a new OTP.');
-            error.status = 429;
+        if (session.verificationProvider === 'fast2sms_smart_otp') {
+          const verification = await SmsService.verifyFast2SmsSmartOtp(phone10, cleanOtp);
+          isValid = verification.valid;
+        } else {
+          isValid = verifyOtpHash(cleanOtp, session.otpHash);
+          if (!isValid) {
+            const attempts = UserModel.recordFailedPhoneAttempt(phone10);
+            const remaining = Math.max(0, MAX_OTP_ATTEMPTS - attempts);
+            if (remaining === 0) {
+              UserModel.revokePhoneOtp(phone10);
+              const error = new Error('Too many failed attempts. Code has been revoked. Please request a new OTP.');
+              error.status = 429;
+              throw error;
+            }
+            const error = new Error(`Invalid verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`);
+            error.status = 400;
+            error.data = { remainingAttempts: remaining };
             throw error;
           }
-          const error = new Error(`Invalid verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`);
-          error.status = 400;
-          error.data = { remainingAttempts: remaining };
-          throw error;
         }
 
-        UserModel.revokePhoneOtp(phone10);
+        if (isValid) UserModel.revokePhoneOtp(phone10);
       } else if (targetUser && (targetUser.otp_code || targetUser.otpCode)) {
         const storedCode = targetUser.otp_code || targetUser.otpCode;
         const expiry = targetUser.otp_expires_at || targetUser.otpExpiresAt;
@@ -640,9 +740,9 @@ export const AuthService = {
 
       // Create or activate user
       if (!targetUser) {
-        targetUser = await UserModel.findOrCreateByPhone(phone);
-      } else {
-        await UserModel.markEmailVerified(targetUser.id);
+        const error = new Error('No registered account found with this mobile number. Create an account first.');
+        error.status = 404;
+        throw error;
       }
     } else if (email) {
       // Email verification path
@@ -675,51 +775,63 @@ export const AuthService = {
   },
 
   /**
-   * Fetch current authenticated user by JWT payload ID
-   */
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
-  /**
-   * Real Google Authentication (GIS JWT or Google Profile)
+   * Real Google Authentication (Google ID Token verified via google-auth-library)
    * Obtains: name, email, profile picture, provider ('google'), authentication ID (googleId)
    * Upserts user in database, creates session token, avoids duplicate accounts, never stores Google password.
    */
-  async googleAuth({ credential, googleId, email, name, picture, accountType = 'candidate', location }) {
-    let extractedEmail = email;
-    let extractedName = name;
-    let extractedPicture = picture;
-    let extractedGoogleId = googleId;
-
-    // Decode Google ID Token (JWT) if credential provided
-    if (credential && typeof credential === 'string' && credential.includes('.')) {
-      try {
-        const parts = credential.split('.');
-        if (parts.length >= 2) {
-          const payloadJson = Buffer.from(parts[1], 'base64').toString('utf-8');
-          const payload = JSON.parse(payloadJson);
-          extractedEmail = payload.email || extractedEmail;
-          extractedName = payload.name || extractedName;
-          extractedPicture = payload.picture || extractedPicture;
-          extractedGoogleId = payload.sub || extractedGoogleId;
-        }
-      } catch (e) {
-        console.warn('[AuthService] Could not decode Google credential JWT:', e.message);
-      }
-    }
-
-    if (!extractedEmail) {
-      const error = new Error('A valid email address is required from your Google account.');
-      error.status = 400;
+  async googleAuth({ credential, idToken }) {
+    const rawToken = credential || idToken;
+    if (!rawToken) {
+      const error = new Error('Google account email is not verified.');
+      error.status = 401;
+      error.code = 'GOOGLE_ID_TOKEN_REQUIRED';
       throw error;
     }
 
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId || clientId.includes('your_google_client_id') || clientId.includes('replace-with-')) {
+      const error = new Error('Google Sign-In is not configured on the backend. Configure GOOGLE_CLIENT_ID to enable it.');
+      error.status = 503;
+      error.code = 'GOOGLE_CLIENT_ID_MISSING';
+      throw error;
+    }
+
+    let payload;
+    try {
+      const { OAuth2Client } = await import('google-auth-library');
+      const client = new OAuth2Client(clientId);
+      const ticket = await client.verifyIdToken({ idToken: rawToken, audience: clientId });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      const error = new Error(`Google ID token verification failed: ${verifyErr.message}`);
+      error.status = 401;
+      error.code = 'INVALID_GOOGLE_TOKEN';
+      throw error;
+    }
+
+    if (!payload?.email || !payload.sub || payload.email_verified !== true) {
+      const error = new Error('Google must provide a verified email and subject claim.');
+      error.status = 403;
+      error.code = 'EMAIL_NOT_VERIFIED';
+      throw error;
+    }
+
+    const extractedEmail = payload.email;
     const cleanEmail = extractedEmail.toLowerCase().trim();
+    const extractedName = payload.name || cleanEmail.split('@')[0];
+    const extractedPicture = payload.picture || null;
+    const extractedGoogleId = payload.sub;
     let user = await UserModel.findByEmail(cleanEmail);
     let isNewUser = false;
 
     if (user) {
+      const existingGoogleId = user.user_metadata?.googleId || user.metadata?.googleId;
+      if (existingGoogleId && existingGoogleId !== extractedGoogleId) {
+        const error = new Error('This email is already linked to a different Google identity.');
+        error.status = 409;
+        error.code = 'GOOGLE_IDENTITY_CONFLICT';
+        throw error;
+      }
       // Existing user: log them in, do NOT create a duplicate account
       // Update Google metadata if needed
       await UserModel.updateUserMetadata(user.id, {
@@ -744,7 +856,7 @@ export const AuthService = {
     } else {
       // New user: Create user in database with stable ID, provider: 'google'
       isNewUser = true;
-      const role = accountType === 'advocate' ? 'lawyer' : 'user';
+      const role = 'user';
       user = await UserModel.create({
         name: extractedName || 'Google Citizen',
         email: cleanEmail,
@@ -756,8 +868,8 @@ export const AuthService = {
           provider: 'google',
           googleId: extractedGoogleId || `google_${Date.now()}`,
           picture: extractedPicture || null,
-          accountType: role === 'lawyer' ? 'advocate' : 'candidate',
-          location: location || { country: 'India', state: 'Karnataka', city: 'Bengaluru' },
+          accountType: 'candidate',
+          location: null,
         },
       });
 
@@ -793,16 +905,9 @@ export const AuthService = {
   /**
    * Complete profile for new user authenticated via Google
    */
-  async completeGoogleProfile(profileData) {
-    const { email, name, phone, accountType, city, state, location, advocateDetails } = profileData;
-    if (!email) {
-      const error = new Error('Email is required to complete profile.');
-      error.status = 400;
-      throw error;
-    }
-
-    const cleanEmail = email.toLowerCase().trim();
-    let user = await UserModel.findByEmail(cleanEmail);
+  async completeGoogleProfile(userId, profileData) {
+    const { name, phone, accountType, city, state, location, advocateDetails } = profileData;
+    const user = await UserModel.findById(userId);
     if (!user) {
       const error = new Error('Account not found.');
       error.status = 404;
@@ -810,63 +915,47 @@ export const AuthService = {
     }
 
     const isAdvocate = accountType === 'advocate';
-    const role = isAdvocate ? 'lawyer' : user.role;
+    const cleanPhone = phone ? normalizePhoneNumber(phone) : user.phone;
+    if (isAdvocate && (!advocateDetails?.enrollmentNumber || !advocateDetails?.barCouncil || !Array.isArray(advocateDetails?.documents) || advocateDetails.documents.length < 2)) {
+      const error = new Error('Advocate onboarding requires a real enrollment number, bar council, and both verification documents. Use the full advocate application form.');
+      error.status = 400;
+      throw error;
+    }
 
     const updatedUser = await UserModel.updateProfile(user.id, {
       name: name || user.name,
-      phone: phone || user.phone,
+      phone: cleanPhone,
       metadata: {
         ...(user.user_metadata || user.metadata || {}),
-        accountType: isAdvocate ? 'advocate' : 'candidate',
+        accountType: user.role === 'lawyer' ? 'advocate' : 'candidate',
         city: city || user.user_metadata?.city,
         state: state || user.user_metadata?.state,
         location: location || user.user_metadata?.location,
-        advocateDetails: advocateDetails || user.user_metadata?.advocateDetails,
       },
     });
 
     if (isAdvocate) {
-      try {
-        const lawyerId = `lawyer_${user.id}`;
-        const lawyerSql = `
-          INSERT INTO lawyers (
-            id, user_id, name, email, phone, bar_registration_number, state_bar_council,
-            years_of_experience, primary_jurisdiction, primary_court, location_city,
-            languages, specializations, consultation_fee, verification_status, profile_bio
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-          ON CONFLICT (email) DO UPDATE SET
-            phone = EXCLUDED.phone,
-            name = EXCLUDED.name,
-            updated_at = NOW();
-        `;
-        await db.query(lawyerSql, [
-          lawyerId,
-          user.id,
-          name || user.name,
-          cleanEmail,
-          phone || user.phone || '+91 98000 22111',
-          advocateDetails?.enrollmentNumber || 'PENDING',
-          advocateDetails?.barCouncil || state || 'Bar Council of Karnataka',
-          advocateDetails?.experienceYears || 3,
-          state || 'Karnataka',
-          'District & Sessions Court',
-          city || 'Bengaluru',
-          JSON.stringify(['English', 'Hindi']),
-          JSON.stringify(advocateDetails?.practiceAreas || ['Civil Law']),
-          800,
-          'pending_verification',
-          'Advocate registered via VidhiSetu Google onboarding.',
-        ]);
-      } catch (e) {
-        console.warn('[Advocate Google Setup Warning]:', e.message);
-      }
+      await LawyerPortalService.registerAdvocate({
+        id: `lawyer_${user.id}`,
+        userId: user.id,
+        name: name || user.name,
+        email: user.email,
+        phone: cleanPhone,
+        barRegistrationNumber: advocateDetails.enrollmentNumber,
+        stateBarCouncil: advocateDetails.barCouncil,
+        yearsOfExperience: advocateDetails.experienceYears,
+        primaryCourt: advocateDetails.primaryCourt,
+        city,
+        specializations: advocateDetails.practiceAreas,
+        documents: advocateDetails.documents,
+      });
     }
 
     const token = jwt.sign(
       {
         id: updatedUser.id,
         email: updatedUser.email,
-        role: role,
+        role: updatedUser.role,
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
@@ -901,7 +990,7 @@ export const AuthService = {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await UserModel.setResetToken(cleanEmail, resetOtp, expiresAt);
 
-    await Promise.allSettled([
+    const [emailDispatch, smsDispatch] = await Promise.allSettled([
       EmailService.sendOtpEmail(cleanEmail, resetOtp, user.name),
       user.phone ? SmsService.sendOtpSms(user.phone, resetOtp) : Promise.resolve(),
     ]);
@@ -909,8 +998,9 @@ export const AuthService = {
     return {
       success: true,
       email: cleanEmail,
-      message: 'Password reset code has been dispatched to your registered contact details.',
-      ...(process.env.NODE_ENV !== 'production' ? { otpPreview: resetOtp } : {}),
+      emailStatus: emailDispatch.status === 'fulfilled' && emailDispatch.value?.delivered ? 'accepted' : 'failed',
+      smsStatus: !user.phone ? 'not_configured' : (smsDispatch.status === 'fulfilled' && smsDispatch.value?.delivered ? 'accepted' : 'failed'),
+      message: `Password reset delivery: email ${emailDispatch.status === 'fulfilled' && emailDispatch.value?.delivered ? 'accepted by provider' : 'failed'}; SMS ${!user.phone ? 'not configured' : (smsDispatch.status === 'fulfilled' && smsDispatch.value?.delivered ? 'accepted by provider' : 'failed')}.`,
     };
   },
 
@@ -985,22 +1075,13 @@ export const AuthService = {
    * Change password for logged in user
    */
   async changePassword(userId, { currentPassword, newPassword }) {
-<<<<<<< HEAD
-=======
-  async getCurrentUser(userId) {
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
     const user = await UserModel.findById(userId);
     if (!user) {
       const error = new Error('User not found.');
       error.status = 404;
       throw error;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3aab4be (dhanush commits)
+
 
     const isMatch = await bcrypt.compare(currentPassword, user.password_hash || user.passwordHash);
     if (!isMatch) {
@@ -1037,12 +1118,38 @@ export const AuthService = {
       error.status = 404;
       throw error;
     }
-<<<<<<< HEAD
-=======
->>>>>>> origin/main
-=======
->>>>>>> 3aab4be (dhanush commits)
-    return sanitizeUser(user);
+
+    const sanitized = sanitizeUser(user);
+    if (sanitized && (sanitized.role === 'lawyer' || user.role === 'lawyer')) {
+      try {
+        const lawyerProfile = await LawyerPortalService.getLawyerProfile(user.id || user.email);
+        if (lawyerProfile) {
+          sanitized.advocateDetails = {
+            id: lawyerProfile.id,
+            name: lawyerProfile.name,
+            email: lawyerProfile.email,
+            phone: lawyerProfile.phone,
+            barNumber: lawyerProfile.bar_registration_number,
+            enrollmentNumber: lawyerProfile.bar_registration_number,
+            barCouncil: lawyerProfile.state_bar_council,
+            stateBarCouncil: lawyerProfile.state_bar_council,
+            enrollmentYear: lawyerProfile.enrollment_year || 2020,
+            experienceYears: lawyerProfile.years_of_experience,
+            primaryCourt: lawyerProfile.primary_court,
+            practiceAreas: lawyerProfile.specializations || [],
+            documents: lawyerProfile.verification_documents || [],
+          };
+          sanitized.verificationStatus = (lawyerProfile.verification_status || 'PENDING').toLowerCase();
+          sanitized.verification_status = lawyerProfile.verification_status || 'PENDING';
+          sanitized.reviewRemarks = lawyerProfile.admin_remarks || '';
+          sanitized.lawyerId = lawyerProfile.id;
+        }
+      } catch (e) {
+        // Non-blocking fallback
+      }
+    }
+
+    return sanitized;
   },
 };
 

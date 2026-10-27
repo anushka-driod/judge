@@ -1,3 +1,4 @@
+import './tests/helpers/safeTestEnvironment.js';
 import app from './src/app.js';
 import http from 'node:http';
 
@@ -371,3 +372,4 @@ async function runTests() {
 }
 
 runTests();
+import './tests/helpers/safeTestEnvironment.js';

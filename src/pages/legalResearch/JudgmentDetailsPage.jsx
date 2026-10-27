@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { legalService } from '../../services/legalService';
-import { mockJudgmentsDatabase } from '../../data/mockData';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
@@ -17,6 +16,9 @@ import {
   BookOpen,
   FileText,
   User,
+  Download,
+  Printer,
+  Sparkles,
 } from 'lucide-react';
 import './LegalResearch.css';
 
@@ -24,6 +26,8 @@ export function JudgmentDetailsPage() {
   const { judgmentId } = useParams();
   const navigate = useNavigate();
   const [judgment, setJudgment] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -32,30 +36,21 @@ export function JudgmentDetailsPage() {
       setLoading(true);
       setError('');
 
-      // Check if it's a seed mock ID first
-      const mockFound = mockJudgmentsDatabase.find((j) => j.id === judgmentId);
-      if (mockFound) {
-        setJudgment({
-          id: mockFound.id,
-          title: mockFound.title,
-          court: mockFound.court,
-          publishDate: mockFound.year,
-          citation: mockFound.citation,
-          ratioDecidendi: mockFound.ratioDecidendi,
-          verdict: mockFound.verdict,
-          keyTakeaway: mockFound.keyTakeaway,
-          similarity: mockFound.similarity,
-          isMock: true,
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Otherwise, fetch authentic judgment from Indian Kanoon API
       try {
         const doc = await legalService.getJudgmentDocument(judgmentId);
         if (doc) {
           setJudgment(doc);
+
+          // Asynchronously load case-specific ratio breakdown
+          try {
+            setAnalysisLoading(true);
+            const caseAnalysis = await legalService.analyzeJudgment(judgmentId);
+            setAnalysis(caseAnalysis);
+          } catch (aErr) {
+            console.warn('[JudgmentDetailsPage] Case analysis fetch skipped:', aErr.message);
+          } finally {
+            setAnalysisLoading(false);
+          }
         } else {
           setError('Unable to locate the specified judgment on Indian Kanoon.');
         }
@@ -77,6 +72,15 @@ export function JudgmentDetailsPage() {
 
     loadJudgment();
   }, [judgmentId]);
+
+  const handleDownloadPdf = () => {
+    const url = legalService.getJudgmentPdfUrl(judgmentId);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (loading) return <Loading text="Retrieving authentic court judgment from Indian Kanoon..." />;
 
@@ -211,6 +215,111 @@ export function JudgmentDetailsPage() {
                 </a>
               )}
             </div>
+
+            {/* AI Case Analysis & Ratio Breakdown Section */}
+            {analysis && (
+              <div className="judgment-analysis-section" style={{
+                marginTop: '20px',
+                padding: '20px',
+                background: 'rgba(217, 119, 6, 0.04)',
+                border: '1px solid rgba(217, 119, 6, 0.25)',
+                borderRadius: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                  <h3 className="judgment-section-title" style={{ margin: 0, color: 'var(--text-primary)' }}>
+                    <Sparkles size={20} className="sec-icon" style={{ color: '#d97706' }} /> Case Analysis & Ratio Decidendi
+                  </h3>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={Download}
+                      onClick={handleDownloadPdf}
+                    >
+                      Download Case Analysis PDF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon={Printer}
+                      onClick={handlePrint}
+                    >
+                      Print Dossier
+                    </Button>
+                  </div>
+                </div>
+
+                {analysis.teluguSummary && (
+                  <div style={{ padding: '12px 16px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '6px', marginBottom: '16px', borderLeft: '4px solid #10b981' }}>
+                    <h4 style={{ margin: '0 0 6px 0', fontSize: '0.9375rem', color: '#065f46' }}>తెలుగు సారాంశం (Telugu Breakdown)</h4>
+                    <p style={{ margin: '0 0 4px 0', fontSize: '0.875rem' }}>{analysis.teluguSummary.holding}</p>
+                    <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>{analysis.teluguSummary.outcome}</p>
+                  </div>
+                )}
+
+                {/* Ratio Decidendi */}
+                <div style={{ marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
+                    ⚖️ Core Precedent Ratio Decidendi:
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.9375rem', lineHeight: 1.6, fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                    "{analysis.holding}"
+                  </p>
+                </div>
+
+                {/* Final Verdict */}
+                <div style={{ marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
+                    🏛️ Final Outcome / Judicial Order:
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.9375rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                    {analysis.finalOutcome}
+                  </p>
+                </div>
+
+                {/* Facts of Case */}
+                {analysis.facts && analysis.facts.length > 0 && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
+                      📋 Adjudicated Facts & Procedural History:
+                    </h4>
+                    <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                      {analysis.facts.map((fact, idx) => (
+                        <li key={idx} style={{ marginBottom: '4px' }}>{fact}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Legal Issues */}
+                {analysis.legalIssues && analysis.legalIssues.length > 0 && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
+                      🔍 Substantial Questions of Law / Issues:
+                    </h4>
+                    <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                      {analysis.legalIssues.map((issue, idx) => (
+                        <li key={idx} style={{ marginBottom: '4px' }}>{issue}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Judicial Reasoning */}
+                {analysis.reasoning && analysis.reasoning.length > 0 && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
+                      🧠 Court's Legal Reasoning:
+                    </h4>
+                    <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                      {analysis.reasoning.map((r, idx) => (
+                        <li key={idx} style={{ marginBottom: '4px' }}>{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Document Content */}
             <div className="judgment-section" style={{ marginTop: '20px' }}>

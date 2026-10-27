@@ -1,0 +1,54 @@
+# =============================================================================
+# Render Blueprint Specification for VidhiSetu Platform
+# Deploys Unified Web Service + Managed PostgreSQL Database + Persistent Storage
+# =============================================================================
+
+databases:
+  - name: vidhisetu-db
+    databaseName: anudb
+    user: anudb_user
+    plan: free
+    region: oregon
+    postgresMajorVersion: 16
+
+services:
+  - type: web
+    name: vidhisetu-app
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    # Render Free tier does not support persistent disks.
+    # To mount a persistent disk, change plan to 'starter' ($7/mo) and uncomment the disk block below:
+    # disk:
+    #   name: vidhisetu-uploads
+    #   mountPath: /data/uploads
+    #   sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vidhisetu-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: "true"
+      - key: VIDHISETU_UPLOAD_DIR
+        value: /data/uploads
+      - key: USE_MEMORY_FALLBACK
+        value: "false"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: ADMIN_EMAIL
+        value: adminvidhisetu@gmail.com
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: INDIANKANOON_API_TOKEN
+        sync: false

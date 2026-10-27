@@ -1,3 +1,4 @@
+import './tests/helpers/safeTestEnvironment.js';
 async function testStream() {
   console.log('--- CALL 1: First Message Stream ---');
   const res1 = await fetch('http://127.0.0.1:5000/api/ai/chat/stream', {
@@ -45,3 +46,4 @@ async function testStream() {
   console.log('Stream 2 finished! Length:', text2.length);
 }
 testStream();
+import './tests/helpers/safeTestEnvironment.js';

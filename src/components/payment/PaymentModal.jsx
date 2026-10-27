@@ -37,9 +37,9 @@ export function PaymentModal({ order, onVerified, onFailure, onClose }) {
           description: `Legal Consultation: ${order.lawyerName || 'Advocate'}`,
           order_id: order.orderId,
           prefill: {
-            name: 'Client',
-            email: 'client@vidhisetu.in',
-            contact: '+91 98450 00000',
+            name: order.userName || 'Client',
+            email: order.userEmail || '',
+            contact: order.userPhone || '',
           },
           theme: {
             color: '#1e3a8a',
